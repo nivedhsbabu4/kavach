@@ -215,7 +215,7 @@ DB = {
         }
     ],
 
-    # Time-stamped access grants with explicit expiry dates
+    # Time-stamped access grants with explicit expiry dates, visit counters, and live status
     "access_grants": [
         {
             "id": "grant-001",
@@ -225,8 +225,11 @@ DB = {
             "granted_to_role": "DOCTOR",
             "granted_by": "usr-soldier-1",
             "purpose": "Routine Orthopedic Follow-up & Knee Evaluation",
-            "expiry_date": "2026-12-31",
+            "expiry_date": "2026-12-31T23:59:59Z",
             "status": "ACTIVE",
+            "access_count": 4,
+            "last_accessed_at": "Today at 09:30 AM",
+            "is_live": True,
             "created_at": "2024-01-15T09:00:00Z"
         },
         {
@@ -237,8 +240,11 @@ DB = {
             "granted_to_role": "PHYSIOTHERAPIST",
             "granted_by": "usr-soldier-1",
             "purpose": "Post-Surgical Knee Rehabilitation Plan Management",
-            "expiry_date": "2026-12-31",
+            "expiry_date": "2026-12-31T23:59:59Z",
             "status": "ACTIVE",
+            "access_count": 7,
+            "last_accessed_at": "Yesterday at 05:45 PM",
+            "is_live": False,
             "created_at": "2024-02-01T10:00:00Z"
         },
         {
@@ -249,8 +255,11 @@ DB = {
             "granted_to_role": "COUNSELOR",
             "granted_by": "usr-soldier-1",
             "purpose": "Confidential Psychological Counseling & Stress Mitigation",
-            "expiry_date": "2026-12-31",
+            "expiry_date": "2026-12-31T23:59:59Z",
             "status": "ACTIVE",
+            "access_count": 2,
+            "last_accessed_at": "Nov 18, 2024 at 03:30 PM",
+            "is_live": False,
             "created_at": "2024-10-10T11:00:00Z"
         },
         {
@@ -261,8 +270,11 @@ DB = {
             "granted_to_role": "CLAIMS_OFFICER",
             "granted_by": "usr-soldier-1",
             "purpose": "Disability & Combat Injury Verification for ECHS Claim",
-            "expiry_date": "2026-12-31",
+            "expiry_date": "2026-12-31T23:59:59Z",
             "status": "ACTIVE",
+            "access_count": 3,
+            "last_accessed_at": "Nov 22, 2024 at 11:15 AM",
+            "is_live": False,
             "created_at": "2024-03-01T12:00:00Z"
         }
     ],
@@ -279,7 +291,7 @@ DB = {
         {"id": "scr-8", "soldier_id": "usr-soldier-1", "questionnaire_type": "GAD-7", "score": 9, "max_score": 21, "severity": "Mild-to-Moderate Anxiety", "date": "2024-11-16", "counselor_nudge_triggered": False}
     ],
 
-    # Structured 20-session knee rehabilitation plan
+    # Structured 20-session knee rehabilitation plan with Doctor's Pain Diagnosis
     "rehab_plans": [
         {
             "id": "rhb-001",
@@ -287,6 +299,13 @@ DB = {
             "physio_id": "usr-physio-1",
             "title": "Post-Arthroscopy Left Knee Mobility & Quadriceps Strengthening",
             "injury_context": "Meniscus repair from North East snow patrol",
+            "pain_location": "Left Knee (Medial Joint Line & Patellar Tendon)",
+            "pain_type": "Sharp throbbing on 90° flexion & post-weight-bearing stiffness",
+            "since_when": "19 Aug 2023 - Sustained during snow patrol on scree in Tawang",
+            "pain_severity": "Moderate (VAS 4/10)",
+            "diagnosed_by": "Capt. Dr. Priya Nair & Lt. Rajesh Kumar",
+            "diagnosed_date": "2023-08-20",
+            "routine_duration_mins": 20,
             "total_sessions": 20,
             "completed_sessions": 14,
             "pain_level": 4, # 0 - 10 VAS scale
@@ -296,10 +315,28 @@ DB = {
             "last_missed_date": "2024-11-21",
             "physio_alerted": True,
             "exercises": [
-                {"id": "ex-1", "name": "Straight Leg Raises (Quad setting)", "reps": "3 sets x 15 reps", "target": "Vastus Medialis", "completed": True},
-                {"id": "ex-2", "name": "Terminal Knee Extension with Theraband", "reps": "3 sets x 12 reps", "target": "Patellar Tracking", "completed": True},
-                {"id": "ex-3", "name": "Wall Squats with Swiss Ball (30 deg)", "reps": "3 sets x 10 reps", "target": "Lower Extremity Stability", "completed": False},
-                {"id": "ex-4", "name": "Hamstring Curls & Towel Heel Slides", "reps": "2 sets x 15 reps", "target": "Flexion Arc Expansion", "completed": False}
+                {"id": "ex-1", "name": "Straight Leg Raises (Quad setting)", "reps": "3 sets x 15 reps", "duration_mins": 5, "target": "Vastus Medialis", "completed": True},
+                {"id": "ex-2", "name": "Terminal Knee Extension with Theraband", "reps": "3 sets x 12 reps", "duration_mins": 5, "target": "Patellar Tracking", "completed": True},
+                {"id": "ex-3", "name": "Wall Squats with Swiss Ball (30 deg)", "reps": "3 sets x 10 reps", "duration_mins": 5, "target": "Lower Extremity Stability", "completed": False},
+                {"id": "ex-4", "name": "Hamstring Curls & Towel Heel Slides", "reps": "2 sets x 15 reps", "duration_mins": 5, "target": "Flexion Arc Expansion", "completed": False}
+            ]
+        }
+    ],
+
+    # ECHS Disability Claim Progress Tracker with Moving Line Stages
+    "claims": [
+        {
+            "id": "clm-001",
+            "soldier_id": "usr-soldier-1",
+            "title": "Left Knee Meniscus Post-Operative Disability Claim",
+            "current_stage": 3, # 1: Submitted, 2: Waiting for Verification, 3: Pending, 4: Waiting for Approval, 5: Claim Sanctioned
+            "status_label": "Pending Medical Scrutiny",
+            "stages": [
+                {"id": 1, "name": "Submitted", "date": "2024-04-10", "completed": True, "note": "Wallet evidence compiled with SHA-256 seals"},
+                {"id": 2, "name": "Waiting for Verification", "date": "2024-06-15", "completed": True, "note": "Verified by Base Hospital Medical Board Delhi"},
+                {"id": 3, "name": "Pending Medical Scrutiny", "date": "2024-11-01", "completed": True, "current": True, "note": "Under Scrutiny by AG Branch Disability Directorate"},
+                {"id": 4, "name": "Waiting for Approval", "date": "Estimated Dec 2024", "completed": False, "note": "Awaiting Financial Sanction & PCDA clearance"},
+                {"id": 5, "name": "Claim Sanctioned", "date": "Pending", "completed": False, "note": "Pension Payment Order (PPO) issuance"}
             ]
         }
     ],
@@ -318,6 +355,7 @@ DB = {
             "follow_up_date": "2024-12-05"
         }
     ],
+
 
     "audit_log": [
         {
@@ -539,11 +577,11 @@ class KavachRequestHandler(http.server.SimpleHTTPRequestHandler):
         elif path == '/api/audit-log':
             return self.send_json(200, DB['audit_log'])
 
-        # 7. API: Consultations
-        elif path == '/api/consultations':
+        # 8. API: Claims Progress Tracker
+        elif path == '/api/claims':
             soldier_id = params.get('soldier_id', ['usr-soldier-1'])[0]
-            consults = [c for c in DB['consultations'] if c['soldier_id'] == soldier_id]
-            return self.send_json(200, consults)
+            claims = [c for c in DB.get('claims', []) if c['soldier_id'] == soldier_id]
+            return self.send_json(200, claims)
 
         # Static file delivery for frontend
         return self.serve_static_files(path)
@@ -782,6 +820,53 @@ class KavachRequestHandler(http.server.SimpleHTTPRequestHandler):
             log_audit(user['id'], user['role'], soldier_id, 'GRANT_ACCESS', 'SUCCESS',
                       f"Soldier granted time-stamped access to {role_to} expiring on {expiry}")
             return self.send_json(201, new_grant)
+
+        # 8. Doctor Logs / Updates Pain Diagnosis in Rehab Plan
+        elif path == '/api/rehab/pain-diagnosis':
+            user = self.get_auth_user()
+            soldier_id = payload.get('soldier_id', 'usr-soldier-1')
+            plan = next((p for p in DB['rehab_plans'] if p['soldier_id'] == soldier_id), None)
+            if not plan:
+                return self.send_json(404, {"error": "Rehab plan not found"})
+
+            plan['pain_location'] = payload.get('pain_location', plan.get('pain_location'))
+            plan['pain_type'] = payload.get('pain_type', plan.get('pain_type'))
+            plan['since_when'] = payload.get('since_when', plan.get('since_when'))
+            plan['pain_severity'] = payload.get('pain_severity', plan.get('pain_severity', 'Moderate'))
+            plan['diagnosed_by'] = user.get('name', 'Capt. Dr. Priya Nair')
+            plan['diagnosed_date'] = datetime.date.today().isoformat()
+
+            log_audit(user['id'], user['role'], soldier_id, 'LOG_PAIN_DIAGNOSIS', 'SUCCESS',
+                      f"Doctor {plan['diagnosed_by']} entered pain diagnosis: {plan['pain_location']} - {plan['pain_type']}")
+            return self.send_json(200, plan)
+
+        # 9. Update Bank Account for Disability Pension / ECHS Reimbursement
+        elif path == '/api/users/bank-account':
+            user = self.get_auth_user()
+            soldier = next((u for u in DB['users'] if u['id'] == 'usr-soldier-1'), None)
+            if soldier:
+                soldier['bank_account'] = {
+                    "bank_name": payload.get('bank_name', 'State Bank of India'),
+                    "branch": payload.get('branch', 'Jaipur Cantt Military Branch'),
+                    "account_no": payload.get('account_no', '30491829401'),
+                    "ifsc_code": payload.get('ifsc_code', 'SBIN0001234'),
+                    "account_holder": payload.get('account_holder', soldier['name']),
+                    "dsp_tag": payload.get('dsp_tag', 'Defence Salary Package (DSP) - Gold')
+                }
+            log_audit(user['id'], user['role'], 'usr-soldier-1', 'UPDATE_BANK_ACCOUNT', 'SUCCESS',
+                      "Updated verified bank disbursement account for disability pension")
+            return self.send_json(200, soldier.get('bank_account', {}))
+
+        # 10. Change Password / Military PIN
+        elif path == '/api/users/password':
+            user = self.get_auth_user()
+            new_pw = payload.get('new_password', '')
+            u = next((usr for usr in DB['users'] if usr['id'] == user['id']), None)
+            if u and new_pw:
+                u['password_hash'] = hashlib.sha256(new_pw.encode()).hexdigest()
+                log_audit(user['id'], user['role'], user['id'], 'PASSWORD_CHANGED', 'SUCCESS', "User updated military terminal password")
+                return self.send_json(200, {"message": "Password successfully updated"})
+            return self.send_json(400, {"error": "Invalid password"})
 
         return self.send_json(404, {"error": "Endpoint not found"})
 

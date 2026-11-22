@@ -679,6 +679,67 @@ app.post('/api/rehab/session', authenticateToken, (req, res) => {
   res.json(plan);
 });
 
+// Doctor logs/updates pain diagnosis for soldier
+app.post('/api/rehab/pain-diagnosis', authenticateToken, (req, res) => {
+  const soldierId = req.body.soldier_id || 'usr-soldier-1';
+  const { pain_location, pain_type, since_when, pain_severity } = req.body;
+
+  const plan = DB.rehab_plans.find(p => p.soldier_id === soldierId);
+  if (!plan) return res.status(404).json({ error: 'Rehab plan not found' });
+
+  if (pain_location) plan.pain_location = pain_location;
+  if (pain_type) plan.pain_type = pain_type;
+  if (since_when) plan.since_when = since_when;
+  if (pain_severity) plan.pain_severity = pain_severity;
+  plan.diagnosed_by = req.user.name || 'Capt. Dr. Priya Nair';
+  plan.diagnosed_date = new Date().toISOString().split('T')[0];
+
+  logAuditEvent({
+    userId: req.user.id,
+    userRole: req.user.role,
+    soldierId,
+    action: 'LOG_PAIN_DIAGNOSIS',
+    status: 'SUCCESS',
+    details: `Doctor ${plan.diagnosed_by} entered pain diagnosis: ${plan.pain_location} - ${plan.pain_type}`
+  });
+
+  res.json(plan);
+});
+
+// Update Bank Account for Disability Pension & ECHS Reimbursement
+app.post('/api/users/bank-account', authenticateToken, (req, res) => {
+  const { bank_name, branch, account_no, ifsc_code, account_holder, dsp_tag } = req.body;
+  const soldier = DB.users.find(u => u.id === 'usr-soldier-1');
+  if (soldier) {
+    soldier.bank_account = {
+      bank_name: bank_name || 'State Bank of India',
+      branch: branch || 'Jaipur Cantt Military Branch',
+      account_no: account_no || '30491829401',
+      ifsc_code: ifsc_code || 'SBIN0001234',
+      account_holder: account_holder || soldier.name,
+      dsp_tag: dsp_tag || 'Defence Salary Package (DSP) - Gold'
+    };
+  }
+
+  logAuditEvent({
+    userId: req.user.id,
+    userRole: req.user.role,
+    soldierId: 'usr-soldier-1',
+    action: 'UPDATE_BANK_ACCOUNT',
+    status: 'SUCCESS',
+    details: 'Updated verified bank disbursement account for disability pension'
+  });
+
+  res.json(soldier ? soldier.bank_account : {});
+});
+
+// Claims tracking status
+app.get('/api/claims', authenticateToken, (req, res) => {
+  const soldierId = req.query.soldier_id || 'usr-soldier-1';
+  res.json(DB.claims ? DB.claims.filter(c => c.soldier_id === soldierId) : []);
+});
+
+
 // 7. TELECONSULTATION BOOKING & AUTO-SAVE TO WALLET
 app.post('/api/consultations', authenticateToken, (req, res) => {
   const { doctor_id, date, specialty, initial_notes } = req.body;

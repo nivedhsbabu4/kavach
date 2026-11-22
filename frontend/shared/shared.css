@@ -391,3 +391,323 @@ body {
 .privacy-curtain.active {
   display: flex;
 }
+
+/* ==========================================================================
+   DYNAMIC MOVING HELPLINE NUMBERS TICKER
+   ========================================================================== */
+.dynamic-ticker-wrap {
+  width: 100%;
+  overflow: hidden;
+  background: #0d1a0b;
+  color: var(--gold-light);
+  border-bottom: 1px solid var(--khaki-700);
+  padding: 5px 0;
+  font-size: 0.78rem;
+  font-weight: 700;
+  white-space: nowrap;
+  position: relative;
+  z-index: 90;
+}
+
+.dynamic-ticker-move {
+  display: inline-block;
+  padding-left: 100%;
+  animation: tickerMarquee 28s linear infinite;
+}
+
+.dynamic-ticker-move:hover {
+  animation-play-state: paused;
+}
+
+@keyframes tickerMarquee {
+  0% { transform: translate(0, 0); }
+  100% { transform: translate(-100%, 0); }
+}
+
+/* ==========================================================================
+   DYNAMIC BLINKING STRESS INDICATORS (Green, Yellow, Orange, Red)
+   ========================================================================== */
+.stress-blinking-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px;
+  border-radius: 999px;
+  font-weight: 800;
+  font-size: 0.78rem;
+  text-transform: uppercase;
+}
+
+.stress-blinking-pill.green {
+  background: #dcfce7;
+  color: #15803d;
+  border: 1.5px solid #86efac;
+  animation: pulseGreen 2s infinite;
+}
+
+.stress-blinking-pill.yellow {
+  background: #fef9c3;
+  color: #854d0e;
+  border: 1.5px solid #fde047;
+  animation: pulseYellow 1.8s infinite;
+}
+
+.stress-blinking-pill.orange {
+  background: #ffedd5;
+  color: #9a3412;
+  border: 1.5px solid #f97316;
+  animation: pulseOrange 1.4s infinite;
+}
+
+.stress-blinking-pill.red {
+  background: #fee2e2;
+  color: #991b1b;
+  border: 1.5px solid #ef4444;
+  animation: pulseRed 1s infinite;
+}
+
+@keyframes pulseGreen {
+  0%, 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(22, 163, 74, 0.4); }
+  50% { transform: scale(1.03); box-shadow: 0 0 8px 2px rgba(22, 163, 74, 0.6); }
+}
+
+@keyframes pulseYellow {
+  0%, 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(234, 179, 8, 0.4); }
+  50% { transform: scale(1.03); box-shadow: 0 0 10px 2px rgba(234, 179, 8, 0.6); }
+}
+
+@keyframes pulseOrange {
+  0%, 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(249, 115, 22, 0.5); }
+  50% { transform: scale(1.05); box-shadow: 0 0 14px 4px rgba(249, 115, 22, 0.7); }
+}
+
+@keyframes pulseRed {
+  0%, 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.6); }
+  50% { transform: scale(1.06); box-shadow: 0 0 18px 5px rgba(239, 68, 68, 0.85); }
+}
+
+/* ==========================================================================
+   CLAIMS TRACKER MOVING LINE ANIMATION (Stages Stepper)
+   ========================================================================== */
+.claims-stepper-wrap {
+  position: relative;
+  padding: 30px 10px 20px 10px;
+  margin: 10px 0 20px 0;
+}
+
+.claims-track-bg {
+  position: absolute;
+  top: 48px;
+  left: 30px;
+  right: 30px;
+  height: 6px;
+  background: var(--border-color);
+  border-radius: 999px;
+  z-index: 1;
+}
+
+.claims-track-progress {
+  position: absolute;
+  top: 48px;
+  left: 30px;
+  height: 6px;
+  background: linear-gradient(90deg, #15803d 0%, #d4af37 50%, #f97316 100%);
+  border-radius: 999px;
+  z-index: 2;
+  transition: width 0.8s ease;
+}
+
+.claims-track-pulse {
+  position: absolute;
+  top: 46px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #ffffff;
+  box-shadow: 0 0 12px 4px #fae084;
+  z-index: 3;
+  animation: movingLinePulse 2.8s linear infinite;
+}
+
+@keyframes movingLinePulse {
+  0% { left: 30px; opacity: 0.2; }
+  50% { opacity: 1; }
+  100% { left: 54%; opacity: 0.2; }
+}
+
+.claims-step-nodes {
+  position: relative;
+  display: flex;
+  justify-content: space-between;
+  z-index: 4;
+}
+
+.claim-step-node {
+  text-align: center;
+  max-width: 120px;
+}
+
+.step-node-icon {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  margin: 0 auto 8px auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  font-size: 0.85rem;
+  background: var(--border-color);
+  color: var(--text-muted);
+  border: 3px solid var(--bg-card);
+  transition: all 0.3s ease;
+}
+
+.claim-step-node.done .step-node-icon {
+  background: #15803d;
+  color: #ffffff;
+}
+
+.claim-step-node.current .step-node-icon {
+  background: #f97316;
+  color: #ffffff;
+  box-shadow: 0 0 12px rgba(249, 115, 22, 0.7);
+  animation: pulseOrange 1.6s infinite;
+}
+
+/* ==========================================================================
+   SLIDE-OUT SETTINGS DRAWER
+   ========================================================================== */
+.settings-drawer-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px);
+  z-index: 1000;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s ease;
+}
+
+.settings-drawer-backdrop.active {
+  opacity: 1;
+  pointer-events: all;
+}
+
+.settings-drawer-panel {
+  position: fixed;
+  top: 0;
+  right: -460px;
+  width: 100%;
+  max-width: 440px;
+  height: 100vh;
+  background: var(--bg-card);
+  border-left: 2px solid var(--border-color);
+  box-shadow: -8px 0 30px rgba(0, 0, 0, 0.5);
+  z-index: 1001;
+  display: flex;
+  flex-direction: column;
+  transition: right 0.32s cubic-bezier(0.16, 1, 0.3, 1);
+  overflow-y: auto;
+}
+
+.settings-drawer-backdrop.active .settings-drawer-panel {
+  right: 0;
+}
+
+.drawer-header {
+  padding: 18px 22px;
+  border-bottom: 1.5px solid var(--border-color);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: var(--bg-sidebar);
+}
+
+.drawer-header h3 {
+  font-size: 1.15rem;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.drawer-body {
+  padding: 22px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.drawer-section {
+  border-bottom: 1px solid var(--border-subtle);
+  padding-bottom: 16px;
+}
+
+.drawer-section-title {
+  font-size: 0.8rem;
+  font-weight: 800;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 10px;
+}
+
+/* ==========================================================================
+   SENIOR-FRIENDLY HEALTH WALLET ENHANCEMENTS
+   ========================================================================== */
+.senior-record-card {
+  border: 2px solid var(--border-color);
+  background: var(--bg-card);
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 16px;
+  box-shadow: var(--shadow-sm);
+  transition: all 0.2s ease;
+}
+
+.senior-record-card:hover {
+  border-color: var(--olive-600);
+  box-shadow: var(--shadow-md);
+}
+
+.senior-card-type-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.senior-type-badge {
+  font-size: 0.85rem;
+  font-weight: 800;
+  padding: 5px 12px;
+  border-radius: 6px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.senior-record-title {
+  font-size: 1.2rem;
+  font-weight: 900;
+  margin-bottom: 8px;
+  color: var(--text-main);
+  line-height: 1.3;
+}
+
+.senior-record-simple-desc {
+  font-size: 0.95rem;
+  line-height: 1.55;
+  color: var(--text-main);
+  background: var(--bg-main);
+  padding: 12px 16px;
+  border-radius: 8px;
+  border-left: 4px solid var(--olive-600);
+  margin-bottom: 12px;
+}
+

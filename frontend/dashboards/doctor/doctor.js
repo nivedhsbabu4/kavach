@@ -210,3 +210,121 @@ async function submitEditRecord(recordId) {
     console.error(err);
   }
 }
+
+function viewPatientRecords(soldierId) {
+  const section = document.getElementById('patientHistorySection');
+  if (section) section.scrollIntoView({ behavior: 'smooth' });
+}
+
+async function openPainDiagnosisModal(soldierId) {
+  let existing = {
+    pain_location: 'Left Knee (Medial Joint Line)',
+    pain_type: 'Sharp throbbing on 90° flexion & post-weight-bearing stiffness',
+    since_when: '19 Aug 2023 - Sustained during snow patrol in Tawang',
+    pain_severity: 'Moderate'
+  };
+
+  try {
+    const headers = getAuthHeaders();
+    const res = await fetch(`/api/rehab?soldier_id=${soldierId}`, { headers });
+    if (res.ok) {
+      const data = await res.json();
+      if (data.pain_location) existing.pain_location = data.pain_location;
+      if (data.pain_type) existing.pain_type = data.pain_type;
+      if (data.since_when) existing.since_when = data.since_when;
+      if (data.pain_severity) existing.pain_severity = data.pain_severity;
+    }
+  } catch (e) {
+    console.warn('Could not fetch existing rehab plan:', e);
+  }
+
+  const modal = document.createElement('div');
+  modal.className = 'privacy-curtain active';
+  modal.id = 'painDiagnosisModal';
+  modal.style.background = 'rgba(0,0,0,0.75)';
+  modal.innerHTML = `
+    <div style="background: var(--bg-card); border-radius: 12px; max-width: 540px; width: 92%; padding: 24px; color: var(--text-main); border: 2px solid #2563eb; text-align: left;" onclick="event.stopPropagation()">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+        <h3 style="font-size: 1.15rem; font-weight: 800; color: #1e40af;">🩺 Prescribe / Update Soldier Pain Diagnosis</h3>
+        <span style="font-size: 0.75rem; background: #dbeafe; color: #1d4ed8; padding: 2px 8px; border-radius: 4px; font-weight: 800;">DOCTOR ONLY</span>
+      </div>
+      <div style="font-size: 0.78rem; color: var(--text-muted); margin-bottom: 16px;">
+        This diagnosis updates the Soldier's Rehab Dashboard and tailors their active exercise protocol.
+      </div>
+
+      <div style="margin-bottom: 12px;">
+        <label style="display: block; font-size: 0.8rem; font-weight: 700; margin-bottom: 4px;">Anatomical Pain Location (Where):</label>
+        <input type="text" id="diagPainLocation" value="${existing.pain_location}" placeholder="e.g. Left Knee (Medial Joint Line) / Right Deltoid" style="width: 100%; padding: 9px; border-radius: 6px; border: 1.5px solid var(--border-color); font-weight: 600;" />
+      </div>
+
+      <div style="margin-bottom: 12px;">
+        <label style="display: block; font-size: 0.8rem; font-weight: 700; margin-bottom: 4px;">Pain Nature &amp; Symptoms (Type):</label>
+        <input type="text" id="diagPainType" value="${existing.pain_type}" placeholder="e.g. Sharp throbbing on 90° flexion & stiffness" style="width: 100%; padding: 9px; border-radius: 6px; border: 1.5px solid var(--border-color); font-weight: 600;" />
+      </div>
+
+      <div style="margin-bottom: 12px;">
+        <label style="display: block; font-size: 0.8rem; font-weight: 700; margin-bottom: 4px;">Onset &amp; Context (From When):</label>
+        <input type="text" id="diagSinceWhen" value="${existing.since_when}" placeholder="e.g. 19 Aug 2023 - Sustained during snow patrol in Tawang" style="width: 100%; padding: 9px; border-radius: 6px; border: 1.5px solid var(--border-color); font-weight: 600;" />
+      </div>
+
+      <div style="margin-bottom: 16px;">
+        <label style="display: block; font-size: 0.8rem; font-weight: 700; margin-bottom: 4px;">Clinical Severity Grade:</label>
+        <select id="diagPainSeverity" style="width: 100%; padding: 9px; border-radius: 6px; border: 1.5px solid var(--border-color); font-weight: 600;">
+          <option value="Mild" ${existing.pain_severity === 'Mild' ? 'selected' : ''}>Mild (VAS 1-3) &bull; Minor discomfort</option>
+          <option value="Moderate" ${existing.pain_severity === 'Moderate' ? 'selected' : ''}>Moderate (VAS 4-6) &bull; Impairs standard drills</option>
+          <option value="Severe" ${existing.pain_severity === 'Severe' ? 'selected' : ''}>Severe (VAS 7-8) &bull; Severe limitation, requires crutches</option>
+          <option value="Critical" ${existing.pain_severity === 'Critical' ? 'selected' : ''}>Critical (VAS 9-10) &bull; Acute post-surgical / trauma</option>
+        </select>
+      </div>
+
+      <div style="background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 6px; padding: 10px; font-size: 0.74rem; color: #166534; margin-bottom: 16px;">
+        ✓ Saving this will instantly update Rifleman Arjun Verma's rehab tracker and notify the Physiotherapist for protocol calibration.
+      </div>
+
+      <div style="display: flex; justify-content: flex-end; gap: 10px;">
+        <button class="btn-outline" onclick="document.getElementById('painDiagnosisModal').remove()">Cancel</button>
+        <button class="btn-primary" style="background: #2563eb; border-color: #1d4ed8;" onclick="submitPainDiagnosis('${soldierId}')">Save Pain Diagnosis</button>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(modal);
+}
+
+async function submitPainDiagnosis(soldierId) {
+  const pain_location = document.getElementById('diagPainLocation').value.trim();
+  const pain_type = document.getElementById('diagPainType').value.trim();
+  const since_when = document.getElementById('diagSinceWhen').value.trim();
+  const pain_severity = document.getElementById('diagPainSeverity').value;
+
+  if (!pain_location || !pain_type) {
+    alert('Please enter pain location and symptom type.');
+    return;
+  }
+
+  try {
+    const headers = getAuthHeaders();
+    const res = await fetch('/api/rehab/pain-diagnosis', {
+      method: 'POST',
+      headers,
+      body: JSON.stringify({
+        soldier_id: soldierId,
+        pain_location,
+        pain_type,
+        since_when,
+        pain_severity
+      })
+    });
+
+    if (res.ok) {
+      document.getElementById('painDiagnosisModal').remove();
+      alert('✓ Pain Diagnosis successfully recorded by Medical Officer and synced to Soldier Rehab Tracker!');
+    } else {
+      const err = await res.json();
+      alert('Error saving pain diagnosis: ' + (err.error || 'Unknown error'));
+    }
+  } catch (err) {
+    console.error(err);
+    alert('Failed to connect to server.');
+  }
+}
+
