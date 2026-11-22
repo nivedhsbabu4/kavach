@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>KAVACH — Soldier and Veteran Health Tracker</title>
+  <link rel="stylesheet" href="splash.css" />
+  <link rel="icon" href="assets/logo.svg" />
+</head>
+<body>
+
+  <!-- Dynamic Olive Green Splash Screen -->
+  <div class="splash-container" id="splashScreen">
+    <div class="tactical-grid"></div>
+    <div class="radar-sweep"></div>
+
+    <div class="splash-content">
+      <!-- Fixed Shield & Cross Logo Emblem -->
+      <div class="logo-wrapper">
+        <img src="assets/logo.svg" alt="Kavach Military Shield & Cross Logo" id="kavachFixedLogo" />
+      </div>
+
+      <h1 class="brand-title">KAVACH</h1>
+      <div class="brand-subtitle">SOLDIER &amp; VETERAN HEALTH AND REHABILITATION TRACKER</div>
+      <div class="brand-tagline">"Health that follows the soldier."</div>
+
+      <!-- 5-Second Animated Loading Indicator -->
+      <div class="progress-container">
+        <div class="progress-bar"></div>
+      </div>
+      <div class="timer-text" id="countdownLabel">INITIALIZING SECURE MILITARY HEALTH NODE... 5s</div>
+
+      <button class="enter-skip-btn" id="skipBtn" onclick="transitionToApp()">
+        ENTER CONSOLE →
+      </button>
+    </div>
+
+    <!-- Security & Encryption Badge -->
+    <div class="security-badge">
+      <span class="dot"></span>
+      <span>AES-256 GCM ENCRYPTED • RBAC ENABLED • AFMS / ECHS PROTOCOL</span>
+    </div>
+  </div>
+
+  <script>
+    // 5-Second Timer with smooth countdown and transition
+    let timeLeft = 5;
+    const countdownEl = document.getElementById('countdownLabel');
+    const splashEl = document.getElementById('splashScreen');
+
+    const countdownInterval = setInterval(() => {
+      timeLeft--;
+      if (timeLeft > 0) {
+        countdownEl.textContent = `INITIALIZING SECURE MILITARY HEALTH NODE... ${timeLeft}s`;
+      } else {
+        clearInterval(countdownInterval);
+        countdownEl.textContent = 'ACCESS GRANTED • CONNECTING TO TERMINAL...';
+        setTimeout(transitionToApp, 400);
+      }
+    }, 1000);
+
+    function transitionToApp() {
+      clearInterval(countdownInterval);
+      splashEl.classList.add('fade-out');
+
+      setTimeout(() => {
+        // Check if active session exists in localStorage
+        const token = localStorage.getItem('kavach_jwt_token');
+        const role = localStorage.getItem('kavach_user_role');
+
+        if (token && role) {
+          const dashboardMap = {
+            'SOLDIER': 'dashboards/soldier/soldier.html',
+            'DOCTOR': 'dashboards/doctor/doctor.html',
+            'PHYSIOTHERAPIST': 'dashboards/physio/physio.html',
+            'COUNSELOR': 'dashboards/counselor/counselor.html',
+            'CLAIMS_OFFICER': 'dashboards/claims/claims.html',
+            'COMMANDING_OFFICER': 'dashboards/commanding/commanding.html'
+          };
+          window.location.href = dashboardMap[role] || 'auth/login.html';
+        } else {
+          window.location.href = 'auth/login.html';
+        }
+      }, 700);
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,217 @@
+/* ==========================================================================
+   KAVACH DYNAMIC OLIVE GREEN 5-SECOND SPLASH SCREEN
+   ========================================================================== */
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body, html {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  background-color: #122110;
+}
+
+.splash-container {
+  width: 100vw;
+  height: 100vh;
+  background: radial-gradient(circle at center, #243d20 0%, #172b15 50%, #0d1a0b 100%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  transition: opacity 0.8s cubic-bezier(0.4, 0, 0.2, 1), transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.splash-container.fade-out {
+  opacity: 0;
+  transform: scale(1.05);
+  pointer-events: none;
+}
+
+/* Subtle military tactical radar grid */
+.tactical-grid {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: 
+    linear-gradient(rgba(194, 178, 128, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(194, 178, 128, 0.05) 1px, transparent 1px);
+  background-size: 50px 50px;
+  pointer-events: none;
+}
+
+/* Rotating radar sweep */
+.radar-sweep {
+  position: absolute;
+  width: 480px;
+  height: 480px;
+  border-radius: 50%;
+  border: 1px solid rgba(194, 178, 128, 0.15);
+  animation: radar-spin 12s linear infinite;
+  pointer-events: none;
+}
+
+.radar-sweep::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 50%;
+  height: 50%;
+  background: linear-gradient(135deg, rgba(194, 178, 128, 0.15) 0%, transparent 80%);
+  border-top-left-radius: 100%;
+}
+
+@keyframes radar-spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* Center Content & Fixed Logo */
+.splash-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  z-index: 10;
+  text-align: center;
+  padding: 20px;
+}
+
+.logo-wrapper {
+  width: 180px;
+  height: 180px;
+  position: relative;
+  margin-bottom: 24px;
+  animation: logo-entrance 1.2s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+}
+
+.logo-wrapper img, .logo-wrapper svg {
+  width: 100%;
+  height: 100%;
+  filter: drop-shadow(0 15px 25px rgba(0, 0, 0, 0.6));
+  user-select: none;
+  pointer-events: none;
+}
+
+@keyframes logo-entrance {
+  0% {
+    opacity: 0;
+    transform: scale(0.65) translateY(20px);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.brand-title {
+  font-size: 2.8rem;
+  font-weight: 900;
+  letter-spacing: 6px;
+  color: #fae084;
+  text-shadow: 0 4px 12px rgba(0, 0, 0, 0.7);
+  margin-bottom: 6px;
+  text-transform: uppercase;
+  animation: text-reveal 1.2s ease forwards;
+}
+
+.brand-subtitle {
+  font-size: 1.05rem;
+  font-weight: 500;
+  color: #d6e4d2;
+  letter-spacing: 1.5px;
+  margin-bottom: 12px;
+  animation: text-reveal 1.4s ease forwards;
+}
+
+.brand-tagline {
+  font-size: 0.92rem;
+  font-style: italic;
+  color: #c2b280;
+  letter-spacing: 1px;
+  margin-bottom: 30px;
+  animation: text-reveal 1.6s ease forwards;
+}
+
+@keyframes text-reveal {
+  0% { opacity: 0; transform: translateY(10px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+/* 5-Second Animated Progress Bar */
+.progress-container {
+  width: 280px;
+  height: 6px;
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: 999px;
+  overflow: hidden;
+  position: relative;
+  margin-bottom: 16px;
+  border: 1px solid rgba(194, 178, 128, 0.3);
+}
+
+.progress-bar {
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg, #c2b280 0%, #fae084 70%, #16a34a 100%);
+  border-radius: 999px;
+  animation: loadProgress 5s linear forwards;
+}
+
+@keyframes loadProgress {
+  0% { width: 0%; }
+  100% { width: 100%; }
+}
+
+.timer-text {
+  font-size: 0.8rem;
+  color: #a3b89f;
+  font-family: monospace;
+  letter-spacing: 1px;
+}
+
+.enter-skip-btn {
+  margin-top: 18px;
+  background: rgba(194, 178, 128, 0.15);
+  border: 1px solid #c2b280;
+  color: #fae084;
+  padding: 7px 18px;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  letter-spacing: 1px;
+  transition: all 0.2s ease;
+}
+
+.enter-skip-btn:hover {
+  background: #c2b280;
+  color: #142412;
+}
+
+.security-badge {
+  position: absolute;
+  bottom: 24px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.75rem;
+  color: #8c9e88;
+  letter-spacing: 0.5px;
+}
+
+.security-badge span.dot {
+  width: 8px;
+  height: 8px;
+  background: #16a34a;
+  border-radius: 50%;
+  box-shadow: 0 0 8px #16a34a;
+}

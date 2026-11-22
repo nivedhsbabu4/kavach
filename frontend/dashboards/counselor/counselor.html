@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>KAVACH — AFMS Psychological Support Cell</title>
+  <link rel="stylesheet" href="../../shared/shared.css" />
+  <link rel="icon" href="../../assets/logo.svg" />
+  <script src="../../shared/auth_guard.js"></script>
+  <script>enforceRoleGuard('COUNSELOR');</script>
+</head>
+<body data-theme="light">
+
+  <aside class="crisis-topbar">
+    <div style="display: flex; align-items: center; gap: 12px;">
+      <span style="font-weight: 800;">🧠 DEFENCE PSYCHOLOGICAL SUPPORT CELL &bull; AFMS COUNSELOR CONSOLE</span>
+      <span style="font-size: 0.75rem; color: var(--gold-light);">COMMAND HOSPITAL (CENTRAL)</span>
+    </div>
+    <button class="btn-logout" onclick="logoutUser()">LOGOUT</button>
+  </aside>
+
+  <header class="app-header">
+    <div class="brand-wrapper">
+      <div class="brand-logo-fixed">
+        <img src="../../assets/logo.svg" alt="Kavach Shield Logo" />
+      </div>
+      <div class="brand-text">
+        <h1>KAVACH <span style="font-size: 0.7rem; background: #fae8ff; color: #86198f; padding: 2px 7px; border-radius: 4px;">PSYCHOLOGICAL PORTAL</span></h1>
+        <div class="brand-tagline-sub">"Confidential sanctuary for the soldier's mind."</div>
+      </div>
+    </div>
+
+    <div class="header-center-info">
+      <div class="role-tag-badge" style="background: #fae8ff; color: #701a75; border-color: #f5d0fe;">
+        <span>🧠</span>
+        <div>
+          <div style="line-height: 1.2;">Dr. Sunita Rao</div>
+          <div style="font-size: 0.72rem; color: var(--text-muted);">Senior Clinical Psychologist &bull; CIV-PSY-042</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="header-actions">
+      <div class="sync-badge synced"><span>🟢</span> <span>CONFIDENTIAL VAULT ACTIVE</span></div>
+    </div>
+  </header>
+
+  <div class="dashboard-layout">
+    <main class="main-content" style="padding: 24px;">
+      <!-- 3-Week Rising Stress Escalation Alert -->
+      <div style="background: #fffbeb; border: 2px solid #f59e0b; border-radius: 10px; padding: 18px 22px; margin-bottom: 24px; display: flex; align-items: center; justify-content: space-between;">
+        <div style="display: flex; align-items: center; gap: 14px;">
+          <span style="font-size: 2.4rem;">⚠️</span>
+          <div>
+            <strong style="color: #92400e; font-size: 1.05rem; display: block;">PROACTIVE COUNSELOR NUDGE: 3 WEEKS ESCALATING STRESS</strong>
+            <span style="font-size: 0.85rem; color: #78350f;">
+              Rifleman Arjun Verma (14 Rajputana Rifles): PHQ-9 depression score climbed 3 weeks consecutively (Oct 24: 8 &rarr; Oct 31: 10 &rarr; Nov 14: 13/27).
+              Gentle supportive nudge delivered to soldier app. Confidential session scheduled.
+            </span>
+          </div>
+        </div>
+        <button class="btn-primary" style="background: #d97706; white-space: nowrap;" onclick="openConfidentialSessionModal('usr-soldier-1')">
+          🔒 Initiate CBT Intervention
+        </button>
+      </div>
+
+      <!-- Confidential Mental Health Dossier -->
+      <div class="card">
+        <div class="card-header">
+          <div>
+            <h2 class="card-title">🔐 Confidential Psychological Dossier: Rifleman Arjun Verma</h2>
+            <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 2px;">
+              Protected by is_mental_health separation &bull; AES-256-GCM encrypted &bull; Strictly invisible to COs and Claims Officers
+            </div>
+          </div>
+          <span class="badge-tag badge-vaccine">ACTIVE PATIENT CONSENT GRANT</span>
+        </div>
+
+        <!-- Screening Breakdown Metrics -->
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; margin-bottom: 20px;">
+          <div style="padding: 16px; border: 1.5px solid var(--border-color); border-radius: 8px; background: var(--bg-card);">
+            <div style="font-size: 0.75rem; color: var(--text-muted); font-weight: 800;">PHQ-9 DEPRESSION (LATEST)</div>
+            <div style="font-size: 1.8rem; font-weight: 900; color: #dc2626; margin: 4px 0;">13 / 27</div>
+            <div style="font-size: 0.75rem; color: #dc2626; font-weight: 700;">Moderate Severity &bull; Sleep Disturbance</div>
+          </div>
+
+          <div style="padding: 16px; border: 1.5px solid var(--border-color); border-radius: 8px; background: var(--bg-card);">
+            <div style="font-size: 0.75rem; color: var(--text-muted); font-weight: 800;">PCL-5 COMBAT PTSD</div>
+            <div style="font-size: 1.8rem; font-weight: 900; color: #d97706; margin: 4px 0;">32 / 80</div>
+            <div style="font-size: 0.75rem; color: var(--text-muted);">High Altitude Snow Patrol Recall Symptoms</div>
+          </div>
+
+          <div style="padding: 16px; border: 1.5px solid var(--border-color); border-radius: 8px; background: var(--bg-card);">
+            <div style="font-size: 0.75rem; color: var(--text-muted); font-weight: 800;">GAD-7 ANXIETY</div>
+            <div style="font-size: 1.8rem; font-weight: 900; color: #15803d; margin: 4px 0;">9 / 21</div>
+            <div style="font-size: 0.75rem; color: var(--text-muted);">Mild-to-Moderate Somatic Tension</div>
+          </div>
+        </div>
+
+        <!-- Clinical Psychological Case Assessment -->
+        <div style="border: 1.5px solid var(--border-color); border-radius: 8px; padding: 18px; background: var(--bg-card); margin-bottom: 18px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+            <strong style="font-size: 1.05rem;">Confidential Combat Stress &amp; Sleep Disturbance Assessment</strong>
+            <span style="font-size: 0.75rem; color: var(--text-muted);">Evaluated: Nov 18, 2024 &bull; Dr. Sunita Rao</span>
+          </div>
+          <p style="font-size: 0.85rem; line-height: 1.5; color: var(--text-main); margin-bottom: 12px;">
+            Soldier reports recurrent nightmares following high-altitude patrol crevasse incident and hypervigilance. Screening indicates escalating PHQ-9 (moderate depressive symptoms, score 13). Initiated cognitive behavioral support, sleep hygiene protocols, and relaxation training.
+          </p>
+          <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.74rem; color: #86198f; font-weight: 700; border-top: 1px solid var(--border-subtle); padding-top: 8px;">
+            <span>🔐 AES-256-GCM Encrypted at Rest &bull; IV: d98a01f928e371b2</span>
+            <span>Tamper Hash Verified: 891023948102...</span>
+          </div>
+        </div>
+
+        <div style="display: flex; justify-content: flex-end;">
+          <button class="btn-primary" onclick="alert('Clinical progress note encrypted with AES-256 and appended to confidential psychological vault.')">
+            ✚ Add Confidential Therapy Note
+          </button>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    function openConfidentialSessionModal(soldierId) {
+      alert('🔒 Opening End-to-End Encrypted Tele-Psychology Room with Rifleman Arjun Verma...\nSession is completely unmonitored by unit commanding officers.');
+    }
+  </script>
+</body>
+</html>

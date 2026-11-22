@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>KAVACH — Unit Command Readiness Portal</title>
+  <link rel="stylesheet" href="../../shared/shared.css" />
+  <link rel="icon" href="../../assets/logo.svg" />
+  <script src="../../shared/auth_guard.js"></script>
+  <script>enforceRoleGuard('COMMANDING_OFFICER');</script>
+</head>
+<body data-theme="light">
+
+  <aside class="crisis-topbar">
+    <div style="display: flex; align-items: center; gap: 12px;">
+      <span style="font-weight: 800;">🎖️ 14 RAJPUTANA RIFLES &bull; REGIMENTAL COMMAND HEADQUARTERS</span>
+      <span style="font-size: 0.75rem; color: var(--gold-light);">OPERATIONAL READINESS TERMINAL</span>
+    </div>
+    <button class="btn-logout" onclick="logoutUser()">LOGOUT</button>
+  </aside>
+
+  <header class="app-header">
+    <div class="brand-wrapper">
+      <div class="brand-logo-fixed">
+        <img src="../../assets/logo.svg" alt="Kavach Shield Logo" />
+      </div>
+      <div class="brand-text">
+        <h1>KAVACH <span style="font-size: 0.7rem; background: var(--olive-100); color: var(--olive-900); padding: 2px 7px; border-radius: 4px;">UNIT COMMAND</span></h1>
+        <div class="brand-tagline-sub">"Regimental Physical Fitness &bull; Operational Readiness"</div>
+      </div>
+    </div>
+
+    <div class="header-center-info">
+      <div class="role-tag-badge" style="background: var(--olive-100); color: var(--olive-900); border-color: var(--olive-300);">
+        <span>🎖️</span>
+        <div>
+          <div style="line-height: 1.2;">Col. R.S. Rathore</div>
+          <div style="font-size: 0.72rem; color: var(--text-muted);">Commanding Officer &bull; 14 Raj Rif &bull; IC-51920P</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="header-actions">
+      <div class="sync-badge synced"><span>🟢</span> <span>UNIT BATTLE READINESS: 96%</span></div>
+    </div>
+  </header>
+
+  <div class="dashboard-layout">
+    <main class="main-content" style="padding: 24px;">
+      <!-- Regimental Readiness Overview -->
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 18px; margin-bottom: 24px;">
+        <div class="card" style="margin-bottom: 0;">
+          <div style="font-size: 0.75rem; font-weight: 800; color: var(--text-muted); text-transform: uppercase;">Battalion Strength</div>
+          <div style="font-size: 1.8rem; font-weight: 900; color: var(--olive-700); margin: 4px 0;">842 Jawans</div>
+          <div style="font-size: 0.75rem; color: #15803d; font-weight: 700;">808 SHAPE-1 Battle Ready</div>
+        </div>
+
+        <div class="card" style="margin-bottom: 0;">
+          <div style="font-size: 0.75rem; font-weight: 800; color: var(--text-muted); text-transform: uppercase;">Vaccinations / High Altitude Prophylaxis</div>
+          <div style="font-size: 1.8rem; font-weight: 900; color: var(--olive-700); margin: 4px 0;">100% Complete</div>
+          <div style="font-size: 0.75rem; color: var(--text-muted);">Siachen &amp; High-Altitude Certified</div>
+        </div>
+
+        <div class="card" style="margin-bottom: 0;">
+          <div style="font-size: 0.75rem; font-weight: 800; color: var(--text-muted); text-transform: uppercase;">Temporary Medical Category (Low Medical)</div>
+          <div style="font-size: 1.8rem; font-weight: 900; color: #d97706; margin: 4px 0;">34 Jawans</div>
+          <div style="font-size: 0.75rem; color: var(--text-muted);">Active Physical Rehab (Knee, Shoulder)</div>
+        </div>
+      </div>
+
+      <!-- Soldier Physical Status (Rifleman Arjun Verma) -->
+      <div class="card">
+        <div class="card-header">
+          <div>
+            <h2 class="card-title">🪖 Jawan Profile: Rifleman Arjun Verma (15489201A)</h2>
+            <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 2px;">
+              Physical health and service injuries &bull; Physical recovery on track for SHAPE-1 upgrade
+            </div>
+          </div>
+          <div class="role-tag-badge" style="background: #fef2f2; color: #991b1b; border-color: #fca5a5;">
+            🔒 Mental Health Dossier Strictly Barred
+          </div>
+        </div>
+
+        <div style="display: flex; flex-direction: column; gap: 10px;">
+          <div style="padding: 12px 16px; border: 1px solid var(--border-color); border-radius: 6px; display: flex; justify-content: space-between; align-items: center;">
+            <div>
+              <strong>Left Knee Arthroscopic Meniscus Repair</strong>
+              <div style="font-size: 0.75rem; color: var(--text-muted);">Attributable to snow patrol in Tawang &bull; Undergoing physical therapy at MH Jaipur</div>
+            </div>
+            <span style="color: #15803d; font-weight: 800; font-size: 0.8rem;">Rehab: 70% Completed</span>
+          </div>
+
+          <div style="padding: 12px 16px; border: 1px solid var(--border-color); border-radius: 6px; display: flex; justify-content: space-between; align-items: center;">
+            <div>
+              <strong>Battle Shrapnel Wound Right Shoulder</strong>
+              <div style="font-size: 0.75rem; color: var(--text-muted);">Tactical exercise &bull; Full debridement performed at MH Jodhpur &bull; Fully healed</div>
+            </div>
+            <span style="color: #15803d; font-weight: 800; font-size: 0.8rem;">Healed &bull; Fit for Duty</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Explicit Mental Health Privacy Barrier Screen for CO -->
+      <div class="card" style="border: 2px solid #dc2626; background: #fff5f5;">
+        <div class="card-header" style="border-bottom: 1.5px solid #fecaca;">
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <span style="font-size: 1.5rem;">⛔</span>
+            <h3 style="font-size: 1.15rem; font-weight: 900; color: #991b1b;">
+              COMMAND PRIVACY BARRIER: MENTAL HEALTH CONFIDENTIAL
+            </h3>
+          </div>
+          <span class="badge-tag badge-injury" style="background: #dc2626; color: #fff;">
+            ACCESS DENIED
+          </span>
+        </div>
+
+        <p style="color: #7f1d1d; font-size: 0.88rem; line-height: 1.55;">
+          <strong>Army Order (AO) on Mental Health Privacy:</strong>
+          Regimental and Battalion Commanders are prohibited from accessing psychological assessments, PCL-5 combat stress check-ins, or counseling notes. This absolute barrier ensures soldiers seek mental health care without fearing impact on promotions or operational command.
+        </p>
+      </div>
+    </main>
+  </div>
+</body>
+</html>

@@ -1,0 +1,279 @@
+/* ==========================================================================
+   KAVACH AUTHENTICATION (LOGIN & REGISTRATION) - OLIVE GREEN MILITARY THEME
+   ========================================================================== */
+
+:root {
+  --olive-950: #0a1409;
+  --olive-900: #142412;
+  --olive-850: #1a3017;
+  --olive-800: #233e1f;
+  --olive-700: #2e5229;
+  --olive-600: #3e6d37;
+  --khaki-500: #c2b280;
+  --khaki-400: #d6caa1;
+  --khaki-300: #ebdcb0;
+  --gold-accent: #fae084;
+  --alert-red: #dc2626;
+  --card-bg: rgba(22, 40, 20, 0.92);
+  --input-bg: rgba(14, 26, 12, 0.85);
+  --border-color: rgba(194, 178, 128, 0.35);
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  background-color: var(--olive-950);
+  background-image: 
+    radial-gradient(circle at 50% 20%, #233e1f 0%, #142412 55%, #0a1409 100%);
+  color: #f7f9f6;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  position: relative;
+}
+
+/* Subtle tactical camouflage texture */
+body::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: 
+    linear-gradient(rgba(194, 178, 128, 0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(194, 178, 128, 0.04) 1px, transparent 1px);
+  background-size: 40px 40px;
+  pointer-events: none;
+}
+
+.auth-wrapper {
+  width: 100%;
+  max-width: 520px;
+  background: var(--card-bg);
+  border: 1.5px solid var(--border-color);
+  border-radius: 14px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.65), 0 0 15px rgba(194, 178, 128, 0.1);
+  backdrop-filter: blur(12px);
+  padding: 32px 36px;
+  position: relative;
+  z-index: 10;
+}
+
+/* Fixed Logo Container */
+.auth-logo-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  margin-bottom: 24px;
+}
+
+.auth-logo {
+  width: 90px;
+  height: 90px;
+  margin-bottom: 12px;
+  filter: drop-shadow(0 6px 12px rgba(0, 0, 0, 0.5));
+}
+
+.auth-logo img {
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  user-select: none;
+}
+
+.auth-title {
+  font-size: 1.8rem;
+  font-weight: 900;
+  letter-spacing: 3px;
+  color: var(--gold-accent);
+  margin-bottom: 2px;
+}
+
+.auth-tagline {
+  font-size: 0.82rem;
+  color: var(--khaki-400);
+  font-style: italic;
+  letter-spacing: 0.5px;
+}
+
+/* Tab Switcher: Login vs Register */
+.auth-tabs {
+  display: flex;
+  background: rgba(10, 20, 9, 0.7);
+  border-radius: 8px;
+  padding: 4px;
+  margin-bottom: 24px;
+  border: 1px solid var(--border-color);
+}
+
+.auth-tab-btn {
+  flex: 1;
+  padding: 10px;
+  background: transparent;
+  border: none;
+  color: #cadbc7;
+  font-size: 0.88rem;
+  font-weight: 700;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  letter-spacing: 0.5px;
+}
+
+.auth-tab-btn.active {
+  background: var(--olive-700);
+  color: #ffffff;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.4);
+  border: 1px solid rgba(250, 224, 132, 0.3);
+}
+
+/* Form Fields */
+.form-group {
+  margin-bottom: 16px;
+}
+
+.form-label {
+  display: block;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--khaki-300);
+  margin-bottom: 6px;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+.form-control {
+  width: 100%;
+  padding: 11px 14px;
+  background: var(--input-bg);
+  border: 1.5px solid var(--border-color);
+  border-radius: 8px;
+  color: #ffffff;
+  font-size: 0.92rem;
+  outline: none;
+  transition: all 0.2s ease;
+}
+
+.form-control:focus {
+  border-color: var(--gold-accent);
+  box-shadow: 0 0 0 3px rgba(250, 224, 132, 0.15);
+}
+
+select.form-control {
+  cursor: pointer;
+}
+
+select.form-control option {
+  background: #142412;
+  color: #ffffff;
+}
+
+/* Submit Button */
+.btn-submit {
+  width: 100%;
+  padding: 12px;
+  background: linear-gradient(135deg, var(--olive-600) 0%, var(--olive-700) 100%);
+  border: 1.5px solid var(--gold-accent);
+  border-radius: 8px;
+  color: #ffffff;
+  font-size: 0.96rem;
+  font-weight: 800;
+  letter-spacing: 1px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin-top: 10px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.4);
+}
+
+.btn-submit:hover {
+  background: linear-gradient(135deg, var(--olive-500) 0%, var(--olive-600) 100%);
+  box-shadow: 0 6px 14px rgba(0,0,0,0.6);
+  transform: translateY(-1px);
+}
+
+/* Demo Fast-Login Pill Buttons */
+.demo-fast-logins {
+  margin-top: 24px;
+  padding-top: 18px;
+  border-top: 1px solid rgba(194, 178, 128, 0.2);
+}
+
+.demo-fast-title {
+  font-size: 0.74rem;
+  color: var(--khaki-400);
+  text-transform: uppercase;
+  font-weight: 700;
+  margin-bottom: 10px;
+  letter-spacing: 0.5px;
+  text-align: center;
+}
+
+.fast-login-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+}
+
+.fast-pill {
+  background: rgba(14, 26, 12, 0.7);
+  border: 1px solid rgba(194, 178, 128, 0.25);
+  padding: 8px 10px;
+  border-radius: 6px;
+  color: #cadbc7;
+  font-size: 0.76rem;
+  font-weight: 600;
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.15s ease;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.fast-pill:hover {
+  background: var(--olive-700);
+  border-color: var(--gold-accent);
+  color: #ffffff;
+}
+
+/* Alert Notification Banner */
+.auth-alert {
+  padding: 10px 14px;
+  border-radius: 8px;
+  font-size: 0.82rem;
+  margin-bottom: 16px;
+  display: none;
+  line-height: 1.4;
+}
+
+.auth-alert.error {
+  display: block;
+  background: rgba(220, 38, 38, 0.2);
+  border: 1px solid var(--alert-red);
+  color: #fca5a5;
+}
+
+.auth-alert.success {
+  display: block;
+  background: rgba(22, 163, 74, 0.2);
+  border: 1px solid #22c55e;
+  color: #86efac;
+}
+
+/* Footer note */
+.auth-footer {
+  margin-top: 24px;
+  text-align: center;
+  font-size: 0.72rem;
+  color: #7d9479;
+}

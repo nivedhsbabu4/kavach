@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>KAVACH — Medical Officer Clinical Portal (AMC)</title>
+  <link rel="stylesheet" href="../../shared/shared.css" />
+  <link rel="icon" href="../../assets/logo.svg" />
+  <script src="../../shared/auth_guard.js"></script>
+  <script>enforceRoleGuard('DOCTOR');</script>
+</head>
+<body data-theme="light">
+
+  <!-- Universal Crisis Top Bar -->
+  <aside class="crisis-topbar">
+    <div style="display: flex; align-items: center; gap: 12px;">
+      <span style="font-weight: 800;">🩺 ARMY MEDICAL CORPS (AMC) &bull; CLINICAL OFFICER CONSOLE</span>
+      <span style="font-size: 0.75rem; color: var(--gold-light);">BASE HOSPITAL DELHI CANTT</span>
+    </div>
+    <button class="btn-logout" onclick="logoutUser()">LOGOUT</button>
+  </aside>
+
+  <!-- Header -->
+  <header class="app-header">
+    <div class="brand-wrapper">
+      <div class="brand-logo-fixed">
+        <img src="../../assets/logo.svg" alt="Kavach Shield Logo" />
+      </div>
+      <div class="brand-text">
+        <h1>KAVACH <span style="font-size: 0.7rem; background: #e0f2fe; color: #0369a1; padding: 2px 7px; border-radius: 4px;">MEDICAL OFFICER</span></h1>
+        <div class="brand-tagline-sub">"Health that follows the soldier."</div>
+      </div>
+    </div>
+
+    <div class="header-center-info">
+      <div class="role-tag-badge" style="background: #e0f2fe; color: #075985; border-color: #bae6fd;">
+        <span>🩺</span>
+        <div>
+          <div style="line-height: 1.2;">Capt. Dr. Priya Nair, AMC</div>
+          <div style="font-size: 0.72rem; color: var(--text-muted);">Orthopedic Specialist &bull; MR-09824X</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="header-actions">
+      <div class="sync-badge synced"><span>🟢</span> <span>AFMS SECURE NODE</span></div>
+    </div>
+  </header>
+
+  <div class="dashboard-layout">
+    <main class="main-content" style="padding: 24px;">
+      <!-- Active Patients with Time-Stamped Access -->
+      <div class="card">
+        <div class="card-header">
+          <div>
+            <h2 class="card-title">🪖 Active Patients Under Your Authorized Care</h2>
+            <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 2px;">
+              Only patients with time-stamped sovereign consent grants appear here &bull; Private counseling notes excluded
+            </div>
+          </div>
+        </div>
+
+        <div style="display: flex; flex-direction: column; gap: 12px;" id="doctorPatientsList">
+          <div style="padding: 16px; border: 1.5px solid var(--border-color); border-radius: 8px; display: flex; justify-content: space-between; align-items: center; background: var(--bg-card);">
+            <div>
+              <div style="display: flex; align-items: center; gap: 10px;">
+                <strong style="font-size: 1.05rem;">Rifleman Arjun Verma</strong>
+                <span class="badge-tag badge-vaccine">ACTIVE GRANT</span>
+                <span style="font-size: 0.75rem; color: var(--text-muted);">Service No: 15489201A &bull; 14 Rajputana Rifles</span>
+              </div>
+              <div style="font-size: 0.82rem; color: var(--text-muted); margin-top: 4px;">
+                Diagnosis: Left Knee Arthroscopic Meniscus Repair &bull; Shrapnel Wound Deltoid
+              </div>
+              <div style="font-size: 0.75rem; color: var(--olive-700); margin-top: 4px; font-weight: 700;">
+                ⏱️ Time-Stamped Consent Active until Dec 31, 2026 (General Medical Only)
+              </div>
+            </div>
+            <div style="display: flex; gap: 8px;">
+              <button class="btn-outline" onclick="viewPatientRecords('usr-soldier-1')">View Wallet History</button>
+              <button class="btn-primary" onclick="openCreateRecordModal('usr-soldier-1')">✚ Create Field Record</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Patient Medical History (Tamper-Proof) -->
+      <div class="card" id="patientHistorySection">
+        <div class="card-header">
+          <div>
+            <h3 class="card-title">📁 Verified Patient Medical History (Rifleman Arjun Verma)</h3>
+            <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 2px;">
+              Tamper-proof records &bull; Once entered, records CANNOT be deleted &bull; Only the original authoring doctor can edit
+            </div>
+          </div>
+          <div class="role-tag-badge" style="background: #fef2f2; color: #991b1b; border-color: #fca5a5;">
+            🔒 Mental Health Notes Barred
+          </div>
+        </div>
+
+        <div class="records-grid" id="doctorRecordsGrid">
+          <!-- Populated by doctor.js -->
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="doctor.js"></script>
+</body>
+</html>

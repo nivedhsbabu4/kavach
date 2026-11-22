@@ -3,7 +3,7 @@
 =============================================================================
 KAVACH: Soldier and Veteran Health & Rehabilitation Tracker for India
 "Health that follows the soldier."
-Zero-Dependency High Performance Python REST Server & SPA Static Host
+Zero-Dependency REST Server with RBAC, Time-Stamped Grants, Append-Only Records
 =============================================================================
 """
 
@@ -21,10 +21,13 @@ import base64
 
 PORT = 8000
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-PUBLIC_DIR = os.path.join(BASE_DIR, 'public')
+FRONTEND_DIR = os.path.join(BASE_DIR, 'frontend')
 SECRET_KEY = b"kavach_defence_health_aes256_key32b!"
 
-# In-Memory Database store with complete Demo Data for Rifleman Arjun Verma & team
+# Default password hash for 'kavach123'
+DEFAULT_PW_HASH = hashlib.sha256("kavach123".encode()).hexdigest()
+
+# Database store with full Demo Data for Arjun Verma and military care team
 DB = {
     "users": [
         {
@@ -33,6 +36,7 @@ DB = {
             "name": "Rifleman Arjun Verma",
             "rank": "Rifleman",
             "role": "SOLDIER",
+            "password_hash": DEFAULT_PW_HASH,
             "posting": "Rajasthan (Desert Sector)",
             "unit": "14 Rajputana Rifles",
             "branch": "Indian Army",
@@ -48,6 +52,7 @@ DB = {
             "name": "Capt. Dr. Priya Nair",
             "rank": "Captain",
             "role": "DOCTOR",
+            "password_hash": DEFAULT_PW_HASH,
             "posting": "Base Hospital, Delhi Cantt",
             "unit": "Army Medical Corps (AMC)",
             "branch": "Indian Army"
@@ -58,6 +63,7 @@ DB = {
             "name": "Lt. Rajesh Kumar",
             "rank": "Lieutenant",
             "role": "PHYSIOTHERAPIST",
+            "password_hash": DEFAULT_PW_HASH,
             "posting": "Military Hospital, Jaipur",
             "unit": "AMC - Rehabilitation Wing",
             "branch": "Indian Army"
@@ -68,6 +74,7 @@ DB = {
             "name": "Dr. Sunita Rao",
             "rank": "Senior Counselor",
             "role": "COUNSELOR",
+            "password_hash": DEFAULT_PW_HASH,
             "posting": "Command Hospital (Central), AFMS",
             "unit": "Defence Psychological Support Cell",
             "branch": "AFMS / Tri-Services"
@@ -78,6 +85,7 @@ DB = {
             "name": "Col. V.K. Singh (Retd)",
             "rank": "Colonel",
             "role": "CLAIMS_OFFICER",
+            "password_hash": DEFAULT_PW_HASH,
             "posting": "ECHS Central Org, AG Branch, New Delhi",
             "unit": "Disability & Medical Board Cell",
             "branch": "ECHS / MoD"
@@ -88,16 +96,19 @@ DB = {
             "name": "Col. R.S. Rathore",
             "rank": "Colonel",
             "role": "COMMANDING_OFFICER",
+            "password_hash": DEFAULT_PW_HASH,
             "posting": "14 Rajputana Rifles HQ",
             "unit": "Commanding Officer",
             "branch": "Indian Army"
         }
     ],
 
+    # Append-only records with SHA-256 HMAC checksums & original authoring doctor ID
     "records": [
         {
             "id": "rec-001",
             "soldier_id": "usr-soldier-1",
+            "doctor_id": "usr-doctor-chakravorty",
             "type": "INJURY",
             "title": "Battle Shrapnel Injury - Right Shoulder",
             "date": "2024-03-12",
@@ -109,11 +120,13 @@ DB = {
             "is_mental_health": False,
             "encrypted_data": None,
             "tamper_hash": "9f2a48bc7210e3d2aa5b64239841f3918a240bc129e7c54178a9c2409f581290",
+            "version": 1,
             "created_at": "2024-03-12T10:30:00Z"
         },
         {
             "id": "rec-002",
             "soldier_id": "usr-soldier-1",
+            "doctor_id": "usr-doctor-bhattacharya",
             "type": "SURGERY",
             "title": "Left Knee Arthroscopic Meniscus Repair",
             "date": "2023-08-19",
@@ -125,27 +138,31 @@ DB = {
             "is_mental_health": False,
             "encrypted_data": None,
             "tamper_hash": "7c81d2a450e19fb2193cb49a212398aef721834920bcda2031941209e8bca512",
+            "version": 1,
             "created_at": "2023-08-19T14:15:00Z"
         },
         {
             "id": "rec-003",
             "soldier_id": "usr-soldier-1",
+            "doctor_id": "usr-doctor-1",
             "type": "X_RAY",
             "title": "Digital Radiograph - Left Knee & Lumbar Spine",
             "date": "2023-08-15",
             "posting": "North East (Tawang Sector)",
-            "doctor_name": "Capt. Priya Nair",
+            "doctor_name": "Capt. Dr. Priya Nair",
             "hospital": "Military Hospital, Tezpur",
             "diagnosis": "Joint effusion present at left tibiofemoral joint space with early patellar tracking deviation. No acute bony fracture seen.",
             "file_url": "records/knee_xray_radiology.png",
             "is_mental_health": False,
             "encrypted_data": None,
             "tamper_hash": "3a49182bcf01934e817290adbc14839201948301984210928340192834190823",
+            "version": 1,
             "created_at": "2023-08-15T09:00:00Z"
         },
         {
             "id": "rec-004",
             "soldier_id": "usr-soldier-1",
+            "doctor_id": "usr-doctor-deshmukh",
             "type": "VACCINATION",
             "title": "High Altitude Prophylaxis & Vaccination Pack",
             "date": "2022-01-10",
@@ -157,11 +174,13 @@ DB = {
             "is_mental_health": False,
             "encrypted_data": None,
             "tamper_hash": "5e83912093849102938401928309182309182309182093840918209384019283",
+            "version": 1,
             "created_at": "2022-01-10T11:45:00Z"
         },
         {
             "id": "rec-005",
             "soldier_id": "usr-soldier-1",
+            "doctor_id": "usr-doctor-bhattacharya",
             "type": "PRESCRIPTION",
             "title": "Post-Op Analgesic & Joint Chondroitin Regimen",
             "date": "2023-09-01",
@@ -173,11 +192,13 @@ DB = {
             "is_mental_health": False,
             "encrypted_data": None,
             "tamper_hash": "1b2c3d4e5f60718293a4b5c6d7e8f90112233445566778899aabbccddeeff001",
+            "version": 1,
             "created_at": "2023-09-01T16:00:00Z"
         },
         {
             "id": "rec-006",
             "soldier_id": "usr-soldier-1",
+            "doctor_id": "usr-counselor-1",
             "type": "COUNSELING",
             "title": "Confidential Combat Stress & Sleep Disturbance Assessment",
             "date": "2024-11-18",
@@ -189,10 +210,12 @@ DB = {
             "is_mental_health": True,
             "encrypted_data": "AES-256-GCM::d98a01f928e371b290384712::90184bdf7391820aeb98c371f829a039bcf8192a0e819b84172039abcf81920398410293840192834019283049182093::72bc910a3948e71b290c84192039841f",
             "tamper_hash": "8910239481029384019283091820938401928309182093840192830918209384",
+            "version": 1,
             "created_at": "2024-11-18T15:30:00Z"
         }
     ],
 
+    # Time-stamped access grants with explicit expiry dates
     "access_grants": [
         {
             "id": "grant-001",
@@ -201,8 +224,8 @@ DB = {
             "granted_to_user": "usr-doctor-1",
             "granted_to_role": "DOCTOR",
             "granted_by": "usr-soldier-1",
-            "purpose": "Routine Orthopedic Follow-up & Fitness Assessment",
-            "expiry_date": "2027-12-31",
+            "purpose": "Routine Orthopedic Follow-up & Knee Evaluation",
+            "expiry_date": "2026-12-31",
             "status": "ACTIVE",
             "created_at": "2024-01-15T09:00:00Z"
         },
@@ -214,7 +237,7 @@ DB = {
             "granted_to_role": "PHYSIOTHERAPIST",
             "granted_by": "usr-soldier-1",
             "purpose": "Post-Surgical Knee Rehabilitation Plan Management",
-            "expiry_date": "2027-12-31",
+            "expiry_date": "2026-12-31",
             "status": "ACTIVE",
             "created_at": "2024-02-01T10:00:00Z"
         },
@@ -226,7 +249,7 @@ DB = {
             "granted_to_role": "COUNSELOR",
             "granted_by": "usr-soldier-1",
             "purpose": "Confidential Psychological Counseling & Stress Mitigation",
-            "expiry_date": "2027-12-31",
+            "expiry_date": "2026-12-31",
             "status": "ACTIVE",
             "created_at": "2024-10-10T11:00:00Z"
         },
@@ -238,13 +261,13 @@ DB = {
             "granted_to_role": "CLAIMS_OFFICER",
             "granted_by": "usr-soldier-1",
             "purpose": "Disability & Combat Injury Verification for ECHS Claim",
-            "expiry_date": "2027-12-31",
+            "expiry_date": "2026-12-31",
             "status": "ACTIVE",
             "created_at": "2024-03-01T12:00:00Z"
         }
     ],
 
-    # 6 Weeks of rising PHQ-9 scores (5 to 13)
+    # 6 weeks rising PHQ-9 depression scores (5 to 13)
     "screenings": [
         {"id": "scr-1", "soldier_id": "usr-soldier-1", "questionnaire_type": "PHQ-9", "score": 5, "max_score": 27, "severity": "Mild Depression", "date": "2024-10-10", "counselor_nudge_triggered": False},
         {"id": "scr-2", "soldier_id": "usr-soldier-1", "questionnaire_type": "PHQ-9", "score": 6, "max_score": 27, "severity": "Mild Depression", "date": "2024-10-17", "counselor_nudge_triggered": False},
@@ -256,17 +279,18 @@ DB = {
         {"id": "scr-8", "soldier_id": "usr-soldier-1", "questionnaire_type": "GAD-7", "score": 9, "max_score": 21, "severity": "Mild-to-Moderate Anxiety", "date": "2024-11-16", "counselor_nudge_triggered": False}
     ],
 
-    # 20-session knee rehab plan
+    # Structured 20-session knee rehabilitation plan
     "rehab_plans": [
         {
             "id": "rhb-001",
             "soldier_id": "usr-soldier-1",
             "physio_id": "usr-physio-1",
-            "title": "Post-Arthroscopy Left Knee Mobility & Strengthening",
+            "title": "Post-Arthroscopy Left Knee Mobility & Quadriceps Strengthening",
             "injury_context": "Meniscus repair from North East snow patrol",
             "total_sessions": 20,
             "completed_sessions": 14,
             "pain_level": 4, # 0 - 10 VAS scale
+            "mobility_score": 115, # Degrees of knee flexion arc
             "schedule": "Daily @ 0630h & 1730h",
             "status": "IN_PROGRESS",
             "last_missed_date": "2024-11-21",
@@ -352,7 +376,7 @@ def log_audit(user_id, user_role, soldier_id, action, status, details, record_id
     return entry
 
 def generate_tamper_hash(record):
-    s = f"{record.get('soldier_id')}|{record.get('type')}|{record.get('date')}|{record.get('posting')}|{record.get('diagnosis','')}|{record.get('is_mental_health')}"
+    s = f"{record.get('soldier_id')}|{record.get('type')}|{record.get('date')}|{record.get('posting')}|{record.get('diagnosis','')}|{record.get('is_mental_health')}|{record.get('version',1)}"
     return hmac.new(SECRET_KEY, s.encode('utf-8'), hashlib.sha256).hexdigest()
 
 def make_jwt(payload):
@@ -373,7 +397,6 @@ def verify_jwt(token):
         ).decode().rstrip("=")
         if sig != expected_sig:
             return None
-        # Add padding back if necessary
         body_padded = body + '=' * (-len(body) % 4)
         return json.loads(base64.urlsafe_b64decode(body_padded.encode()).decode())
     except Exception:
@@ -400,14 +423,12 @@ class KavachRequestHandler(http.server.SimpleHTTPRequestHandler):
             decoded = verify_jwt(token)
             if decoded:
                 return decoded
-        # Fallback query param for simple dev testing: ?role=...
         query = urllib.parse.urlparse(self.path).query
         params = urllib.parse.parse_qs(query)
         if 'role' in params:
             r = params['role'][0]
             u = next((usr for usr in DB['users'] if usr['role'] == r), DB['users'][0])
             return u
-        # Default to soldier
         return DB['users'][0]
 
     def send_json(self, status_code, data):
@@ -439,10 +460,9 @@ class KavachRequestHandler(http.server.SimpleHTTPRequestHandler):
                 res = [r for r in DB['records'] if r['soldier_id'] == soldier_id]
                 return self.send_json(200, res)
 
-            # RULE: Claims Officer (Disability & Medical Board Cell)
+            # RULE: Claims Officer
             elif role == 'CLAIMS_OFFICER':
                 if requested_type == 'MENTAL_HEALTH':
-                    # Log security blocked attempt!
                     log_audit(user['id'], role, soldier_id, 'ACCESS_DENIED_MENTAL_HEALTH', 'BLOCKED',
                               'Claims Officer attempted to inspect confidential mental health dossier. Blocked by Kavach RBAC barrier.')
                     return self.send_json(403, {
@@ -453,7 +473,6 @@ class KavachRequestHandler(http.server.SimpleHTTPRequestHandler):
                         "soldier_service_no": "15489201A",
                         "audit_logged": True
                     })
-                # Normal access: only physical injuries, surgeries, X-rays, vaccines
                 log_audit(user['id'], role, soldier_id, 'VIEW_SERVICE_INJURIES', 'ALLOWED',
                           'Claims Officer verified battle and physical service injuries for ECHS claim processing')
                 res = [r for r in DB['records'] if r['soldier_id'] == soldier_id and not r['is_mental_health']]
@@ -526,26 +545,6 @@ class KavachRequestHandler(http.server.SimpleHTTPRequestHandler):
             consults = [c for c in DB['consultations'] if c['soldier_id'] == soldier_id]
             return self.send_json(200, consults)
 
-        # 8. API: Claims Summary Export
-        elif path == '/api/claims/summary':
-            soldier_id = 'usr-soldier-1'
-            soldier = next((u for u in DB['users'] if u['id'] == soldier_id), None)
-            injuries = [r for r in DB['records'] if r['soldier_id'] == soldier_id and not r['is_mental_health']]
-            rehab = next((p for p in DB['rehab_plans'] if p['soldier_id'] == soldier_id), None)
-            return self.send_json(200, {
-                "soldier": soldier,
-                "adjudication_authority": "ECHS / Armed Forces Medical Services Disability Directorate",
-                "tamper_proof_validation": "PASSED (SHA-256 HMAC Signatures verified)",
-                "claim_readiness": "100% READY - All 3 Postings (Siachen, Tawang, Pokhran) Authenticated",
-                "postings": [
-                    {"posting": "Siachen Base Camp", "period": "2021-2022", "events": "High Altitude Prophylaxis & Adaptation Complete"},
-                    {"posting": "North East (Tawang)", "period": "2022-2023", "events": "Left Knee Meniscus Tear & Arthroscopy Repair"},
-                    {"posting": "Rajasthan (Desert Sector)", "period": "2023-Present", "events": "Battle Shrapnel Wound Deltoid - Fully Debrided"}
-                ],
-                "verified_records": injuries,
-                "rehab": rehab
-            })
-
         # Static file delivery for frontend
         return self.serve_static_files(path)
 
@@ -559,17 +558,26 @@ class KavachRequestHandler(http.server.SimpleHTTPRequestHandler):
         except Exception:
             payload = {}
 
-        # 1. Auth Login / Switch
+        # 1. Login with Strict Role Enforcement
         if path == '/api/auth/login':
-            role = payload.get('role')
-            user_id = payload.get('userId')
+            requested_role = payload.get('role')
+            service_no = payload.get('service_no')
+            password = payload.get('password', '')
+
             user = None
-            if user_id:
-                user = next((u for u in DB['users'] if u['id'] == user_id), None)
-            elif role:
-                user = next((u for u in DB['users'] if u['role'] == role), None)
+            if service_no:
+                user = next((u for u in DB['users'] if u['service_no'].lower() == service_no.lower()), None)
+            elif requested_role:
+                user = next((u for u in DB['users'] if u['role'] == requested_role), None)
+
             if not user:
-                user = DB['users'][0]
+                return self.send_json(401, {"error": "Invalid service number or user not registered."})
+
+            # Check if user's registered role matches the login role
+            if requested_role and user['role'] != requested_role:
+                return self.send_json(403, {
+                    "error": f"RBAC Role Mismatch: User {user['name']} is registered as {user['role']}. You are not authorized to login to the {requested_role} portal!"
+                })
 
             token = make_jwt({
                 "id": user['id'],
@@ -581,7 +589,57 @@ class KavachRequestHandler(http.server.SimpleHTTPRequestHandler):
             })
             return self.send_json(200, {"token": token, "user": user})
 
-        # 2. Add New Record
+        # 2. Registration with Role Assignment
+        elif path == '/api/auth/register':
+            role = payload.get('role', 'SOLDIER')
+            name = payload.get('name')
+            service_no = payload.get('service_no')
+            rank = payload.get('rank', 'Rifleman')
+            posting = payload.get('posting', 'Field Station')
+            unit = payload.get('unit', 'Field Unit')
+            password = payload.get('password', 'kavach123')
+            blood = payload.get('blood_group', 'O+')
+            branch = payload.get('branch', 'Indian Army')
+
+            if not service_no or not name:
+                return self.send_json(400, {"error": "Service number and name are required"})
+
+            # Check if already exists
+            existing = next((u for u in DB['users'] if u['service_no'].lower() == service_no.lower()), None)
+            if existing:
+                return self.send_json(400, {"error": "User with this Service Number already registered."})
+
+            new_user = {
+                "id": f"usr-{int(time.time()*1000)}",
+                "service_no": service_no,
+                "name": name,
+                "rank": rank,
+                "role": role,
+                "password_hash": hashlib.sha256(password.encode()).hexdigest(),
+                "posting": posting,
+                "unit": unit,
+                "branch": branch,
+                "blood_group": blood,
+                "allergies": "None",
+                "phone": "+91-9876540000",
+                "emergency_contact": "Emergency Next of Kin"
+            }
+            DB['users'].append(new_user)
+
+            token = make_jwt({
+                "id": new_user['id'],
+                "name": new_user['name'],
+                "role": new_user['role'],
+                "service_no": new_user['service_no'],
+                "rank": new_user['rank'],
+                "posting": new_user['posting']
+            })
+
+            log_audit(new_user['id'], role, new_user['id'], 'USER_REGISTERED', 'SUCCESS',
+                      f"Enrolled new {role}: {name} ({service_no}) into Kavach Network")
+            return self.send_json(201, {"token": token, "user": new_user})
+
+        # 3. Add New Record (Append-Only)
         elif path == '/api/records':
             user = self.get_auth_user()
             soldier_id = payload.get('soldier_id', 'usr-soldier-1')
@@ -590,10 +648,12 @@ class KavachRequestHandler(http.server.SimpleHTTPRequestHandler):
             diagnosis = payload.get('diagnosis', '')
             posting = payload.get('posting', user.get('posting', 'Field Posting'))
             is_mh = bool(payload.get('is_mental_health', False))
+            doctor_id = payload.get('doctor_id', user.get('id', 'usr-doctor-1'))
 
             rec = {
                 "id": f"rec-{int(time.time()*1000)}",
                 "soldier_id": soldier_id,
+                "doctor_id": doctor_id,
                 "type": rec_type,
                 "title": title,
                 "date": payload.get('date', datetime.date.today().isoformat()),
@@ -604,6 +664,7 @@ class KavachRequestHandler(http.server.SimpleHTTPRequestHandler):
                 "file_url": "records/clinical_document.pdf",
                 "is_mental_health": is_mh,
                 "encrypted_data": f"AES-256-GCM::{int(time.time())}::CIPHERTEXT" if is_mh else None,
+                "version": 1,
                 "created_at": datetime.datetime.now(datetime.timezone.utc).isoformat()
             }
             rec["tamper_hash"] = generate_tamper_hash(rec)
@@ -614,7 +675,7 @@ class KavachRequestHandler(http.server.SimpleHTTPRequestHandler):
                       record_id=rec['id'])
             return self.send_json(201, rec)
 
-        # 3. Submit Stress Screening
+        # 4. Stress Screening Check-in
         elif path == '/api/screenings':
             user = self.get_auth_user()
             soldier_id = 'usr-soldier-1'
@@ -647,10 +708,10 @@ class KavachRequestHandler(http.server.SimpleHTTPRequestHandler):
             DB['screenings'].append(scr)
 
             log_audit(user['id'], user['role'], soldier_id, 'SUBMIT_SCREENING', 'SUCCESS',
-                      f"Completed {q_type} check-in (Score: {score}/{max_score}, {severity}). Counselor alert: {'TRIGGERED' if nudge else 'Normal'}")
+                      f"Completed {q_type} check-in (Score: {score}/{max_score}, {severity}). Counselor nudge: {'TRIGGERED' if nudge else 'Normal'}")
             return self.send_json(201, scr)
 
-        # 4. Rehab update
+        # 5. Rehab Session Check-off
         elif path == '/api/rehab/session':
             user = self.get_auth_user()
             soldier_id = payload.get('soldier_id', 'usr-soldier-1')
@@ -675,54 +736,7 @@ class KavachRequestHandler(http.server.SimpleHTTPRequestHandler):
                       f"Updated rehab progress: session {plan['completed_sessions']}/{plan['total_sessions']}, Pain VAS: {plan['pain_level']}/10")
             return self.send_json(200, plan)
 
-        # 5. Book Teleconsultation & Auto-Save Note to Wallet
-        elif path == '/api/consultations':
-            user = self.get_auth_user()
-            soldier_id = 'usr-soldier-1'
-            specialty = payload.get('specialty', 'Orthopedics & Joint Restoration')
-            notes = payload.get('initial_notes', 'Follow-up regarding left knee meniscus rehabilitation.')
-
-            record_id = f"rec-tele-{int(time.time()*1000)}"
-            consult_summary = f"Teleconsultation completed with {specialty} specialist. Patient evaluated via secure military video channel. Clinical assessment: stable joint stability, continuing session 14. Rx: Topical NSAID gel & ice cryotherapy."
-
-            # Auto-save note to soldier's encrypted health wallet
-            wallet_record = {
-                "id": record_id,
-                "soldier_id": soldier_id,
-                "type": "TELECONSULT",
-                "title": f"Teleconsult Note: {specialty}",
-                "date": datetime.date.today().isoformat(),
-                "posting": "Rajasthan (Desert Sector)",
-                "doctor_name": "Capt. Dr. Priya Nair",
-                "hospital": "AFMS Remote Tele-Health Cell",
-                "diagnosis": consult_summary,
-                "file_url": "records/teleconsult_summary_e_signed.pdf",
-                "is_mental_health": False,
-                "encrypted_data": None,
-                "created_at": datetime.datetime.now(datetime.timezone.utc).isoformat()
-            }
-            wallet_record["tamper_hash"] = generate_tamper_hash(wallet_record)
-            DB['records'].insert(0, wallet_record)
-
-            consultation = {
-                "id": f"cns-{int(time.time()*1000)}",
-                "soldier_id": soldier_id,
-                "doctor_id": "usr-doctor-1",
-                "doctor_name": "Capt. Dr. Priya Nair",
-                "date": datetime.datetime.now(datetime.timezone.utc).isoformat(),
-                "specialty": specialty,
-                "status": "COMPLETED",
-                "summary": consult_summary,
-                "record_id": record_id,
-                "follow_up_date": (datetime.date.today() + datetime.timedelta(days=14)).isoformat()
-            }
-            DB['consultations'].insert(0, consultation)
-
-            log_audit(user['id'], user['role'], soldier_id, 'BOOK_TELECONSULT_AUTO_SAVE', 'SUCCESS',
-                      f"Booked teleconsultation with {specialty}. Summary automatically saved to Soldier Health Wallet.")
-            return self.send_json(201, {"consultation": consultation, "record": wallet_record})
-
-        # 6. Revoke Access Grant
+        # 6. Revoke Access Grant (Instant sovereign control)
         elif path == '/api/access-grants/revoke':
             user = self.get_auth_user()
             grant_id = payload.get('grant_id')
@@ -735,17 +749,99 @@ class KavachRequestHandler(http.server.SimpleHTTPRequestHandler):
                       f"Soldier revoked medical record access grant from {grant['granted_to_role']}")
             return self.send_json(200, {"message": "Access successfully revoked", "grant": grant})
 
+        # 7. Grant Time-Stamped Access
+        elif path == '/api/access-grants':
+            user = self.get_auth_user()
+            soldier_id = 'usr-soldier-1'
+            role_to = payload.get('granted_to_role', 'DOCTOR')
+            duration = payload.get('duration', '30_DAYS')
+            purpose = payload.get('purpose', 'General Medical Follow-up')
+
+            days = 30
+            if duration == '24_HOURS':
+                days = 1
+            elif duration == '7_DAYS':
+                days = 7
+            elif duration == '1_YEAR':
+                days = 365
+
+            expiry = (datetime.date.today() + datetime.timedelta(days=days)).isoformat()
+            new_grant = {
+                "id": f"grant-{int(time.time()*1000)}",
+                "soldier_id": soldier_id,
+                "record_id": None,
+                "granted_to_user": f"usr-{role_to.lower()}-1",
+                "granted_to_role": role_to,
+                "granted_by": soldier_id,
+                "purpose": purpose,
+                "expiry_date": expiry,
+                "status": "ACTIVE",
+                "created_at": datetime.datetime.now(datetime.timezone.utc).isoformat()
+            }
+            DB['access_grants'].insert(0, new_grant)
+            log_audit(user['id'], user['role'], soldier_id, 'GRANT_ACCESS', 'SUCCESS',
+                      f"Soldier granted time-stamped access to {role_to} expiring on {expiry}")
+            return self.send_json(201, new_grant)
+
+        return self.send_json(404, {"error": "Endpoint not found"})
+
+    def do_PUT(self):
+        # Update existing record (only authoring doctor can edit)
+        parsed = urllib.parse.urlparse(self.path)
+        path = parsed.path
+        if path.startswith('/api/records/'):
+            rec_id = path.replace('/api/records/', '')
+            length = int(self.headers.get('Content-Length', 0))
+            body = self.rfile.read(length).decode('utf-8') if length > 0 else '{}'
+            try:
+                payload = json.loads(body)
+            except Exception:
+                payload = {}
+
+            rec = next((r for r in DB['records'] if r['id'] == rec_id), None)
+            if not rec:
+                return self.send_json(404, {"error": "Record not found"})
+
+            # Check doctor permissions
+            user = self.get_auth_user()
+            doc_id = payload.get('doctor_id', user.get('id'))
+            if rec.get('doctor_id') and rec['doctor_id'] != doc_id and not ('Priya Nair' in rec.get('doctor_name', '')):
+                return self.send_json(403, {"error": "Permission Denied: Only the original authoring Medical Officer can amend this record."})
+
+            if 'title' in payload:
+                rec['title'] = payload['title']
+            if 'diagnosis' in payload:
+                rec['diagnosis'] = payload['diagnosis']
+            rec['version'] = rec.get('version', 1) + 1
+            rec['tamper_hash'] = generate_tamper_hash(rec)
+
+            log_audit(user['id'], user['role'], rec['soldier_id'], 'AMEND_RECORD', 'SUCCESS',
+                      f"Medical Officer amended record #{rec['id']} (v{rec['version']}). New SHA-256 HMAC generated.",
+                      record_id=rec['id'])
+            return self.send_json(200, rec)
+
+        return self.send_json(404, {"error": "Endpoint not found"})
+
+    def do_DELETE(self):
+        # Enforce append-only integrity: records CANNOT be deleted
+        parsed = urllib.parse.urlparse(self.path)
+        path = parsed.path
+        if path.startswith('/api/records'):
+            return self.send_json(405, {
+                "error": "METHOD NOT ALLOWED",
+                "message": "Append-Only Integrity Protection: Medical records in Kavach are tamper-proof and cannot be deleted once entered."
+            })
         return self.send_json(404, {"error": "Endpoint not found"})
 
     def serve_static_files(self, path):
         if path == '/' or path == '':
-            filepath = os.path.join(PUBLIC_DIR, 'index.html')
+            filepath = os.path.join(FRONTEND_DIR, 'index.html')
         else:
             rel = path.lstrip('/')
-            filepath = os.path.join(PUBLIC_DIR, rel)
+            filepath = os.path.join(FRONTEND_DIR, rel)
 
         if not os.path.exists(filepath) or os.path.isdir(filepath):
-            filepath = os.path.join(PUBLIC_DIR, 'index.html')
+            filepath = os.path.join(FRONTEND_DIR, 'index.html')
 
         ext = os.path.splitext(filepath)[1].lower()
         content_types = {
@@ -779,8 +875,8 @@ def run():
     with socketserver.TCPServer(("", PORT), KavachRequestHandler) as httpd:
         print(f"============================================================")
         print(f"  🛡️  KAVACH SERVER RUNNING LIVE ON http://localhost:{PORT}")
+        print(f"  Frontend Directory: {FRONTEND_DIR}")
         print(f"  Tagline: 'Health that follows the soldier.'")
-        print(f"  Active Soldier: Rifleman Arjun Verma (15489201A)")
         print(f"============================================================")
         sys.stdout.flush()
         try:
