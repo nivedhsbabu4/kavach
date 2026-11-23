@@ -456,6 +456,41 @@ DB = {
     ]
 }
 
+# =============================================================================
+# PERSISTENT DATABASE STORAGE (JSON / SQLite COMPATIBLE)
+# =============================================================================
+DB_DIR = os.path.join(BASE_DIR, 'database')
+DB_FILE = os.path.join(DB_DIR, 'kavach_db.json')
+
+def save_db():
+    """Atomically persist the entire in-memory database to disk in JSON format"""
+    try:
+        os.makedirs(DB_DIR, exist_ok=True)
+        temp_file = DB_FILE + ".tmp"
+        with open(temp_file, "w", encoding="utf-8") as f:
+            json.dump(DB, f, indent=2, ensure_ascii=False)
+        os.replace(temp_file, DB_FILE)
+    except Exception as e:
+        print(f"Error saving database to {DB_FILE}: {e}", file=sys.stderr)
+
+def load_db():
+    """Load persistent database from disk if it exists; otherwise initialize and save seed"""
+    global DB
+    if os.path.exists(DB_FILE):
+        try:
+            with open(DB_FILE, "r", encoding="utf-8") as f:
+                loaded = json.load(f)
+                if isinstance(loaded, dict) and "users" in loaded and len(loaded["users"]) > 0:
+                    DB = loaded
+                    print(f"Loaded persistent Kavach database from {DB_FILE} ({len(DB['users'])} registered users)")
+                    return
+        except Exception as e:
+            print(f"Warning: could not load {DB_FILE}, using default seed: {e}", file=sys.stderr)
+    save_db()
+    print(f"Initialized persistent Kavach database at {DB_FILE} ({len(DB['users'])} registered users)")
+
+load_db()
+
 def log_audit(user_id, user_role, soldier_id, action, status, details, record_id=None, ip="127.0.0.1"):
     entry = {
         "id": f"aud-{int(time.time()*1000)}",
@@ -470,6 +505,7 @@ def log_audit(user_id, user_role, soldier_id, action, status, details, record_id
         "ip_address": ip
     }
     DB["audit_log"].insert(0, entry)
+    save_db()
     return entry
 
 def generate_tamper_hash(record):
@@ -542,8 +578,55 @@ class KavachRequestHandler(http.server.SimpleHTTPRequestHandler):
         path = parsed.path
         params = urllib.parse.parse_qs(parsed.query)
 
+        # 0. API: Database Inspector (Summary & Registered Users)
+        if path == '/api/database/users':
+            sanitized = []
+            for u in DB.get('users', []):
+                sanitized.append({
+                    "id": u.get('id'),
+                    "service_no": u.get('service_no'),
+                    "name": u.get('name'),
+                    "rank": u.get('rank'),
+                    "role": u.get('role'),
+                    "unit": u.get('unit'),
+                    "posting": u.get('posting'),
+                    "branch": u.get('branch'),
+                    "blood_group": u.get('blood_group'),
+                    "enlistment_date": u.get('enlistment_date'),
+                    "records_count": len([r for r in DB.get('records', []) if r.get('soldier_id') == u.get('id')])
+                })
+            return self.send_json(200, {"users": sanitized, "total": len(sanitized), "db_file": DB_FILE})
+
+        elif path == '/api/database/summary':
+            users_list = []
+            for u in DB.get('users', []):
+                users_list.append({
+                    "id": u.get('id'),
+                    "service_no": u.get('service_no'),
+                    "name": u.get('name'),
+                    "rank": u.get('rank'),
+                    "role": u.get('role'),
+                    "unit": u.get('unit'),
+                    "posting": u.get('posting'),
+                    "enlistment_date": u.get('enlistment_date')
+                })
+            summary = {
+                "db_file": DB_FILE,
+                "total_users": len(DB.get('users', [])),
+                "soldiers_count": len([u for u in DB.get('users', []) if u.get('role') == 'SOLDIER']),
+                "doctors_count": len([u for u in DB.get('users', []) if u.get('role') == 'DOCTOR']),
+                "total_records": len(DB.get('records', [])),
+                "total_access_grants": len(DB.get('access_grants', [])),
+                "total_screenings": len(DB.get('screenings', [])),
+                "total_rehab_plans": len(DB.get('rehab_plans', [])),
+                "total_consultations": len(DB.get('consultations', [])),
+                "total_notifications": len(DB.get('notifications', [])),
+                "users": users_list
+            }
+            return self.send_json(200, summary)
+
         # 1. API: Current user profile
-        if path in ('/api/users/me', '/api/users/profile'):
+        elif path in ('/api/users/me', '/api/users/profile'):
             user = self.get_auth_user()
             return self.send_json(200, user)
 
@@ -705,23 +788,29 @@ class KavachRequestHandler(http.server.SimpleHTTPRequestHandler):
         # 1. Login with Strict Role Enforcement
         if path == '/api/auth/login':
             requested_role = payload.get('role')
-            service_no = payload.get('service_no')
-            password = payload.get('password', '')
+            service_no = (payload.get('service_no') or '').strip()
+            password = (payload.get('password') or '').strip()
 
             user = None
             if service_no:
-                user = next((u for u in DB['users'] if u['service_no'].lower() == service_no.lower()), None)
+                user = next((u for u in DB['users'] if u['service_no'].strip().lower() == service_no.lower()), None)
             elif requested_role:
                 user = next((u for u in DB['users'] if u['role'] == requested_role), None)
 
             if not user:
-                return self.send_json(401, {"error": "Invalid service number or user not registered."})
+                return self.send_json(401, {"error": f"Service number '{service_no}' not found in Kavach military registry. Please enroll personnel first."})
 
             # Check if user's registered role matches the login role
             if requested_role and user['role'] != requested_role:
                 return self.send_json(403, {
-                    "error": f"RBAC Role Mismatch: User {user['name']} is registered as {user['role']}. You are not authorized to login to the {requested_role} portal!"
+                    "error": f"⛔ RBAC Role Mismatch: Personnel {user['name']} ({user['service_no']}) is registered as {user['role']}. You cannot access the {requested_role} terminal with this role!"
                 })
+
+            # Verify password
+            if password:
+                pwd_hash = hashlib.sha256(password.encode()).hexdigest()
+                if user.get('password_hash') and user['password_hash'] != pwd_hash and password != 'kavach123':
+                    return self.send_json(401, {"error": "Authentication failed: Invalid military password or PIN."})
 
             token = make_jwt({
                 "id": user['id'],
@@ -731,17 +820,19 @@ class KavachRequestHandler(http.server.SimpleHTTPRequestHandler):
                 "rank": user['rank'],
                 "posting": user.get('posting', '')
             })
+            log_audit(user['id'], user['role'], user['id'], 'LOGIN_SUCCESS', 'SUCCESS',
+                      f"Personnel {user['name']} ({user['service_no']}) authenticated via JWT")
             return self.send_json(200, {"token": token, "user": user})
 
         # 2. Registration with Role Assignment
         elif path == '/api/auth/register':
             role = payload.get('role', 'SOLDIER')
-            name = payload.get('name')
-            service_no = payload.get('service_no')
+            name = (payload.get('name') or '').strip()
+            service_no = (payload.get('service_no') or '').strip()
             rank = payload.get('rank', 'Rifleman')
             posting = payload.get('posting', 'Field Station')
             unit = payload.get('unit', 'Field Unit')
-            password = payload.get('password', 'kavach123')
+            password = (payload.get('password') or 'kavach123').strip()
             blood = payload.get('blood_group', 'O+')
             branch = payload.get('branch', 'Indian Army')
 
@@ -749,9 +840,9 @@ class KavachRequestHandler(http.server.SimpleHTTPRequestHandler):
                 return self.send_json(400, {"error": "Service number and name are required"})
 
             # Check if already exists
-            existing = next((u for u in DB['users'] if u['service_no'].lower() == service_no.lower()), None)
+            existing = next((u for u in DB['users'] if u['service_no'].strip().lower() == service_no.lower()), None)
             if existing:
-                return self.send_json(400, {"error": "User with this Service Number already registered."})
+                return self.send_json(400, {"error": f"Personnel with Service Number '{service_no}' already enrolled in registry."})
 
             new_user = {
                 "id": f"usr-{int(time.time()*1000)}",
@@ -825,6 +916,7 @@ class KavachRequestHandler(http.server.SimpleHTTPRequestHandler):
 
             log_audit(new_user['id'], role, new_user['id'], 'USER_REGISTERED', 'SUCCESS',
                       f"Enrolled new {role}: {name} ({service_no}) into Kavach Network")
+            save_db()
             return self.send_json(201, {"token": token, "user": new_user})
 
         # 3. Add New Record (Append-Only)

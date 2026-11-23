@@ -132,6 +132,12 @@
             </button>
           </div>
         </div>
+
+        <!-- Database Inspector Shortcut -->
+        <button type="button" class="btn-db-registry" onclick="openDatabaseModal()">
+          <span>🗄️ Database Inspector &amp; Registered Personnel</span>
+          <span class="badge-count" id="dbUserCountBadge">6 Active</span>
+        </button>
       </form>
 
       <!-- 2. REGISTRATION FORM -->
@@ -212,6 +218,52 @@
           REGISTER &amp; INITIALIZE WALLET →
         </button>
       </form>
+    </div>
+  </div>
+
+  <!-- DATABASE INSPECTOR MODAL -->
+  <div class="db-modal-backdrop" id="dbModalBackdrop" onclick="handleDbModalBackdropClick(event)">
+    <div class="db-modal">
+      <div class="db-modal-header">
+        <div class="db-modal-title">
+          <span>🗄️</span> KAVACH MILITARY REGISTRY DATABASE
+        </div>
+        <button type="button" class="db-modal-close" onclick="closeDatabaseModal()">✕</button>
+      </div>
+      <div class="db-modal-body">
+        <div class="db-info-strip">
+          <div>
+            <span>Persistent Database: </span>
+            <span class="db-path-badge" id="dbFilePath">database/kavach_db.json</span>
+          </div>
+          <div>
+            <span id="dbSummaryCounts">Loading records...</span>
+          </div>
+        </div>
+
+        <div style="margin-bottom: 12px; display: flex; gap: 8px;">
+          <input type="text" id="dbSearchInput" class="form-control" placeholder="Search registered personnel by name, service number, rank, or role..." oninput="filterDatabaseTable()" style="font-size: 0.8rem; padding: 8px 12px;" />
+          <button type="button" class="btn-submit" onclick="fetchDatabaseRegistry()" style="width: auto; padding: 8px 14px; font-size: 0.78rem; white-space: nowrap;">⟳ Refresh DB</button>
+        </div>
+
+        <div class="db-table-container">
+          <table class="db-table">
+            <thead>
+              <tr>
+                <th>Role</th>
+                <th>Service No</th>
+                <th>Name &amp; Rank</th>
+                <th>Unit / Station</th>
+                <th>Enrolled</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="dbTableBody">
+              <tr><td colspan="6" style="text-align: center; padding: 20px; color: #94a3b8;">Loading registered personnel...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
     </div>
   </div>
 

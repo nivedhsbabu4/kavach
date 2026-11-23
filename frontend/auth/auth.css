@@ -404,3 +404,216 @@ select.form-control option {
   border: 1px solid rgba(16, 185, 129, 0.4);
   color: #86efac;
 }
+
+/* Registered Input Field Highlight */
+.input-registered-highlight {
+  border-color: #10b981 !important;
+  box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.35), 0 0 14px rgba(16, 185, 129, 0.2) !important;
+  animation: pulse-emerald 2s infinite ease-in-out;
+}
+
+@keyframes pulse-emerald {
+  0% { box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.35); }
+  50% { box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.6); }
+  100% { box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.35); }
+}
+
+/* Database Registry Button */
+.btn-db-registry {
+  width: 100%;
+  margin-top: 14px;
+  padding: 9px 14px;
+  background: rgba(184, 147, 65, 0.12);
+  border: 1px solid rgba(184, 147, 65, 0.4);
+  color: #fce7b0;
+  border-radius: 8px;
+  font-size: 0.76rem;
+  font-weight: 800;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: all 0.2s;
+  font-family: var(--font-mono);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.btn-db-registry:hover {
+  background: rgba(184, 147, 65, 0.25);
+  border-color: #cfaa5e;
+  transform: translateY(-1px);
+}
+
+.btn-db-registry .badge-count {
+  background: #b89341;
+  color: #08110a;
+  padding: 1px 7px;
+  border-radius: 12px;
+  font-size: 0.7rem;
+  font-weight: 900;
+}
+
+/* Database Inspector Modal */
+.db-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(4, 9, 5, 0.82);
+  backdrop-filter: blur(8px);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 10000;
+  padding: 16px;
+}
+
+.db-modal-backdrop.active {
+  display: flex;
+}
+
+.db-modal {
+  background: #0d1a10;
+  border: 2px solid #274c31;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7), 0 0 30px rgba(48, 99, 64, 0.3);
+  border-radius: 14px;
+  width: 100%;
+  max-width: 820px;
+  max-height: 85vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  color: #f1f5f9;
+}
+
+.db-modal-header {
+  padding: 18px 24px;
+  background: #142819;
+  border-bottom: 1px solid #274c31;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.db-modal-title {
+  font-size: 1.05rem;
+  font-weight: 900;
+  color: #cfaa5e;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--font-mono);
+}
+
+.db-modal-close {
+  background: transparent;
+  border: none;
+  color: #94a3b8;
+  font-size: 1.3rem;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 4px;
+}
+
+.db-modal-close:hover {
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.db-modal-body {
+  padding: 20px 24px;
+  overflow-y: auto;
+  flex: 1;
+}
+
+.db-info-strip {
+  background: rgba(0, 0, 0, 0.35);
+  border: 1px solid #1f3d27;
+  padding: 10px 14px;
+  border-radius: 8px;
+  font-size: 0.75rem;
+  color: #94a3b8;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.db-path-badge {
+  font-family: var(--font-mono);
+  color: #86efac;
+  background: rgba(16, 185, 129, 0.15);
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 0.72rem;
+}
+
+.db-table-container {
+  overflow-x: auto;
+  border: 1px solid #1f3d27;
+  border-radius: 8px;
+}
+
+.db-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.78rem;
+  text-align: left;
+}
+
+.db-table th {
+  background: #142819;
+  color: #cfaa5e;
+  padding: 10px 12px;
+  font-weight: 800;
+  font-family: var(--font-mono);
+  border-bottom: 1px solid #274c31;
+  text-transform: uppercase;
+  font-size: 0.7rem;
+  letter-spacing: 0.04em;
+}
+
+.db-table td {
+  padding: 10px 12px;
+  border-bottom: 1px solid rgba(39, 76, 49, 0.4);
+  color: #cbd5e1;
+}
+
+.db-table tr:hover td {
+  background: rgba(39, 76, 49, 0.25);
+}
+
+.db-role-badge {
+  display: inline-block;
+  padding: 2px 7px;
+  border-radius: 4px;
+  font-size: 0.68rem;
+  font-weight: 800;
+  font-family: var(--font-mono);
+}
+
+.db-role-SOLDIER { background: rgba(59, 130, 246, 0.2); color: #93c5fd; border: 1px solid rgba(59, 130, 246, 0.4); }
+.db-role-DOCTOR { background: rgba(16, 185, 129, 0.2); color: #86efac; border: 1px solid rgba(16, 185, 129, 0.4); }
+.db-role-PHYSIOTHERAPIST { background: rgba(245, 158, 11, 0.2); color: #fcd34d; border: 1px solid rgba(245, 158, 11, 0.4); }
+.db-role-COUNSELOR { background: rgba(168, 85, 247, 0.2); color: #d8b4fe; border: 1px solid rgba(168, 85, 247, 0.4); }
+.db-role-CLAIMS_OFFICER { background: rgba(239, 68, 68, 0.2); color: #fca5a5; border: 1px solid rgba(239, 68, 68, 0.4); }
+.db-role-COMMANDING_OFFICER { background: rgba(217, 119, 6, 0.2); color: #fde68a; border: 1px solid rgba(217, 119, 6, 0.4); }
+
+.btn-select-user {
+  background: #1b3823;
+  border: 1px solid #306340;
+  color: #86efac;
+  padding: 4px 10px;
+  border-radius: 4px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.btn-select-user:hover {
+  background: #306340;
+  color: #ffffff;
+}
