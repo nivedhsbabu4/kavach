@@ -48,7 +48,38 @@
             <span class="sync-badge synced"><span class="sync-pulse-dot"></span> <span>MH JAIPUR</span></span>
           </div>
         </div>
+      <!-- Notification Bell with Alert Badge -->
+      <div style="position: relative;">
+        <button class="header-action-btn" id="physioNotifBellBtn" onclick="togglePhysioNotifDrawer()" title="Rehab Notifications (1 Alert)" style="position: relative; width: 40px; height: 40px; border-radius: 8px; border: 1.5px solid var(--border-color); background: var(--bg-card); cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 1.15rem;">
+          🔔
+          <span style="position: absolute; top: -4px; right: -4px; background: #e11d48; color: white; font-size: 0.65rem; font-weight: 900; width: 18px; height: 18px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 2px solid var(--bg-card);">1</span>
+        </button>
+
+        <!-- Dropdown Notifications Menu -->
+        <div id="physioNotifDrawer" style="display: none; position: absolute; right: 0; top: 48px; width: 360px; background: var(--bg-card); border: 1.5px solid var(--border-color); border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.25); z-index: 100; padding: 16px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; border-bottom: 1px solid var(--border-subtle); padding-bottom: 8px;">
+            <strong style="font-size: 0.88rem;">🏃 Rehab Adherence Notifications</strong>
+            <span style="font-size: 0.7rem; background: #fee2e2; color: #991b1b; padding: 2px 6px; border-radius: 4px; font-weight: 800;">1 MISSED</span>
+          </div>
+
+          <div style="background: #fff1f2; border: 1px solid #fecdd3; border-radius: 8px; padding: 12px; margin-bottom: 8px;">
+            <div style="display: flex; justify-content: space-between; font-size: 0.72rem; color: #9f1239; font-weight: 800; margin-bottom: 4px;">
+              <span>⚠️ MISSED SESSION #14</span>
+              <span>YESTERDAY</span>
+            </div>
+            <div style="font-size: 0.82rem; font-weight: 700; color: #881337;">
+              Rfn. Arjun Verma (15489201A) &bull; 14 Rajputana Rifles
+            </div>
+            <div style="font-size: 0.74rem; color: #475569; margin: 4px 0;">
+              Left Knee Flexion Wall Squat &bull; VAS Pain: 4/10. Adherence reminder recommended.
+            </div>
+            <button class="btn-primary" style="background: #e11d48; border-color: #be123c; font-size: 0.75rem; padding: 6px 10px; width: 100%; margin-top: 6px; font-weight: 800;" onclick="sendPhysioNudge('usr-soldier-1')">
+              📱 Send Mobile Adherence Push
+            </button>
+          </div>
+        </div>
       </div>
+
       <button class="btn-logout" onclick="logoutUser()">LOGOUT</button>
     </div>
   </header>
@@ -146,8 +177,17 @@
   </div>
 
   <script>
+    function togglePhysioNotifDrawer() {
+      const drawer = document.getElementById('physioNotifDrawer');
+      if (drawer) {
+        drawer.style.display = drawer.style.display === 'none' || drawer.style.display === '' ? 'block' : 'none';
+      }
+    }
+
     function sendPhysioNudge(soldierId) {
       alert('📱 Push Notification & SMS Dispatched to Rifleman Arjun Verma:\n"Lt. Rajesh Kumar: Please complete Session 14 knee exercises or report joint swelling. Your recovery is vital."');
+      const drawer = document.getElementById('physioNotifDrawer');
+      if (drawer) drawer.style.display = 'none';
     }
   </script>
 </body>

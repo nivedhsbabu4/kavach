@@ -1,930 +1,1523 @@
 // ============================================================================
-// KAVACH: ENHANCED SOLDIER & VETERAN PATIENT CONSOLE
+// KAVACH: REACT 18 COMPONENT-POWERED SOLDIER HEALTH CONSOLE
+// Tagline: "Health that follows the soldier."
+// Architecture: Top Navigation Bar (No Left Sidebar), Interactive Teleconsultation,
+// Senior-Friendly Health Wallet, Doctor's Pain Diagnosis, and Settings Profile.
 // ============================================================================
 
-const I18N_SOLDIER = {
-  en: {
-    appTitle: "KAVACH",
-    appSub: "SOLDIER WALLET",
-    tagline: "Health that follows the soldier.",
-    navWallet: "Health Wallet",
-    navStress: "Stress & PTSD",
-    navRehab: "Rehab Tracker",
-    navGrants: "Access Grants",
-    navClaims: "Claims Tracker",
-    vaultDesc: "Records stay with you through every posting and ECHS retirement.",
-    recLabel: "Health Records",
-    recSub: "Across 3 Postings • Tamper-Proof",
-    rehabLabel: "Rehab Sessions",
-    rehabSub: "Left Knee Protocol • 70% Done",
-    stressLabel: "Stress Status",
-    stressSub: "PHQ-9 Moderate • 3 Wks Climbing",
-    nextApptLabel: "Next Appointment",
-    drawerTitle: "Settings & Preferences",
-    darkMode: "Dark Tactical Mode:",
-    nudgeTitle: "Your stress scores have climbed 3 weeks in a row — a confidential counselor is one tap away.",
-    nudgeSub: "Weekly PHQ-9 rose from 5 to 13 during Desert patrol. AFMS Psychological Support Cell (Dr. Sunita Rao) is available.",
-    connectCounselor: "Connect with Counselor"
-  },
-  hi: {
-    appTitle: "कवच",
-    appSub: "सैनिक स्वास्थ्य वॉलेट",
-    tagline: "स्वास्थ्य जो सैनिक के साथ चलता है।",
-    navWallet: "स्वास्थ्य वॉलेट",
-    navStress: "तनाव एवं पीटीएसडी",
-    navRehab: "पुनर्वास ट्रैकर",
-    navGrants: "अनुमति नियंत्रण",
-    navClaims: "दावा ट्रैकर",
-    vaultDesc: "हर पोस्टिंग और सेवानिवृत्ति के दौरान आपके मेडिकल रिकॉर्ड सुरक्षित रहते हैं।",
-    recLabel: "स्वास्थ्य रिकॉर्ड",
-    recSub: "3 पोस्टिंग के रिकॉर्ड • छेड़छाड़ रहित",
-    rehabLabel: "पुनर्वास सत्र",
-    rehabSub: "बाएं घुटने का प्रोटोकॉल • 70% पूरा",
-    stressLabel: "तनाव की स्थिति",
-    stressSub: "मध्यम तनाव • 3 सप्ताह से वृद्धि",
-    nextApptLabel: "अगली अपॉइंटमेंट",
-    drawerTitle: "सेटिंग्स और प्राथमिकताएं",
-    darkMode: "डार्क टैक्टिकल मोड:",
-    nudgeTitle: "आपके तनाव स्कोर में लगातार 3 हफ्तों से वृद्धि हुई है — गोपनीय काउंसलर केवल एक टैप दूर है।",
-    nudgeSub: "रेगिस्तानी पेट्रोलिंग के दौरान स्कोर 5 से बढ़कर 13 हुआ। एएफएमएस मानसिक स्वास्थ्य सेल उपलब्ध है।",
-    connectCounselor: "काउंसलर से संपर्क करें"
-  }
-};
+const { useState, useEffect, useMemo, useRef } = React;
 
-const state = {
-  lang: 'en',
-  activeTab: 'wallet',
-  chartPeriod: 'weekly',
-  walletCategory: 'ALL',
-  records: [],
-  screenings: [],
-  rehabPlan: null,
-  grants: [],
-  claims: [],
-  routineTimerSeconds: 15 * 60, // 15 mins daily routine
-  timerInterval: null,
-  isTimerRunning: false
-};
+function SoldierApp() {
+  // Navigation State (Top Bar Tabs)
+  const [activeTab, setActiveTab] = useState('wallet');
+  
+  // Data State
+  const [records, setRecords] = useState([]);
+  const [screenings, setScreenings] = useState([]);
+  const [rehabPlan, setRehabPlan] = useState(null);
+  const [grants, setGrants] = useState([]);
+  const [claims, setClaims] = useState([]);
+  const [consultations, setConsultations] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-document.addEventListener('DOMContentLoaded', async () => {
-  const name = localStorage.getItem('kavach_user_name') || 'Rfn. Arjun Verma';
-  const posting = localStorage.getItem('kavach_user_posting') || 'Rajasthan (Desert Sector)';
-
-  document.getElementById('topSoldierName').textContent = name;
-  document.getElementById('topSoldierPlace').textContent = `📍 ${posting}`;
-
-  await loadSoldierData();
-  renderSoldierTab();
-  startGrantCountdownTicker();
-});
-
-// Load all soldier data from REST API
-async function loadSoldierData() {
-  try {
-    const headers = getAuthHeaders();
-    const [recRes, scrRes, rhbRes, grtRes, clmRes] = await Promise.all([
-      fetch('/api/records?role=SOLDIER', { headers }),
-      fetch('/api/screenings?role=SOLDIER', { headers }),
-      fetch('/api/rehab?role=SOLDIER', { headers }),
-      fetch('/api/access-grants?role=SOLDIER', { headers }),
-      fetch('/api/claims?role=SOLDIER', { headers })
-    ]);
-
-    if (recRes.ok) state.records = await recRes.json();
-    if (scrRes.ok) state.screenings = await scrRes.json();
-    if (rhbRes.ok) state.rehabPlan = await rhbRes.json();
-    if (grtRes.ok) state.grants = await grtRes.json();
-    if (clmRes.ok) state.claims = await clmRes.json();
-
-    updateStatCards();
-  } catch (err) {
-    console.error('Error loading soldier data:', err);
-  }
-}
-
-// Update Top 4 Stat Cards & Blinking Pulse
-function updateStatCards() {
-  document.getElementById('statRecCount').textContent = state.records.length || 6;
-  if (state.rehabPlan) {
-    document.getElementById('statRehabProgress').textContent = `${state.rehabPlan.completed_sessions} / ${state.rehabPlan.total_sessions}`;
-  }
-
-  const phqRecords = state.screenings.filter(s => s.questionnaire_type === 'PHQ-9');
-  if (phqRecords.length > 0) {
-    const latest = phqRecords[phqRecords.length - 1];
-    const score = latest.score;
-    document.getElementById('statStressScore').textContent = `${score}/27`;
-
-    // Dynamic Blinking Indicator Class based on score
-    const pill = document.getElementById('stressBlinkPill');
-    if (pill) {
-      if (score < 5) {
-        pill.className = 'stress-blinking-pill green';
-        pill.textContent = 'NORMAL';
-      } else if (score < 10) {
-        pill.className = 'stress-blinking-pill yellow';
-        pill.textContent = 'MILD';
-      } else if (score < 15) {
-        pill.className = 'stress-blinking-pill orange';
-        pill.textContent = 'WARNING';
-      } else {
-        pill.className = 'stress-blinking-pill red';
-        pill.textContent = 'SEVERE ALERT';
-      }
+  // User Profile State
+  const [soldierProfile, setSoldierProfile] = useState({
+    name: 'Rifleman Arjun Verma',
+    serviceNo: '15489201A',
+    rank: 'Rifleman',
+    unit: '14 Rajputana Rifles (Infantry)',
+    posting: 'Rajasthan (Desert Sector)',
+    bloodGroup: 'O+',
+    allergies: 'Penicillin (Severe Anaphylactic Risk)',
+    nextOfKin: 'Sunita Verma (Wife) • +91-9876543211',
+    serviceYears: '8 Years (Enrolled 2016)',
+    dspPackage: 'Defence Salary Package (DSP) - Gold Verified',
+    bankAccount: {
+      bankName: 'State Bank of India (SBI)',
+      branch: 'Jaipur Cantt Military Branch',
+      accountNo: '30491829401',
+      ifsc: 'SBIN0001234'
     }
-  }
-}
-
-// Switch Navigation Tabs
-function switchSoldierTab(tab) {
-  state.activeTab = tab;
-  document.querySelectorAll('.sidebar-link').forEach(link => {
-    link.classList.toggle('active', link.getAttribute('data-tab') === tab);
   });
-  renderSoldierTab();
-}
 
-function renderSoldierTab() {
-  const container = document.getElementById('soldierTabContent');
-  switch (state.activeTab) {
-    case 'wallet':
-      renderSeniorFriendlyWallet(container);
-      break;
-    case 'stress':
-      renderStressTab(container);
-      break;
-    case 'rehab':
-      renderRehabTab(container);
-      break;
-    case 'grants':
-      renderGrantsTab(container);
-      break;
-    case 'claims':
-      renderClaimsTab(container);
-      break;
-    default:
-      renderSeniorFriendlyWallet(container);
+  // UI Modals & Drawers
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const [activeRecordModal, setActiveRecordModal] = useState(null);
+  const [activeVideoCall, setActiveVideoCall] = useState(null);
+  const [activeAssessmentModal, setActiveAssessmentModal] = useState(null);
+  const [isEditProfileOpen, setIsEditProfileOpen] = useState(false);
+  const [isUpdateBankOpen, setIsUpdateBankOpen] = useState(false);
+  const [isChangePasswordOpen, setIsChangePasswordOpen] = useState(false);
+  const [language, setLanguage] = useState('en');
+  const [isDarkMode, setIsDarkMode] = useState(false);
+  const [isNotifOpen, setIsNotifOpen] = useState(false);
+
+  // Health Wallet Search & Category
+  const [walletCategory, setWalletCategory] = useState('ALL');
+  const [walletSearch, setWalletSearch] = useState('');
+
+  // Routine Timer State
+  const [routineSeconds, setRoutineSeconds] = useState(900); // 15 mins
+  const [isTimerRunning, setIsTimerRunning] = useState(false);
+
+  // Teleconsultation Booking Form State
+  const [bookingForm, setBookingForm] = useState({
+    branch: 'Indian Army',
+    hospital: 'Base Hospital, Delhi Cantt',
+    specialty: 'Orthopedics & Joint Reconstruction',
+    doctorId: 'usr-doctor-1',
+    doctorName: 'Capt. Dr. Priya Nair, AMC',
+    date: new Date().toISOString().split('T')[0],
+    timeSlot: '10:30 AM',
+    reason: 'Follow-up on Left Knee mobility, lateral pain & theraband protocol check'
+  });
+
+  // Load Initial Data
+  useEffect(() => {
+    fetchInitialData();
+  }, []);
+
+  // Timer Tick
+  useEffect(() => {
+    let interval = null;
+    if (isTimerRunning && routineSeconds > 0) {
+      interval = setInterval(() => {
+        setRoutineSeconds(prev => prev - 1);
+      }, 1000);
+    } else if (routineSeconds === 0 && isTimerRunning) {
+      setIsTimerRunning(false);
+      alert('🔔 Knee Routine Complete! Excellent work finishing today’s rehabilitation drills.');
+    }
+    return () => clearInterval(interval);
+  }, [isTimerRunning, routineSeconds]);
+
+  async function fetchInitialData() {
+    try {
+      const headers = getAuthHeaders();
+      const [recRes, scrRes, rhbRes, grtRes, clmRes, cnsRes] = await Promise.all([
+        fetch('/api/records?role=SOLDIER', { headers }),
+        fetch('/api/screenings?role=SOLDIER', { headers }),
+        fetch('/api/rehab?role=SOLDIER', { headers }),
+        fetch('/api/access-grants?role=SOLDIER', { headers }),
+        fetch('/api/claims?role=SOLDIER', { headers }),
+        fetch('/api/consultations?role=SOLDIER', { headers })
+      ]);
+
+      if (recRes.ok) setRecords(await recRes.json());
+      if (scrRes.ok) setScreenings(await scrRes.json());
+      if (rhbRes.ok) setRehabPlan(await rhbRes.json());
+      if (grtRes.ok) setGrants(await grtRes.json());
+      if (clmRes.ok) setClaims(await clmRes.json());
+      if (cnsRes.ok) setConsultations(await cnsRes.json());
+    } catch (err) {
+      console.error('Error fetching soldier data:', err);
+    } finally {
+      setLoading(false);
+    }
   }
-}
 
-// ============================================================================
-// 1. SENIOR-FRIENDLY HEALTH WALLET (SIMPLE, LARGE FONT, CLEAR CATEGORIES)
-// ============================================================================
-function renderSeniorFriendlyWallet(container) {
-  let filtered = state.records;
-  if (state.walletCategory !== 'ALL') {
-    filtered = filtered.filter(r => r.type.toUpperCase() === state.walletCategory.toUpperCase());
+  function getAuthHeaders() {
+    const token = localStorage.getItem('kavach_jwt_token');
+    return token ? { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' } : { 'Content-Type': 'application/json' };
   }
 
-  container.innerHTML = `
-    <div class="card">
-      <div class="card-header">
-        <div>
-          <h2 class="card-title">💼 Health Wallet (स्वास्थ्य रिकॉर्ड)</h2>
-          <div style="font-size: 0.82rem; color: var(--text-muted); margin-top: 3px;">
-            Clear, easy-to-read medical history &bull; Tap any record to view details &bull; Sealed with SHA-256
+  // Handle Teleconsultation Booking
+  async function handleBookTeleconsult(e) {
+    e.preventDefault();
+    try {
+      const headers = getAuthHeaders();
+      const res = await fetch('/api/consultations', {
+        method: 'POST',
+        headers,
+        body: JSON.stringify({
+          soldier_id: 'usr-soldier-1',
+          ...bookingForm
+        })
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        // Prepend new record to health wallet
+        setRecords(prev => [data.record, ...prev]);
+        setConsultations(prev => [data.consultation, ...prev]);
+        
+        // Launch simulated live teleconsultation window
+        setActiveVideoCall(data.consultation);
+      } else {
+        alert('Failed to book teleconsultation.');
+      }
+    } catch (err) {
+      console.error(err);
+      alert('Network error while booking consultation.');
+    }
+  }
+
+  // Handle Exercise Checkbox
+  async function handleToggleExercise(exerciseId, isChecked) {
+    if (!rehabPlan) return;
+    const updatedExercises = rehabPlan.exercises.map(ex => 
+      ex.id === exerciseId ? { ...ex, completed: isChecked } : ex
+    );
+    const updatedPlan = { ...rehabPlan, exercises: updatedExercises };
+    setRehabPlan(updatedPlan);
+
+    try {
+      const headers = getAuthHeaders();
+      await fetch('/api/rehab/session', {
+        method: 'POST',
+        headers,
+        body: JSON.stringify({
+          completed_exercise_ids: updatedExercises.filter(e => e.completed).map(e => e.id)
+        })
+      });
+    } catch (err) {
+      console.error(err);
+    }
+  }
+
+  // Handle Mark Session Complete
+  async function handleMarkSessionComplete() {
+    try {
+      const headers = getAuthHeaders();
+      const res = await fetch('/api/rehab/session', {
+        method: 'POST',
+        headers,
+        body: JSON.stringify({ mark_completed: true })
+      });
+      if (res.ok) {
+        const updated = await res.json();
+        setRehabPlan(updated);
+        alert(`✓ Session marked complete! Progress recorded to Military Hospital Jaipur.`);
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  }
+
+  // Handle Revoke Grant
+  async function handleRevokeGrant(grantId) {
+    if (!confirm('Revoke access immediately? Medical provider will be blocked instantly.')) return;
+    try {
+      const headers = getAuthHeaders();
+      const res = await fetch('/api/access-grants/revoke', {
+        method: 'POST',
+        headers,
+        body: JSON.stringify({ grant_id: grantId })
+      });
+      if (res.ok) {
+        setGrants(prev => prev.map(g => g.id === grantId ? { ...g, status: 'REVOKED' } : g));
+        alert('✓ Access permission revoked immediately!');
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  }
+
+  // Filtered Health Wallet Records
+  const filteredRecords = useMemo(() => {
+    return records.filter(r => {
+      const matchesCategory = (walletCategory === 'ALL' || r.type.toUpperCase() === walletCategory.toUpperCase());
+      const matchesSearch = !walletSearch || 
+        r.title.toLowerCase().includes(walletSearch.toLowerCase()) ||
+        r.posting.toLowerCase().includes(walletSearch.toLowerCase()) ||
+        (r.hospital && r.hospital.toLowerCase().includes(walletSearch.toLowerCase())) ||
+        (r.diagnosis && r.diagnosis.toLowerCase().includes(walletSearch.toLowerCase()));
+      return matchesCategory && matchesSearch;
+    });
+  }, [records, walletCategory, walletSearch]);
+
+  const remainingExercises = rehabPlan ? rehabPlan.exercises.filter(e => !e.completed).length : 2;
+
+  // Format Timer
+  const timerMins = String(Math.floor(routineSeconds / 60)).padStart(2, '0');
+  const timerSecs = String(routineSeconds % 60).padStart(2, '0');
+
+  return (
+    <div className={`min-h-screen bg-slate-50 text-slate-800 ${isDarkMode ? 'dark bg-slate-950 text-slate-100' : ''}`}>
+      
+      {/* 1. Universal Emergency Ticker Topbar */}
+      <aside className="bg-slate-900 border-b border-amber-900/30 text-slate-300 px-6 py-2 text-xs flex justify-between items-center z-50">
+        <div className="flex items-center gap-3">
+          <span className="text-sm">🛡️</span>
+          <strong className="tracking-wider text-slate-100 font-bold uppercase">AFMS Tactical Health Network</strong>
+          <span className="bg-amber-500/10 text-amber-300 border border-amber-500/30 px-2 py-0.5 rounded text-[10px] font-mono font-bold">
+            NODE 14-RR // DESERT SECTOR
+          </span>
+        </div>
+
+        <div className="overflow-hidden flex-1 mx-6 font-mono text-[11px] text-slate-400">
+          <div className="whitespace-nowrap animate-[tickerMarquee_32s_linear_infinite] inline-block pl-full">
+            <span>🚨 24x7 ARMED FORCES HELPLINES:</span>
+            <span className="mx-3">•</span>
+            <span>📞 AFMS Tele-MANAS: 14416</span>
+            <span className="mx-3">•</span>
+            <span>📞 Army Sanjeevani Crisis: 1800-120-0012</span>
+            <span className="mx-3">•</span>
+            <span>📞 ECHS Toll-Free Support: 1800-114-115</span>
+            <span className="mx-3">•</span>
+            <span>📞 Army Medical Welfare Cell: 1904</span>
+            <span className="mx-3">•</span>
+            <span>🔒 AES-256-GCM Sovereign Encrypted • Append-Only Sealed Records</span>
           </div>
         </div>
-        <div style="display: flex; gap: 10px;">
-          <button class="btn-primary" onclick="alert('Printing simplified large-text medical summary for your doctor visit.')">
-            🖨️ Print for Doctor
-          </button>
+
+        <div className="flex items-center gap-3 flex-shrink-0">
+          <a href="tel:14416" className="bg-rose-500/20 text-rose-300 hover:bg-rose-500/30 border border-rose-500/40 px-3 py-1 rounded-full text-xs font-bold inline-flex items-center gap-1.5 transition">
+            <span>📞</span> <span>Crisis Line: 14416</span>
+          </a>
         </div>
-      </div>
+      </aside>
 
-      <!-- Senior-Friendly Big Category Buttons -->
-      <div style="display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap;">
-        <button class="posting-btn ${state.walletCategory === 'ALL' ? 'active' : ''}" onclick="setWalletCategory('ALL')">
-          📁 All Records (${state.records.length})
-        </button>
-        <button class="posting-btn ${state.walletCategory === 'SURGERY' ? 'active' : ''}" onclick="setWalletCategory('SURGERY')">
-          🏥 Surgeries &amp; Hospital
-        </button>
-        <button class="posting-btn ${state.walletCategory === 'INJURY' ? 'active' : ''}" onclick="setWalletCategory('INJURY')">
-          🩹 Battle Casualties
-        </button>
-        <button class="posting-btn ${state.walletCategory === 'X_RAY' ? 'active' : ''}" onclick="setWalletCategory('X_RAY')">
-          🩻 X-Rays &amp; Scans
-        </button>
-        <button class="posting-btn ${state.walletCategory === 'VACCINATION' ? 'active' : ''}" onclick="setWalletCategory('VACCINATION')">
-          💉 Vaccinations
-        </button>
-        <button class="posting-btn ${state.walletCategory === 'PRESCRIPTION' ? 'active' : ''}" onclick="setWalletCategory('PRESCRIPTION')">
-          💊 Medications
-        </button>
-      </div>
-
-      <!-- Senior-Friendly Big Clear Record Cards -->
-      <div style="display: flex; flex-direction: column; gap: 16px;">
-        ${filtered.map(r => {
-          let categoryIcon = '📄';
-          let badgeClass = 'badge-vaccine';
-          if (r.type === 'SURGERY') { categoryIcon = '🏥'; badgeClass = 'badge-surgery'; }
-          else if (r.type === 'INJURY') { categoryIcon = '🩹'; badgeClass = 'badge-injury'; }
-          else if (r.type === 'X_RAY') { categoryIcon = '🩻'; badgeClass = 'badge-xray'; }
-          else if (r.type === 'VACCINATION') { categoryIcon = '💉'; badgeClass = 'badge-vaccine'; }
-          else if (r.type === 'PRESCRIPTION') { categoryIcon = '💊'; badgeClass = 'badge-surgery'; }
-
-          return `
-            <div class="senior-record-card">
-              <div class="senior-card-type-header">
-                <span class="senior-type-badge ${badgeClass}">
-                  <span>${categoryIcon}</span> <span>${r.type}</span>
-                </span>
-                <span style="font-size: 0.85rem; font-weight: 800; color: var(--text-muted);">
-                  📅 Date: ${r.date}
-                </span>
-              </div>
-
-              <h3 class="senior-record-title">${r.title}</h3>
-
-              <!-- Plain Language Explanation for Senior Veterans -->
-              <div class="senior-record-simple-desc">
-                <strong>What happened:</strong> ${r.is_mental_health ? 'Confidential mental health check-in (Protected with AES-256 military encryption).' : r.diagnosis}
-              </div>
-
-              <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.82rem; color: var(--text-muted); flex-wrap: wrap; gap: 8px;">
-                <div>
-                  <span>📍 <strong>Location:</strong> ${r.posting}</span> &bull; 
-                  <span>👨‍⚕️ <strong>Doctor:</strong> ${r.doctor_name || 'Medical Officer'}</span> &bull; 
-                  <span>🏥 <strong>Hospital:</strong> ${r.hospital || 'Base Hospital'}</span>
-                </div>
-                <div class="tamper-hash-seal" title="SHA-256 HMAC: ${r.tamper_hash}">
-                  <span>🛡️</span> <span>Verified Tamper-Proof</span>
-                </div>
-              </div>
-            </div>
-          `;
-        }).join('')}
-      </div>
-    </div>
-  `;
-}
-
-function setWalletCategory(cat) {
-  state.walletCategory = cat;
-  renderSeniorFriendlyWallet(document.getElementById('soldierTabContent'));
-}
-
-// ============================================================================
-// 2. STRESS SCREENING TAB WITH DYNAMIC BLINKING INDICATOR
-// ============================================================================
-function renderStressTab(container) {
-  const phqList = state.screenings.filter(s => s.questionnaire_type === 'PHQ-9');
-  const latest = phqList[phqList.length - 1] || { score: 13 };
-  const score = latest.score;
-
-  let blinkColor = 'orange';
-  let severityLabel = 'MODERATE WARNING';
-  if (score < 5) { blinkColor = 'green'; severityLabel = 'NORMAL / HEALTHY'; }
-  else if (score < 10) { blinkColor = 'yellow'; severityLabel = 'MILD'; }
-  else if (score >= 15) { blinkColor = 'red'; severityLabel = 'SEVERE ALERT'; }
-
-  container.innerHTML = `
-    <!-- Gentle Counselor Nudge Banner -->
-    <div class="counselor-nudge-banner">
-      <div class="nudge-content">
-        <span class="nudge-icon">⚠️</span>
-        <div class="nudge-text">
-          <strong>Your stress scores have climbed 3 weeks in a row — a confidential counselor is one tap away.</strong>
-          <span>Weekly PHQ-9 rose from 5 to 13 during Desert patrol. AFMS Psychological Support Cell (Dr. Sunita Rao) is available.</span>
-        </div>
-      </div>
-      <button class="btn-primary" style="background: #d97706; white-space: nowrap;" onclick="alert('📞 Direct Confidential Line to Dr. Sunita Rao (AFMS Psychological Cell) connected.')">
-        Connect with Counselor
-      </button>
-    </div>
-
-    <!-- Dual Charts Row -->
-    <div class="charts-dual-grid">
-      <!-- 1. Interactive Line Graph with Dynamic Blinking Marker -->
-      <div class="chart-box">
-        <div class="chart-header-controls">
+      {/* 2. Main App Header */}
+      <header className="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 px-8 py-3.5 flex justify-between items-center shadow-xs sticky top-0 z-40 backdrop-blur-md">
+        <div className="flex items-center gap-3.5">
+          <div className="w-11 h-11 flex-shrink-0 drop-shadow-md">
+            <img src="../../assets/logo.svg" alt="Kavach Shield Logo" className="w-full h-full pointer-events-none select-none" />
+          </div>
           <div>
-            <h3 style="font-size: 1.05rem; font-weight: 800; display: flex; align-items: center; gap: 8px;">
-              <span>📈</span> <span>Weekly Stress Trajectory</span>
-              <span class="stress-blinking-pill ${blinkColor}">${severityLabel}</span>
-            </h3>
-            <span style="font-size: 0.76rem; color: var(--text-muted);">
-              Threshold: &ge; 10 triggers Proactive Counselor Outreach
-            </span>
-          </div>
-
-          <div class="period-pill-toggle">
-            <button class="period-btn ${state.chartPeriod === 'weekly' ? 'active' : ''}" onclick="togglePeriod('weekly')">Weekly</button>
-            <button class="period-btn ${state.chartPeriod === 'monthly' ? 'active' : ''}" onclick="togglePeriod('monthly')">Monthly</button>
+            <h1 className="text-xl font-black tracking-tight text-slate-900 dark:text-white flex items-center gap-2">
+              KAVACH
+              <span className="text-[10px] font-extrabold uppercase font-mono px-2 py-0.5 rounded bg-emerald-50 text-emerald-800 border border-emerald-200 dark:bg-emerald-950 dark:text-emerald-300 dark:border-emerald-800">
+                SOLDIER CONSOLE (REACT)
+              </span>
+            </h1>
+            <div className="text-xs text-slate-500 dark:text-slate-400 font-medium">"Health that follows the soldier."</div>
           </div>
         </div>
 
-        <div style="height: 240px; position: relative;">
-          ${renderLineChartWithPulse(state.chartPeriod, blinkColor)}
+        {/* Center Security Clearance Chip */}
+        <div className="hidden lg:flex items-center gap-2 bg-emerald-50 dark:bg-emerald-950/40 text-emerald-800 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 px-3.5 py-1.5 rounded-full text-xs font-bold">
+          <span>🛡️</span>
+          <span>SOVEREIGN ENCRYPTED • AES-256-GCM RECORD STORE</span>
         </div>
-      </div>
 
-      <!-- 2. Interactive Pie Chart -->
-      <div class="chart-box">
-        <div class="chart-header-controls">
-          <h3 style="font-size: 1.05rem; font-weight: 800;">🥧 Symptom Distribution</h3>
-          <span style="font-size: 0.74rem; color: var(--text-muted);">Self-Assessments</span>
-        </div>
-        <div style="height: 240px; display: flex; flex-direction: column; align-items: center; justify-content: center;">
-          <svg width="180" height="180" viewBox="0 0 200 200">
-            <circle cx="100" cy="100" r="70" fill="transparent" stroke="#15803d" stroke-width="32" stroke-dasharray="110 330" stroke-dashoffset="0" />
-            <circle cx="100" cy="100" r="70" fill="transparent" stroke="#d4af37" stroke-width="32" stroke-dasharray="154 286" stroke-dashoffset="-110" />
-            <circle cx="100" cy="100" r="70" fill="transparent" stroke="#f97316" stroke-width="32" stroke-dasharray="132 308" stroke-dashoffset="-264" />
-            <circle cx="100" cy="100" r="70" fill="transparent" stroke="#dc2626" stroke-width="32" stroke-dasharray="44 396" stroke-dashoffset="-396" />
-            <text x="100" y="105" text-anchor="middle" font-size="15" font-weight="900" fill="var(--text-main)">PHQ-9</text>
-          </svg>
-          <div style="display: flex; justify-content: center; gap: 10px; font-size: 0.72rem; margin-top: 10px; flex-wrap: wrap;">
-            <span><span style="color: #15803d;">●</span> Minimal (25%)</span>
-            <span><span style="color: #d4af37;">●</span> Mild (35%)</span>
-            <span><span style="color: #f97316;">●</span> Moderate (30%)</span>
-            <span><span style="color: #dc2626;">●</span> Severe (10%)</span>
+        {/* Right Soldier Profile & Settings Button */}
+        <div className="flex items-center gap-3.5">
+          <div className="flex items-center gap-2.5 bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 px-3.5 py-1.5 rounded-xl shadow-xs">
+            <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-emerald-700 to-emerald-900 text-white font-bold text-xs flex items-center justify-center shadow-sm">
+              AV
+            </div>
+            <div className="text-left leading-tight">
+              <div className="font-extrabold text-xs text-slate-900 dark:text-white">{soldierProfile.name}</div>
+              <div className="text-[11px] text-slate-500 dark:text-slate-400 flex items-center gap-1.5 font-mono">
+                <span>{soldierProfile.posting}</span>
+                <span>•</span>
+                <span className="text-emerald-600 dark:text-emerald-400 font-bold inline-flex items-center gap-1">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-ping"></span> LIVE
+                </span>
+              </div>
+            </div>
           </div>
-        </div>
-      </div>
-    </div>
 
-    <!-- Globally Validated Questionnaire Check-ins -->
-    <div class="card">
-      <div class="card-header">
-        <div>
-          <h3 class="card-title">📝 Globally Validated Self-Assessments</h3>
-          <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 2px;">
-            PCL-5 (PTSD), PHQ-9 (Depression), GAD-7 (Anxiety) &bull; 100% Confidential
+          {/* Notification Bell with Badge & Dropdown */}
+          <div className="relative">
+            <button 
+              onClick={() => setIsNotifOpen(!isNotifOpen)}
+              className="w-10 h-10 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 flex items-center justify-center text-lg hover:border-emerald-500 transition shadow-xs relative"
+              title="Notifications & Adherence Alerts"
+            >
+              🔔
+              <span className="absolute -top-1 -right-1 bg-rose-600 text-white text-[10px] font-black w-4.5 h-4.5 rounded-full flex items-center justify-center border-2 border-white dark:border-slate-800">
+                2
+              </span>
+            </button>
+
+            {/* Notification Popover Dropdown */}
+            {isNotifOpen && (
+              <div className="absolute right-0 top-12 w-80 bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-xl p-4 z-50">
+                <div className="flex justify-between items-center pb-2 border-b border-slate-100 dark:border-slate-700 mb-3">
+                  <span className="text-xs font-black text-slate-800 dark:text-white uppercase tracking-wider">
+                    🔔 Active Notifications
+                  </span>
+                  <span className="text-[10px] font-bold bg-rose-100 text-rose-700 dark:bg-rose-950 dark:text-rose-300 px-2 py-0.5 rounded-md">
+                    2 High Priority
+                  </span>
+                </div>
+
+                <div className="space-y-2.5">
+                  <div 
+                    onClick={() => { setActiveTab('rehab'); setIsNotifOpen(false); }}
+                    className="p-2.5 rounded-xl bg-rose-50/70 dark:bg-rose-950/30 border border-rose-200 dark:border-rose-900 cursor-pointer hover:bg-rose-100/70 transition"
+                  >
+                    <div className="flex justify-between text-[10px] font-bold text-rose-700 dark:text-rose-400 mb-1">
+                      <span>🏃 MISSED REHAB SESSION</span>
+                      <span>YESTERDAY</span>
+                    </div>
+                    <div className="text-xs font-bold text-slate-900 dark:text-white">
+                      Knee Mobility Session #14 Missed
+                    </div>
+                    <div className="text-[11px] text-slate-600 dark:text-slate-300 mt-1">
+                      Dr. Priya Nair &amp; Lt. Rajesh Kumar flagged Session #14. Tap to resume today's protocol.
+                    </div>
+                  </div>
+
+                  <div 
+                    onClick={() => { setActiveTab('stress'); setIsNotifOpen(false); }}
+                    className="p-2.5 rounded-xl bg-amber-50/70 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-900 cursor-pointer hover:bg-amber-100/70 transition"
+                  >
+                    <div className="flex justify-between text-[10px] font-bold text-amber-700 dark:text-amber-400 mb-1">
+                      <span>⚠️ STRESS SCREENING NUDGE</span>
+                      <span>3 DAYS AGO</span>
+                    </div>
+                    <div className="text-xs font-bold text-slate-900 dark:text-white">
+                      PHQ-9 Score Trend Alert
+                    </div>
+                    <div className="text-[11px] text-slate-600 dark:text-slate-300 mt-1">
+                      Stress scores climbed 3 weeks in a row. Confidential counselor line is available.
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
-        </div>
-      </div>
 
-      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px;">
-        <div style="border: 1.5px solid var(--border-color); border-radius: 8px; padding: 18px; background: var(--bg-card);">
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-            <strong style="font-size: 1rem;">PHQ-9 (Depression Inventory)</strong>
-            <span style="font-size: 0.75rem; color: #dc2626; font-weight: 800;">Score: ${score}/27</span>
-          </div>
-          <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 14px;">Tracks mood, sleep, and fatigue over previous 14 days.</p>
-          <button class="btn-outline" style="width: 100%;" onclick="openAssessmentModal('PHQ-9')">Take PHQ-9 Assessment →</button>
-        </div>
-
-        <div style="border: 1.5px solid var(--border-color); border-radius: 8px; padding: 18px; background: var(--bg-card);">
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-            <strong style="font-size: 1rem;">PCL-5 (PTSD Checklist)</strong>
-            <span style="font-size: 0.75rem; color: #d97706; font-weight: 800;">Score: 32/80</span>
-          </div>
-          <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 14px;">Evaluates combat stress recall and hyper-vigilance.</p>
-          <button class="btn-outline" style="width: 100%;" onclick="openAssessmentModal('PCL-5')">Take PCL-5 Assessment →</button>
-        </div>
-
-        <div style="border: 1.5px solid var(--border-color); border-radius: 8px; padding: 18px; background: var(--bg-card);">
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-            <strong style="font-size: 1rem;">GAD-7 (Anxiety Scale)</strong>
-            <span style="font-size: 0.75rem; color: #15803d; font-weight: 800;">Score: 9/21</span>
-          </div>
-          <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 14px;">Measures somatic tension, nervous arousal, and worry.</p>
-          <button class="btn-outline" style="width: 100%;" onclick="openAssessmentModal('GAD-7')">Take GAD-7 Assessment →</button>
-        </div>
-      </div>
-    </div>
-  `;
-}
-
-function togglePeriod(period) {
-  state.chartPeriod = period;
-  renderStressTab(document.getElementById('soldierTabContent'));
-}
-
-function renderLineChartWithPulse(period, blinkColor) {
-  const pointsData = period === 'weekly' ? [
-    { label: 'Wk 1 (Oct 10)', score: 5 },
-    { label: 'Wk 2 (Oct 17)', score: 6 },
-    { label: 'Wk 3 (Oct 24)', score: 8 },
-    { label: 'Wk 4 (Oct 31)', score: 10 },
-    { label: 'Wk 5 (Nov 07)', score: 11 },
-    { label: 'Wk 6 (Nov 14)', score: 13 }
-  ] : [
-    { label: 'Aug 2024', score: 4 },
-    { label: 'Sep 2024', score: 5 },
-    { label: 'Oct 2024', score: 8 },
-    { label: 'Nov 2024', score: 13 }
-  ];
-
-  const svgWidth = 650;
-  const svgHeight = 220;
-  const padX = 60;
-  const padY = 30;
-  const w = svgWidth - padX * 2;
-  const h = svgHeight - padY * 2;
-
-  const points = pointsData.map((d, i) => ({
-    x: padX + (i / (pointsData.length - 1)) * w,
-    y: svgHeight - padY - (d.score / 27) * h,
-    score: d.score,
-    label: d.label
-  }));
-
-  const pathD = points.map((p, i) => `${i === 0 ? 'M' : 'L'} ${p.x} ${p.y}`).join(' ');
-  const lastPoint = points[points.length - 1];
-
-  return `
-    <svg width="100%" height="100%" viewBox="0 0 ${svgWidth} ${svgHeight}">
-      <line x1="${padX}" y1="${svgHeight - padY}" x2="${svgWidth - padX}" y2="${svgHeight - padY}" stroke="var(--border-subtle)" stroke-width="1.5" />
-      <line x1="${padX}" y1="${svgHeight - padY - (10/27)*h}" x2="${svgWidth - padX}" y2="${svgHeight - padY - (10/27)*h}" stroke="#f59e0b" stroke-width="2" stroke-dasharray="5,4" />
-      <text x="${svgWidth - padX - 90}" y="${svgHeight - padY - (10/27)*h - 6}" font-size="11" font-weight="700" fill="#f59e0b">Threshold (10)</text>
-
-      <path d="${pathD}" fill="none" stroke="#dc2626" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" />
-
-      ${points.map((p, idx) => `
-        <circle cx="${p.x}" cy="${p.y}" r="${idx === points.length - 1 ? 8 : 5}" fill="${idx === points.length - 1 ? '#f97316' : '#2e5229'}" stroke="#ffffff" stroke-width="2" />
-        <text x="${p.x}" y="${p.y - 12}" text-anchor="middle" font-size="12" font-weight="800" fill="var(--text-main)">${p.score}</text>
-        <text x="${p.x}" y="${svgHeight - 8}" text-anchor="middle" font-size="10" font-weight="600" fill="var(--text-muted)">${p.label}</text>
-      `).join('')}
-
-      <!-- Dynamic Blinking Pulse Ring around the latest score point -->
-      <circle cx="${lastPoint.x}" cy="${lastPoint.y}" r="14" fill="none" stroke="#f97316" stroke-width="2.5" opacity="0.8">
-        <animate attributeName="r" values="8;18;8" dur="1.5s" repeatCount="indefinite"/>
-        <animate attributeName="opacity" values="1;0;1" dur="1.5s" repeatCount="indefinite"/>
-      </circle>
-    </svg>
-  `;
-}
-
-// ============================================================================
-// 3. REHAB TRACKER WITH DOCTOR'S PAIN DIAGNOSIS & ROUTINE TIMER
-// ============================================================================
-function renderRehabTab(container) {
-  const plan = state.rehabPlan || {
-    title: 'Post-Arthroscopy Left Knee Mobility & Quadriceps Strengthening',
-    completed_sessions: 14,
-    total_sessions: 20,
-    pain_level: 4,
-    mobility_score: 115,
-    pain_location: 'Left Knee (Medial Joint Line)',
-    pain_type: 'Sharp throbbing on 90° flexion & post-weight-bearing stiffness',
-    since_when: '19 Aug 2023 - Sustained during snow patrol in Tawang',
-    diagnosed_by: 'Capt. Dr. Priya Nair & Lt. Rajesh Kumar',
-    exercises: [
-      { id: 'ex-1', name: 'Straight Leg Raises (Quad setting)', reps: '3 sets x 15 reps', completed: true },
-      { id: 'ex-2', name: 'Terminal Knee Extension with Theraband', reps: '3 sets x 12 reps', completed: true },
-      { id: 'ex-3', name: 'Wall Squats with Swiss Ball (30 deg)', reps: '3 sets x 10 reps', completed: false },
-      { id: 'ex-4', name: 'Hamstring Curls & Towel Heel Slides', reps: '2 sets x 15 reps', completed: false }
-    ]
-  };
-
-  const remainingExercises = plan.exercises.filter(e => !e.completed).length;
-  const pct = Math.round((plan.completed_sessions / plan.total_sessions) * 100);
-
-  // Format timer
-  const mins = String(Math.floor(state.routineTimerSeconds / 60)).padStart(2, '0');
-  const secs = String(state.routineTimerSeconds % 60).padStart(2, '0');
-
-  container.innerHTML = `
-    <!-- Doctor's Prescribed Pain Diagnosis Certified Box -->
-    <div class="pain-diagnosis-certified-box">
-      <div class="pain-diagnosis-header">
-        <span class="pain-diagnosis-badge">
-          🩺 CERTIFIED CLINICAL PAIN DIAGNOSIS &bull; MEDICAL OFFICER RECORD
-        </span>
-        <span style="font-size: 0.76rem; color: var(--text-muted); font-family: var(--font-mono);">
-          ATTENDING: ${plan.diagnosed_by || 'Capt. Dr. Priya Nair, AMC'}
-        </span>
-      </div>
-
-      <div class="pain-grid-layout">
-        <div class="pain-grid-cell">
-          <div class="pain-grid-label">Pain Location</div>
-          <div class="pain-grid-value">📍 ${plan.pain_location || 'Left Knee (Medial Joint Line)'}</div>
-        </div>
-        <div class="pain-grid-cell">
-          <div class="pain-grid-label">Pain Nature &amp; Symptoms</div>
-          <div class="pain-grid-value">⚡ ${plan.pain_type || 'Sharp throbbing on 90° flexion & stiffness'}</div>
-        </div>
-        <div class="pain-grid-cell">
-          <div class="pain-grid-label">Onset &amp; Context</div>
-          <div class="pain-grid-value">📅 ${plan.since_when || '19 Aug 2023 - Tawang Snow Patrol'}</div>
-        </div>
-        <div class="pain-grid-cell">
-          <div class="pain-grid-label">Clinical Grade</div>
-          <div class="pain-grid-value" style="color: var(--status-amber);">⚠️ ${plan.pain_severity || 'Moderate (VAS 4/10)'}</div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Active Protocol & Exercises -->
-    <div class="card">
-      <div class="card-header">
-        <div>
-          <h2 class="card-title">🏃 ${plan.title}</h2>
-          <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 2px;">
-            Targeted Knee Mobility Arc: <strong>115&deg; Flexion</strong> (+15&deg; recovery)
-          </div>
-        </div>
-        <div style="text-align: right;">
-          <div style="font-size: 1.25rem; font-weight: 900; color: var(--olive-700);">${plan.completed_sessions} of ${plan.total_sessions} Sessions</div>
-          <div style="font-size: 0.75rem; color: var(--text-muted);">Protocol 70% Completed</div>
-        </div>
-      </div>
-
-      <!-- Exercise Status Bar & Active Routine Timer -->
-      <div style="background: var(--bg-main); border: 1.5px solid var(--border-color); border-radius: 8px; padding: 14px 18px; margin-bottom: 18px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
-        <div>
-          <strong style="font-size: 0.95rem; color: var(--olive-900);">Today's Session Queue:</strong>
-          <span style="font-size: 0.85rem; color: ${remainingExercises > 0 ? '#d97706' : '#15803d'}; font-weight: 800; margin-left: 8px;">
-            ${remainingExercises > 0 ? `⏳ ${remainingExercises} exercises remaining for today` : '✓ All exercises completed for today!'}
-          </span>
-        </div>
-
-        <!-- Active Exercise Countdown Timer -->
-        <div style="display: flex; align-items: center; gap: 10px;">
-          <span style="font-size: 0.8rem; font-weight: 700; color: var(--text-muted);">Routine Timer:</span>
-          <span id="routineTimerDisplay" style="font-family: monospace; font-size: 1.2rem; font-weight: 900; color: var(--olive-800); background: var(--bg-card); padding: 4px 10px; border-radius: 6px; border: 1px solid var(--border-color);">
-            ${mins}:${secs}
-          </span>
-          <button class="btn-primary" style="padding: 5px 12px; font-size: 0.78rem;" onclick="toggleRoutineTimer()">
-            ${state.isTimerRunning ? '⏸ Pause' : '▶ Start Timer'}
+          {/* Sleek Settings Gear Button */}
+          <button 
+            onClick={() => setIsSettingsOpen(true)}
+            className="w-10 h-10 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 flex items-center justify-center text-lg hover:border-emerald-500 hover:text-emerald-600 transition shadow-xs"
+            title="Settings, Soldier Profile, Language & Bank"
+          >
+            ⚙️
           </button>
         </div>
-      </div>
+      </header>
 
-      <!-- Exercises Checklist -->
-      <div class="exercise-list">
-        ${plan.exercises.map(ex => `
-          <div class="exercise-row ${ex.completed ? 'completed' : ''}">
-            <div style="display: flex; align-items: center; gap: 12px;">
-              <input type="checkbox" id="${ex.id}" ${ex.completed ? 'checked' : ''} style="width: 20px; height: 20px; cursor: pointer;" onchange="toggleExerciseItem('${ex.id}', this.checked)" />
-              <div>
-                <label for="${ex.id}" style="font-weight: 800; font-size: 0.92rem; cursor: pointer; text-decoration: ${ex.completed ? 'line-through' : 'none'};">
-                  ${ex.name}
-                </label>
-                <div style="font-size: 0.78rem; color: var(--text-muted);">${ex.reps} &bull; Est. 5 mins</div>
-              </div>
-            </div>
-            <button class="btn-outline" style="font-size: 0.72rem; padding: 4px 8px;" onclick="alert('Playing 3D physiotherapy guidance demo for ${ex.name}')">
-              🎥 Video Demo
+      {/* 3. Modern TOP NAVIGATION BAR (Replaces Clunky Left Sidebar!) */}
+      <nav className="bg-slate-100/80 dark:bg-slate-900/80 border-b border-slate-200 dark:border-slate-800 px-8 py-2 sticky top-[69px] z-30 backdrop-blur-md">
+        <div className="max-w-7xl mx-auto flex items-center justify-between gap-2 overflow-x-auto no-scrollbar">
+          <div className="flex items-center gap-1.5 p-1 bg-white dark:bg-slate-800/80 rounded-xl border border-slate-200/80 dark:border-slate-700/80 shadow-xs">
+            
+            <button 
+              onClick={() => setActiveTab('wallet')}
+              className={`px-4 py-2 rounded-lg text-xs font-bold transition flex items-center gap-2 ${activeTab === 'wallet' ? 'bg-emerald-800 text-white shadow-sm' : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700'}`}
+            >
+              <span>💼</span>
+              <span>Health Wallet</span>
+              <span className={`px-1.5 py-0.2 rounded-full text-[10px] font-mono ${activeTab === 'wallet' ? 'bg-emerald-950 text-emerald-200' : 'bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300'}`}>
+                {records.length}
+              </span>
             </button>
+
+            <button 
+              onClick={() => setActiveTab('teleconsult')}
+              className={`px-4 py-2 rounded-lg text-xs font-bold transition flex items-center gap-2 ${activeTab === 'teleconsult' ? 'bg-emerald-800 text-white shadow-sm' : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700'}`}
+            >
+              <span>🩺</span>
+              <span>Teleconsultation</span>
+              <span className="px-1.5 py-0.2 rounded-full text-[10px] font-mono bg-blue-100 text-blue-800 dark:bg-blue-950 dark:text-blue-300">
+                AFMS Cell
+              </span>
+            </button>
+
+            <button 
+              onClick={() => setActiveTab('stress')}
+              className={`px-4 py-2 rounded-lg text-xs font-bold transition flex items-center gap-2 ${activeTab === 'stress' ? 'bg-emerald-800 text-white shadow-sm' : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700'}`}
+            >
+              <span>🧠</span>
+              <span>Stress &amp; PTSD</span>
+              <span className="px-1.5 py-0.2 rounded-full text-[10px] font-mono bg-orange-100 text-orange-800 dark:bg-orange-950 dark:text-orange-300">
+                13/27
+              </span>
+            </button>
+
+            <button 
+              onClick={() => setActiveTab('rehab')}
+              className={`px-4 py-2 rounded-lg text-xs font-bold transition flex items-center gap-2 ${activeTab === 'rehab' ? 'bg-emerald-800 text-white shadow-sm' : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700'}`}
+            >
+              <span>🏃</span>
+              <span>Rehab Tracker</span>
+              <span className="px-1.5 py-0.2 rounded-full text-[10px] font-mono bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300">
+                70% Done
+              </span>
+            </button>
+
+            <button 
+              onClick={() => setActiveTab('grants')}
+              className={`px-4 py-2 rounded-lg text-xs font-bold transition flex items-center gap-2 ${activeTab === 'grants' ? 'bg-emerald-800 text-white shadow-sm' : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700'}`}
+            >
+              <span>🔐</span>
+              <span>Access Grants</span>
+              <span className="px-1.5 py-0.2 rounded-full text-[10px] font-mono bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300">
+                {grants.filter(g => g.status === 'ACTIVE').length} Active
+              </span>
+            </button>
+
+            <button 
+              onClick={() => setActiveTab('claims')}
+              className={`px-4 py-2 rounded-lg text-xs font-bold transition flex items-center gap-2 ${activeTab === 'claims' ? 'bg-emerald-800 text-white shadow-sm' : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700'}`}
+            >
+              <span>📋</span>
+              <span>Claims Tracker</span>
+              <span className="px-1.5 py-0.2 rounded-full text-[10px] font-mono bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300">
+                Stage 3
+              </span>
+            </button>
+
           </div>
-        `).join('')}
-      </div>
 
-      <!-- Pain Scale Slider -->
-      <div style="background: var(--bg-main); padding: 14px 18px; border-radius: 8px; border: 1px solid var(--border-color); margin-top: 18px;">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-          <label style="font-weight: 800; font-size: 0.88rem;">Log Today's Joint Pain (VAS 0–10):</label>
-          <span id="painSliderVal" style="font-weight: 900; color: #dc2626; font-size: 1.1rem;">${plan.pain_level}/10</span>
-        </div>
-        <input type="range" min="0" max="10" value="${plan.pain_level}" style="width: 100%; accent-color: var(--olive-700); cursor: pointer;"
-          oninput="document.getElementById('painSliderVal').textContent = this.value + '/10'; updatePainValue(this.value);" />
-      </div>
-
-      <div style="display: flex; justify-content: flex-end; margin-top: 18px;">
-        <button class="btn-primary" onclick="markRehabSessionComplete()">
-          ✓ Mark Today's Session Completed (${plan.completed_sessions + 1}/${plan.total_sessions})
-        </button>
-      </div>
-    </div>
-  `;
-}
-
-function toggleRoutineTimer() {
-  state.isTimerRunning = !state.isTimerRunning;
-  if (state.isTimerRunning) {
-    state.timerInterval = setInterval(() => {
-      if (state.routineTimerSeconds > 0) {
-        state.routineTimerSeconds--;
-        const mins = String(Math.floor(state.routineTimerSeconds / 60)).padStart(2, '0');
-        const secs = String(state.routineTimerSeconds % 60).padStart(2, '0');
-        const disp = document.getElementById('routineTimerDisplay');
-        if (disp) disp.textContent = `${mins}:${secs}`;
-      } else {
-        clearInterval(state.timerInterval);
-        state.isTimerRunning = false;
-        alert('🔔 Routine Timer Complete! Great job completing your knee exercises.');
-      }
-    }, 1000);
-  } else {
-    clearInterval(state.timerInterval);
-  }
-  renderRehabTab(document.getElementById('soldierTabContent'));
-}
-
-async function updatePainValue(val) {
-  try {
-    const headers = getAuthHeaders();
-    await fetch('/api/rehab/session', {
-      method: 'POST',
-      headers,
-      body: JSON.stringify({ pain_level: Number(val) })
-    });
-  } catch (err) {
-    console.error(err);
-  }
-}
-
-async function toggleExerciseItem(exId, isChecked) {
-  if (!state.rehabPlan) return;
-  const ex = state.rehabPlan.exercises.find(e => e.id === exId);
-  if (ex) ex.completed = isChecked;
-
-  try {
-    const headers = getAuthHeaders();
-    await fetch('/api/rehab/session', {
-      method: 'POST',
-      headers,
-      body: JSON.stringify({
-        completed_exercise_ids: state.rehabPlan.exercises.filter(e => e.completed).map(e => e.id)
-      })
-    });
-    renderRehabTab(document.getElementById('soldierTabContent'));
-  } catch (err) {
-    console.error(err);
-  }
-}
-
-async function markRehabSessionComplete() {
-  try {
-    const headers = getAuthHeaders();
-    const res = await fetch('/api/rehab/session', {
-      method: 'POST',
-      headers,
-      body: JSON.stringify({ mark_completed: true })
-    });
-    if (res.ok) {
-      state.rehabPlan = await res.json();
-      alert('✓ Session marked complete! Progress recorded to Military Hospital Jaipur.');
-      updateStatCards();
-      renderRehabTab(document.getElementById('soldierTabContent'));
-    }
-  } catch (err) {
-    console.error(err);
-  }
-}
-
-// ============================================================================
-// 4. ACCESS GRANTS TAB WITH LIVE COUNTDOWN TIMER & VISIT TRACKER
-// ============================================================================
-function renderGrantsTab(container) {
-  container.innerHTML = `
-    <div class="card">
-      <div class="card-header">
-        <div>
-          <h2 class="card-title">🔐 Sovereign Access Grants &amp; Live Tracking</h2>
-          <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 2px;">
-            Real-time countdown timer &bull; See if doctors accessed your file live &bull; Total visits count
+          <div className="hidden xl:flex items-center gap-2 text-xs text-slate-500 font-mono">
+            <span>🛡️ CHAIN: SHA256-HMAC-VERIFIED</span>
           </div>
         </div>
-      </div>
+      </nav>
 
-      <div class="grants-list" id="grantsListContainer">
-        ${state.grants.map(g => {
-          const isLive = g.is_live;
-          return `
-            <div class="grant-item-card">
+      {/* 4. Main Body Content (Spacious Wide Layout!) */}
+      <main className="max-w-7xl mx-auto px-8 py-6">
+        
+        {/* Top 4 Stat Cards Row */}
+        <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-4.5 shadow-xs flex items-center gap-4">
+            <div className="w-12 h-12 rounded-xl bg-emerald-50 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 flex items-center justify-center text-xl flex-shrink-0">
+              📁
+            </div>
+            <div>
+              <div className="text-[11px] font-extrabold uppercase tracking-wider text-slate-400">Health Records</div>
+              <div className="text-2xl font-black text-slate-900 dark:text-white font-mono">{records.length}</div>
+              <div className="text-xs text-slate-500">Across 3 Postings • Tamper-Proof</div>
+            </div>
+          </div>
+
+          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-4.5 shadow-xs flex items-center gap-4">
+            <div className="w-12 h-12 rounded-xl bg-amber-50 dark:bg-amber-950/60 text-amber-700 dark:text-amber-300 flex items-center justify-center text-xl flex-shrink-0">
+              🏃
+            </div>
+            <div>
+              <div className="text-[11px] font-extrabold uppercase tracking-wider text-slate-400">Rehab Recovery</div>
+              <div className="text-2xl font-black text-slate-900 dark:text-white font-mono">
+                {rehabPlan ? `${rehabPlan.completed_sessions}/${rehabPlan.total_sessions}` : '14/20'}
+              </div>
+              <div className="text-xs text-slate-500">Left Knee Protocol • 70% Done</div>
+            </div>
+          </div>
+
+          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-4.5 shadow-xs flex items-center gap-4">
+            <div className="w-12 h-12 rounded-xl bg-rose-50 dark:bg-rose-950/60 text-rose-700 dark:text-rose-300 flex items-center justify-center text-xl flex-shrink-0">
+              🧠
+            </div>
+            <div>
+              <div className="text-[11px] font-extrabold uppercase tracking-wider text-slate-400">Stress Status</div>
+              <div className="flex items-center gap-2">
+                <span className="text-2xl font-black text-slate-900 dark:text-white font-mono">13/27</span>
+                <span className="bg-orange-100 text-orange-800 border border-orange-300 text-[10px] font-black px-2 py-0.5 rounded-full uppercase animate-pulse">
+                  WARNING
+                </span>
+              </div>
+              <div className="text-xs text-slate-500">PHQ-9 Moderate • 3 Wks Climbing</div>
+            </div>
+          </div>
+
+          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-4.5 shadow-xs flex items-center gap-4">
+            <div className="w-12 h-12 rounded-xl bg-blue-50 dark:bg-blue-950/60 text-blue-700 dark:text-blue-300 flex items-center justify-center text-xl flex-shrink-0">
+              📅
+            </div>
+            <div>
+              <div className="text-[11px] font-extrabold uppercase tracking-wider text-slate-400">Next Consultation</div>
+              <div className="text-base font-black text-slate-900 dark:text-white font-mono mt-0.5">Dec 05, 2024</div>
+              <div className="text-xs text-slate-500">Capt. Dr. Priya Nair • Ortho</div>
+            </div>
+          </div>
+        </section>
+
+        {/* ====================================================================
+            TAB 1: HEALTH WALLET
+            ==================================================================== */}
+        {activeTab === 'wallet' && (
+          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 shadow-xs">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6 pb-4 border-b border-slate-200 dark:border-slate-800">
               <div>
-                <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 6px;">
-                  <strong style="font-size: 1.05rem; font-weight: 800; color: var(--text-main);">${g.granted_to_role}</strong>
-                  <span class="badge-tag ${g.status === 'ACTIVE' ? 'badge-vaccine' : 'badge-injury'}">${g.status}</span>
-                  ${isLive ? `
-                    <span style="font-size: 0.72rem; background: var(--status-emerald-bg); color: var(--status-emerald); border: 1px solid var(--status-emerald-border); padding: 2px 8px; border-radius: 999px; font-weight: 800; animation: pulseGreen 1.5s infinite; font-family: var(--font-mono);">
-                      🟢 ACCESSED LIVE NOW
-                    </span>
-                  ` : `
-                    <span style="font-size: 0.72rem; color: var(--text-muted); font-family: var(--font-mono);">
-                      Last viewed: ${g.last_accessed_at || 'Yesterday'}
-                    </span>
-                  `}
-                </div>
-
-                <div style="font-size: 0.88rem; color: var(--text-body); margin-bottom: 10px; line-height: 1.45;">
-                  ${g.purpose}
-                </div>
-
-                <div style="display: flex; flex-wrap: wrap; gap: 12px; align-items: center;">
-                  <!-- Real-time Expiry Countdown Timer -->
-                  <span class="grant-timer-pill grant-countdown" data-expiry="${g.expiry_date}">
-                    ⏳ Computing...
-                  </span>
-                  <span class="grant-visit-pill">
-                    👁️ Viewed ${g.access_count || 1} times
-                  </span>
+                <h2 className="text-lg font-black text-slate-900 dark:text-white flex items-center gap-2">
+                  <span>💼</span> <span>Sovereign Health Wallet (स्वास्थ्य रिकॉर्ड)</span>
+                </h2>
+                <div className="text-xs text-slate-500 mt-1">
+                  Tamper-proof medical records across all your postings • Senior-friendly clear summaries • Sealed with SHA-256 HMAC
                 </div>
               </div>
 
-              <div>
-                ${g.status === 'ACTIVE' ? `
-                  <button class="btn-revoke" onclick="revokeGrant('${g.id}')">
-                    🚫 Revoke Access
-                  </button>
-                ` : `
-                  <span style="font-size: 0.8rem; color: var(--text-muted); font-style: italic;">Revoked</span>
-                `}
+              {/* Search Bar & Print Button */}
+              <div className="flex items-center gap-3">
+                <input 
+                  type="text" 
+                  value={walletSearch}
+                  onChange={e => setWalletSearch(e.target.value)}
+                  placeholder="🔍 Search records, surgeries, tests..."
+                  className="px-3.5 py-1.5 text-xs rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-slate-100 w-64 focus:outline-none focus:border-emerald-600"
+                />
+                <button 
+                  onClick={() => alert('Printing high-readability medical record summary for your hospital visit.')}
+                  className="bg-emerald-800 hover:bg-emerald-900 text-white text-xs font-bold px-3.5 py-2 rounded-xl transition shadow-xs flex items-center gap-1.5"
+                >
+                  🖨️ Print for Doctor
+                </button>
               </div>
             </div>
-          `;
-        }).join('')}
-      </div>
+
+            {/* Category Filter Pills */}
+            <div className="flex items-center gap-2 mb-6 flex-wrap">
+              {[
+                { id: 'ALL', label: `📁 All Records (${records.length})` },
+                { id: 'SURGERY', label: '🏥 Surgeries & Ops' },
+                { id: 'INJURY', label: '🩹 Battle Casualties' },
+                { id: 'X_RAY', label: '🩻 Radiology & X-Rays' },
+                { id: 'VACCINATION', label: '💉 Vaccinations' },
+                { id: 'PRESCRIPTION', label: '💊 Prescriptions' },
+                { id: 'TELECONSULT', label: '🩺 Teleconsultations' }
+              ].map(cat => (
+                <button
+                  key={cat.id}
+                  onClick={() => setWalletCategory(cat.id)}
+                  className={`px-3.5 py-1.5 rounded-full text-xs font-bold transition ${walletCategory === cat.id ? 'bg-slate-900 text-white dark:bg-white dark:text-slate-900' : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200'}`}
+                >
+                  {cat.label}
+                </button>
+              ))}
+            </div>
+
+            {/* Record Cards Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {filteredRecords.map(rec => (
+                <div 
+                  key={rec.id} 
+                  className="border border-slate-200 dark:border-slate-800 rounded-xl p-5 hover:border-emerald-600 dark:hover:border-emerald-500 transition shadow-xs bg-slate-50/50 dark:bg-slate-800/40 flex flex-col justify-between cursor-pointer"
+                  onClick={() => setActiveRecordModal(rec)}
+                >
+                  <div>
+                    <div className="flex justify-between items-center mb-2.5">
+                      <span className="text-[10px] font-black uppercase font-mono px-2.5 py-1 rounded-md bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300">
+                        {rec.type}
+                      </span>
+                      <span className="text-xs font-mono font-bold text-slate-500">
+                        📅 {rec.date}
+                      </span>
+                    </div>
+
+                    <h3 className="text-sm font-extrabold text-slate-900 dark:text-white mb-2 leading-snug">
+                      {rec.title}
+                    </h3>
+
+                    {/* Senior-Friendly Simple Explanation Box */}
+                    <div className="bg-white dark:bg-slate-900/80 p-3 rounded-lg border-l-4 border-emerald-600 text-xs text-slate-700 dark:text-slate-300 leading-relaxed mb-3">
+                      <strong className="text-emerald-900 dark:text-emerald-300 block mb-0.5">What happened:</strong>
+                      {rec.is_mental_health 
+                        ? 'Confidential combat stress assessment (Protected with AES-256 military encryption).'
+                        : rec.diagnosis}
+                    </div>
+                  </div>
+
+                  <div className="pt-3 border-t border-slate-200 dark:border-slate-700 flex justify-between items-center text-[11px] text-slate-500 flex-wrap gap-2">
+                    <div>
+                      <span>📍 {rec.posting}</span> • <span>🏥 {rec.hospital || 'Military Hospital'}</span>
+                    </div>
+                    <div className="font-mono text-emerald-700 dark:text-emerald-400 font-bold flex items-center gap-1">
+                      <span>🛡️</span> <span>SHA-256 HMAC Sealed</span>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* ====================================================================
+            TAB 2: TELECONSULTATION BOOKING & MOCK CALL (USER REQUESTED FEATURE!)
+            ==================================================================== */}
+        {activeTab === 'teleconsult' && (
+          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 shadow-xs">
+            <div className="mb-6 pb-4 border-b border-slate-200 dark:border-slate-800">
+              <h2 className="text-lg font-black text-slate-900 dark:text-white flex items-center gap-2">
+                <span>🩺</span> <span>AFMS Remote Teleconsultation Booking</span>
+              </h2>
+              <div className="text-xs text-slate-500 mt-1">
+                Connect with specialist military doctors across Army, Navy, Air Force, and Base Hospitals • Automatically saved into your Health Wallet
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+              {/* Teleconsultation Form */}
+              <form onSubmit={handleBookTeleconsult} className="lg:col-span-2 space-y-4">
+                
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
+                      Armed Force Branch (सेना प्रभाग):
+                    </label>
+                    <select 
+                      value={bookingForm.branch}
+                      onChange={e => setBookingForm({ ...bookingForm, branch: e.target.value })}
+                      className="w-full px-3 py-2 text-xs rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-slate-100"
+                    >
+                      <option value="Indian Army">Indian Army (थल सेना)</option>
+                      <option value="Indian Navy">Indian Navy (नौसेना)</option>
+                      <option value="Indian Air Force">Indian Air Force (वायु सेना)</option>
+                      <option value="Paramilitary - CRPF/BSF">Paramilitary (CRPF / BSF / ITBP / CISF)</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
+                      Military Hospital (सैन्य अस्पताल):
+                    </label>
+                    <select 
+                      value={bookingForm.hospital}
+                      onChange={e => setBookingForm({ ...bookingForm, hospital: e.target.value })}
+                      className="w-full px-3 py-2 text-xs rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-slate-100"
+                    >
+                      <option value="Base Hospital, Delhi Cantt">Base Hospital, Delhi Cantt</option>
+                      <option value="Command Hospital (WC) Chandimandir">Command Hospital (WC) Chandimandir</option>
+                      <option value="Military Hospital, Jaipur">Military Hospital, Jaipur</option>
+                      <option value="151 Base Hospital, Guwahati">151 Base Hospital, Guwahati</option>
+                      <option value="Armed Forces Medical College (AFMC) Pune">AFMC Pune</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
+                      Clinical Specialty (विशेषज्ञता):
+                    </label>
+                    <select 
+                      value={bookingForm.specialty}
+                      onChange={e => setBookingForm({ ...bookingForm, specialty: e.target.value })}
+                      className="w-full px-3 py-2 text-xs rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-slate-100"
+                    >
+                      <option value="Orthopedics & Joint Reconstruction">Orthopedics & Joint Reconstruction</option>
+                      <option value="Physical Medicine & Rehabilitation (PMR)">Physical Medicine & Rehabilitation (PMR)</option>
+                      <option value="Combat Psychiatry & Tele-MANAS">Combat Psychiatry & Tele-MANAS</option>
+                      <option value="General Medicine & Battle Injuries">General Medicine & Battle Injuries</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
+                      Attending Medical Officer (डॉक्टर):
+                    </label>
+                    <select 
+                      value={bookingForm.doctorName}
+                      onChange={e => setBookingForm({ ...bookingForm, doctorName: e.target.value })}
+                      className="w-full px-3 py-2 text-xs rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-slate-100"
+                    >
+                      <option value="Capt. Dr. Priya Nair, AMC">Capt. Dr. Priya Nair, AMC (Orthopedic Specialist)</option>
+                      <option value="Lt. Col. A. Bhattacharya, AMC">Lt. Col. A. Bhattacharya, AMC (General Medicine)</option>
+                      <option value="Dr. Sunita Rao (AFMS Psychological Cell)">Dr. Sunita Rao (AFMS Psychological Cell)</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
+                      Preferred Date:
+                    </label>
+                    <input 
+                      type="date"
+                      value={bookingForm.date}
+                      onChange={e => setBookingForm({ ...bookingForm, date: e.target.value })}
+                      className="w-full px-3 py-2 text-xs rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-slate-100"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
+                      Preferred Time Slot:
+                    </label>
+                    <select 
+                      value={bookingForm.timeSlot}
+                      onChange={e => setBookingForm({ ...bookingForm, timeSlot: e.target.value })}
+                      className="w-full px-3 py-2 text-xs rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-slate-100"
+                    >
+                      <option value="09:30 AM">09:30 AM (Morning Shift)</option>
+                      <option value="10:30 AM">10:30 AM (Available)</option>
+                      <option value="02:30 PM">02:30 PM (Afternoon Shift)</option>
+                      <option value="04:30 PM">04:30 PM (Evening Tele-slot)</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
+                    Chief Complaint &amp; Symptoms (समस्या का विवरण):
+                  </label>
+                  <textarea 
+                    rows="3"
+                    value={bookingForm.reason}
+                    onChange={e => setBookingForm({ ...bookingForm, reason: e.target.value })}
+                    className="w-full px-3 py-2 text-xs rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-slate-100"
+                    placeholder="Describe your pain, symptoms, or reason for follow-up..."
+                  ></textarea>
+                </div>
+
+                <button 
+                  type="submit"
+                  className="w-full bg-emerald-800 hover:bg-emerald-900 text-white font-bold py-2.5 rounded-xl transition shadow-xs text-xs flex items-center justify-center gap-2"
+                >
+                  <span>📅</span> <span>CONFIRM TELECONSULTATION &amp; AUTO-SAVE TO WALLET →</span>
+                </button>
+              </form>
+
+              {/* Consultation History & Information Box */}
+              <div className="bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700 p-5 rounded-2xl flex flex-col justify-between">
+                <div>
+                  <h3 className="text-xs font-extrabold uppercase tracking-wider text-slate-400 mb-3">
+                    Recent Teleconsultations
+                  </h3>
+                  <div className="space-y-3">
+                    {consultations.length === 0 ? (
+                      <div className="text-xs text-slate-500 italic">No previous teleconsultations booked.</div>
+                    ) : (
+                      consultations.slice(0, 3).map((c, i) => (
+                        <div key={i} className="bg-white dark:bg-slate-800 p-3 rounded-xl border border-slate-200 dark:border-slate-700 text-xs">
+                          <div className="font-bold text-slate-900 dark:text-white">{c.doctor_name}</div>
+                          <div className="text-[11px] text-slate-500">{c.hospital} • {c.date}</div>
+                          <div className="mt-1 text-emerald-700 dark:text-emerald-400 font-mono text-[10px] font-bold">
+                            ✓ Auto-Saved to Health Wallet
+                          </div>
+                        </div>
+                      ))
+                    )}
+                  </div>
+                </div>
+
+                <div className="mt-4 pt-4 border-t border-slate-200 dark:border-slate-700 text-[11px] text-slate-500 leading-relaxed">
+                  🛡️ <strong>Kavach Security Protocol:</strong> All teleconsultation summaries, e-prescriptions, and recovery directives automatically receive a SHA-256 HMAC seal and stay permanently in your soldier-centric wallet.
+                </div>
+              </div>
+
+            </div>
+          </div>
+        )}
+
+        {/* ====================================================================
+            TAB 3: STRESS & PTSD SCREENING
+            ==================================================================== */}
+        {activeTab === 'stress' && (
+          <div className="space-y-6">
+            
+            {/* Proactive Counselor Nudge Banner */}
+            <div className="bg-gradient-to-r from-amber-50 to-amber-100/60 dark:from-amber-950/40 dark:to-amber-900/20 border border-amber-300 dark:border-amber-800 rounded-2xl p-5 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-xs">
+              <div className="flex items-start gap-4">
+                <span className="text-3xl">⚠️</span>
+                <div>
+                  <strong className="text-sm font-extrabold text-amber-900 dark:text-amber-200 block mb-1">
+                    Your stress scores have climbed 3 weeks in a row — a confidential counselor is one tap away.
+                  </strong>
+                  <span className="text-xs text-amber-800 dark:text-amber-300">
+                    PHQ-9 rose from 5 to 13 during Desert patrol. AFMS Psychological Support Cell (Dr. Sunita Rao) is available. Completely private.
+                  </span>
+                </div>
+              </div>
+              <button 
+                onClick={() => alert('📞 Direct Confidential Line to Dr. Sunita Rao (AFMS Psychological Cell) connected.')}
+                className="bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs px-4 py-2.5 rounded-xl whitespace-nowrap transition shadow-xs flex items-center gap-1.5"
+              >
+                <span>📞</span> <span>Connect with Counselor</span>
+              </button>
+            </div>
+
+            {/* Dual Charts: Line Trajectory + Symptom Pie */}
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              
+              {/* Line Graph with Pulsing Marker */}
+              <div className="lg:col-span-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 shadow-xs">
+                <div className="flex justify-between items-center mb-4 pb-3 border-b border-slate-200 dark:border-slate-800">
+                  <div>
+                    <h3 className="text-sm font-black text-slate-900 dark:text-white flex items-center gap-2">
+                      <span>📈</span> <span>Weekly Stress Trajectory (PHQ-9 Depression Inventory)</span>
+                      <span className="bg-orange-100 text-orange-800 border border-orange-300 text-[10px] font-black px-2 py-0.5 rounded-full uppercase animate-pulse">
+                        WARNING 13/27
+                      </span>
+                    </h3>
+                    <div className="text-xs text-slate-500">Threshold: &ge; 10 triggers Proactive Counselor Outreach</div>
+                  </div>
+                </div>
+
+                {/* SVG Line Graph */}
+                <div className="h-56 relative flex items-center justify-center">
+                  <svg width="100%" height="100%" viewBox="0 0 650 200" className="overflow-visible">
+                    <line x1="50" y1="170" x2="600" y2="170" stroke="#cbd5e1" strokeWidth="1.5" />
+                    <line x1="50" y1="100" x2="600" y2="100" stroke="#f59e0b" strokeWidth="1.5" strokeDasharray="5,4" />
+                    <text x="510" y="94" fontSize="10" fontWeight="700" fill="#f59e0b">Threshold (10)</text>
+
+                    {/* Polyline Path */}
+                    <path 
+                      d="M 50 150 L 160 140 L 270 120 L 380 95 L 490 85 L 600 65" 
+                      fill="none" 
+                      stroke="#ea580c" 
+                      strokeWidth="3.5" 
+                      strokeLinecap="round" 
+                      strokeLinejoin="round" 
+                    />
+
+                    {/* Data Points */}
+                    {[
+                      { x: 50, y: 150, score: 5, label: 'Wk 1' },
+                      { x: 160, y: 140, score: 6, label: 'Wk 2' },
+                      { x: 270, y: 120, score: 8, label: 'Wk 3' },
+                      { x: 380, y: 95, score: 10, label: 'Wk 4' },
+                      { x: 490, y: 85, score: 11, label: 'Wk 5' },
+                      { x: 600, y: 65, score: 13, label: 'Wk 6' }
+                    ].map((pt, i) => (
+                      <g key={i}>
+                        <circle cx={pt.x} cy={pt.y} r={i === 5 ? 7 : 4} fill={i === 5 ? '#ea580c' : '#15803d'} stroke="#fff" strokeWidth="2" />
+                        <text x={pt.x} y={pt.y - 10} textAnchor="middle" fontSize="11" fontWeight="800" fill="#334155">{pt.score}</text>
+                        <text x={pt.x} y="190" textAnchor="middle" fontSize="10" fontWeight="600" fill="#94a3b8">{pt.label}</text>
+                      </g>
+                    ))}
+
+                    {/* Animated Pulsing Ring on latest point */}
+                    <circle cx="600" cy="65" r="14" fill="none" stroke="#ea580c" strokeWidth="2.5" opacity="0.8">
+                      <animate attributeName="r" values="7;18;7" dur="1.5s" repeatCount="indefinite" />
+                      <animate attributeName="opacity" values="1;0;1" dur="1.5s" repeatCount="indefinite" />
+                    </circle>
+                  </svg>
+                </div>
+              </div>
+
+              {/* Donut Symptom Breakdown */}
+              <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 shadow-xs flex flex-col justify-between">
+                <div className="border-b border-slate-200 dark:border-slate-800 pb-3">
+                  <h3 className="text-sm font-black text-slate-900 dark:text-white">🥧 Symptom Distribution</h3>
+                  <div className="text-xs text-slate-500">Historical Assessments</div>
+                </div>
+
+                <div className="flex flex-col items-center justify-center my-4">
+                  <svg width="150" height="150" viewBox="0 0 200 200">
+                    <circle cx="100" cy="100" r="70" fill="transparent" stroke="#10b981" strokeWidth="28" strokeDasharray="110 330" />
+                    <circle cx="100" cy="100" r="70" fill="transparent" stroke="#f59e0b" strokeWidth="28" strokeDasharray="154 286" strokeDashoffset="-110" />
+                    <circle cx="100" cy="100" r="70" fill="transparent" stroke="#ea580c" strokeWidth="28" strokeDasharray="132 308" strokeDashoffset="-264" />
+                    <circle cx="100" cy="100" r="70" fill="transparent" stroke="#e11d48" strokeWidth="28" strokeDasharray="44 396" strokeDashoffset="-396" />
+                    <text x="100" y="105" textAnchor="middle" fontSize="14" fontWeight="900" fill="#0f172a">PHQ-9</text>
+                  </svg>
+
+                  <div className="grid grid-cols-2 gap-2 text-[11px] text-slate-600 dark:text-slate-300 mt-3">
+                    <span><span className="text-emerald-600">●</span> Minimal (25%)</span>
+                    <span><span className="text-amber-500">●</span> Mild (35%)</span>
+                    <span><span className="text-orange-500">●</span> Moderate (30%)</span>
+                    <span><span className="text-rose-600">●</span> Severe (10%)</span>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+
+            {/* Globally Validated Questionnaires Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 shadow-xs">
+                <div className="flex justify-between items-center mb-2">
+                  <strong className="text-sm font-extrabold text-slate-900 dark:text-white">PHQ-9 Depression</strong>
+                  <span className="text-xs font-mono font-black text-rose-600">13/27</span>
+                </div>
+                <p className="text-xs text-slate-500 mb-4">Evaluates mood, sleep quality, and fatigue over previous 14 days.</p>
+                <button 
+                  onClick={() => alert('Starting confidential PHQ-9 self-assessment...')}
+                  className="w-full bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 text-slate-800 dark:text-slate-200 font-bold text-xs py-2 rounded-xl transition"
+                >
+                  Take PHQ-9 Assessment →
+                </button>
+              </div>
+
+              <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 shadow-xs">
+                <div className="flex justify-between items-center mb-2">
+                  <strong className="text-sm font-extrabold text-slate-900 dark:text-white">PCL-5 Combat PTSD</strong>
+                  <span className="text-xs font-mono font-black text-amber-600">32/80</span>
+                </div>
+                <p className="text-xs text-slate-500 mb-4">Assesses hypervigilance, intrusion symptoms and combat stress recall.</p>
+                <button 
+                  onClick={() => alert('Starting confidential PCL-5 self-assessment...')}
+                  className="w-full bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 text-slate-800 dark:text-slate-200 font-bold text-xs py-2 rounded-xl transition"
+                >
+                  Take PCL-5 Assessment →
+                </button>
+              </div>
+
+              <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 shadow-xs">
+                <div className="flex justify-between items-center mb-2">
+                  <strong className="text-sm font-extrabold text-slate-900 dark:text-white">GAD-7 Anxiety Scale</strong>
+                  <span className="text-xs font-mono font-black text-emerald-600">9/21</span>
+                </div>
+                <p className="text-xs text-slate-500 mb-4">Measures generalized somatic tension, nervousness and restless arousal.</p>
+                <button 
+                  onClick={() => alert('Starting confidential GAD-7 self-assessment...')}
+                  className="w-full bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 text-slate-800 dark:text-slate-200 font-bold text-xs py-2 rounded-xl transition"
+                >
+                  Take GAD-7 Assessment →
+                </button>
+              </div>
+            </div>
+
+          </div>
+        )}
+
+        {/* ====================================================================
+            TAB 4: REHAB TRACKER & DOCTOR'S PAIN DIAGNOSIS
+            ==================================================================== */}
+        {activeTab === 'rehab' && rehabPlan && (
+          <div className="space-y-6">
+            
+            {/* Missed Session Adherence Alert Banner */}
+            <div className="bg-rose-50 dark:bg-rose-950/40 border-2 border-rose-400 dark:border-rose-800 rounded-2xl p-5 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-xs">
+              <div className="flex items-start gap-4">
+                <span className="text-3xl">⚠️</span>
+                <div>
+                  <div className="flex items-center gap-2 mb-1">
+                    <strong className="text-sm font-black text-rose-900 dark:text-rose-200">
+                      REHAB ADHERENCE NOTICE: Session #14 Missed Yesterday (22 Nov 2026)
+                    </strong>
+                    <span className="bg-rose-600 text-white text-[10px] font-black px-2 py-0.5 rounded-full uppercase">
+                      ALERT ACTIVE
+                    </span>
+                  </div>
+                  <span className="text-xs text-rose-800 dark:text-rose-300">
+                    Capt. Dr. Priya Nair &amp; Lt. Rajesh Kumar have flagged this missed session. Regular daily drills prevent muscle atrophy and safeguard your SHAPE-1 medical classification.
+                  </span>
+                </div>
+              </div>
+              <button 
+                onClick={() => {
+                  const el = document.getElementById('dailyExerciseSection');
+                  if (el) el.scrollIntoView({ behavior: 'smooth' });
+                }}
+                className="bg-rose-700 hover:bg-rose-800 text-white font-bold text-xs px-4 py-2.5 rounded-xl whitespace-nowrap transition shadow-xs"
+              >
+                Start Exercises Now ↓
+              </button>
+            </div>
+
+            {/* DOCTOR'S PRESCRIBED PAIN DIAGNOSIS (READ-ONLY FOR PATIENT) */}
+            <div className="bg-gradient-to-br from-emerald-50/70 to-slate-50 dark:from-emerald-950/30 dark:to-slate-900 border-2 border-emerald-700/60 rounded-2xl p-6 shadow-xs">
+              <div className="flex justify-between items-center mb-4 pb-3 border-b border-emerald-200/80 dark:border-emerald-800/80 flex-wrap gap-2">
+                <span className="bg-emerald-800 text-white font-mono font-bold text-xs px-3 py-1 rounded-md uppercase tracking-wider flex items-center gap-1.5">
+                  🩺 CERTIFIED MEDICAL OFFICER PAIN DIAGNOSIS &bull; READ-ONLY
+                </span>
+                <span className="text-xs text-slate-500 font-mono">
+                  Attending: <strong>{rehabPlan.diagnosed_by || 'Capt. Dr. Priya Nair, AMC'}</strong>
+                </span>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 text-xs">
+                <div className="bg-white dark:bg-slate-800 p-3.5 rounded-xl border border-slate-200 dark:border-slate-700">
+                  <div className="text-[10px] font-extrabold uppercase tracking-wider text-slate-400 mb-1">Pain Location</div>
+                  <div className="font-extrabold text-slate-900 dark:text-white text-sm">📍 {rehabPlan.pain_location || 'Left Knee (Medial Joint Line)'}</div>
+                </div>
+
+                <div className="bg-white dark:bg-slate-800 p-3.5 rounded-xl border border-slate-200 dark:border-slate-700">
+                  <div className="text-[10px] font-extrabold uppercase tracking-wider text-slate-400 mb-1">Pain Nature &amp; Symptoms</div>
+                  <div className="font-extrabold text-slate-900 dark:text-white text-sm">⚡ {rehabPlan.pain_type || 'Sharp throbbing on 90° flexion & stiffness'}</div>
+                </div>
+
+                <div className="bg-white dark:bg-slate-800 p-3.5 rounded-xl border border-slate-200 dark:border-slate-700">
+                  <div className="text-[10px] font-extrabold uppercase tracking-wider text-slate-400 mb-1">Onset / Since When</div>
+                  <div className="font-extrabold text-slate-900 dark:text-white text-sm">📅 {rehabPlan.since_when || '19 Aug 2023 - Tawang Snow Patrol'}</div>
+                </div>
+
+                <div className="bg-white dark:bg-slate-800 p-3.5 rounded-xl border border-slate-200 dark:border-slate-700">
+                  <div className="text-[10px] font-extrabold uppercase tracking-wider text-slate-400 mb-1">Clinical Severity</div>
+                  <div className="font-extrabold text-amber-600 dark:text-amber-400 text-sm">⚠️ {rehabPlan.pain_severity || 'Moderate (VAS 4/10)'}</div>
+                </div>
+              </div>
+            </div>
+
+            {/* Active Protocol Card */}
+            <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 shadow-xs">
+              <div className="flex justify-between items-center mb-4 pb-3 border-b border-slate-200 dark:border-slate-800">
+                <div>
+                  <h3 className="text-base font-black text-slate-900 dark:text-white">🏃 {rehabPlan.title}</h3>
+                  <div className="text-xs text-slate-500">Targeted Knee Mobility Arc: <strong>115° Flexion</strong> (+15° recovery)</div>
+                </div>
+                <div className="text-right">
+                  <div className="text-lg font-black font-mono text-emerald-800 dark:text-emerald-400">
+                    {rehabPlan.completed_sessions} of {rehabPlan.total_sessions} Sessions
+                  </div>
+                  <div className="text-xs text-slate-500">70% Protocol Completed</div>
+                </div>
+              </div>
+
+              {/* Queue Status Bar & Countdown Timer */}
+              <div className="bg-slate-50 dark:bg-slate-800/60 p-4 rounded-xl border border-slate-200 dark:border-slate-700 flex flex-wrap justify-between items-center gap-4 mb-6">
+                <div>
+                  <strong className="text-xs font-extrabold uppercase tracking-wider text-slate-500 block mb-0.5">
+                    Today's Session Queue:
+                  </strong>
+                  <span className={`text-sm font-black ${remainingExercises > 0 ? 'text-amber-600' : 'text-emerald-600'}`}>
+                    {remainingExercises > 0 ? `⏳ ${remainingExercises} exercises remaining for today` : '✓ All exercises completed for today!'}
+                  </span>
+                </div>
+
+                {/* Digital Stopwatch Timer */}
+                <div className="flex items-center gap-3">
+                  <span className="text-xs font-bold text-slate-500">Routine Timer:</span>
+                  <span className="font-mono text-xl font-black px-3.5 py-1 rounded-xl bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 text-emerald-900 dark:text-emerald-400 shadow-xs">
+                    {timerMins}:{timerSecs}
+                  </span>
+                  <button 
+                    onClick={() => setIsTimerRunning(!isTimerRunning)}
+                    className="bg-emerald-800 hover:bg-emerald-900 text-white font-bold text-xs px-3.5 py-2 rounded-xl transition shadow-xs"
+                  >
+                    {isTimerRunning ? '⏸ Pause Timer' : '▶ Start Timer'}
+                  </button>
+                </div>
+              </div>
+
+              {/* Exercises Checklist */}
+              <div id="dailyExerciseSection" className="space-y-3 mb-6">
+                {rehabPlan.exercises.map(ex => (
+                  <div key={ex.id} className={`p-4 rounded-xl border transition flex justify-between items-center ${ex.completed ? 'bg-emerald-50/50 border-emerald-200 dark:bg-emerald-950/20 dark:border-emerald-800' : 'bg-slate-50 dark:bg-slate-800/40 border-slate-200 dark:border-slate-700'}`}>
+                    <div className="flex items-center gap-3.5">
+                      <input 
+                        type="checkbox" 
+                        checked={ex.completed}
+                        onChange={e => handleToggleExercise(ex.id, e.target.checked)}
+                        className="w-5 h-5 accent-emerald-700 cursor-pointer"
+                      />
+                      <div>
+                        <div className={`text-sm font-extrabold ${ex.completed ? 'line-through text-slate-400' : 'text-slate-900 dark:text-white'}`}>
+                          {ex.name}
+                        </div>
+                        <div className="text-xs text-slate-500 font-mono">{ex.reps} • Est. 5 mins</div>
+                      </div>
+                    </div>
+
+                    <button 
+                      onClick={() => alert(`Playing 3D Physiotherapy guidance demo for ${ex.name}...`)}
+                      className="text-xs font-bold px-3 py-1.5 rounded-lg border border-slate-300 dark:border-slate-600 hover:bg-slate-100 dark:hover:bg-slate-700 transition"
+                    >
+                      🎥 Video Demo
+                    </button>
+                  </div>
+                ))}
+              </div>
+
+              {/* Pain Scale Slider */}
+              <div className="bg-slate-50 dark:bg-slate-800/40 p-4 rounded-xl border border-slate-200 dark:border-slate-700 mb-6">
+                <div className="flex justify-between items-center mb-2">
+                  <label className="text-xs font-extrabold uppercase tracking-wider text-slate-700 dark:text-slate-300">
+                    Log Today's Joint Pain (VAS 0–10):
+                  </label>
+                  <span className="text-base font-black font-mono text-rose-600">
+                    {rehabPlan.pain_level}/10
+                  </span>
+                </div>
+                <input 
+                  type="range" 
+                  min="0" 
+                  max="10" 
+                  value={rehabPlan.pain_level} 
+                  onChange={e => setRehabPlan({ ...rehabPlan, pain_level: Number(e.target.value) })}
+                  className="w-full accent-emerald-700 cursor-pointer"
+                />
+              </div>
+
+              <div className="flex justify-end">
+                <button 
+                  onClick={handleMarkSessionComplete}
+                  className="bg-emerald-800 hover:bg-emerald-900 text-white font-bold text-xs px-5 py-2.5 rounded-xl transition shadow-xs flex items-center gap-2"
+                >
+                  <span>✓</span> <span>Mark Today's Session Completed ({rehabPlan.completed_sessions + 1}/{rehabPlan.total_sessions})</span>
+                </button>
+              </div>
+            </div>
+
+          </div>
+        )}
+
+        {/* ====================================================================
+            TAB 5: ACCESS GRANTS MATRIX
+            ==================================================================== */}
+        {activeTab === 'grants' && (
+          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 shadow-xs">
+            <div className="mb-6 pb-4 border-b border-slate-200 dark:border-slate-800">
+              <h2 className="text-lg font-black text-slate-900 dark:text-white flex items-center gap-2">
+                <span>🔐</span> <span>Sovereign Access Grants Matrix &amp; Live Monitoring</span>
+              </h2>
+              <div className="text-xs text-slate-500 mt-1">
+                You control access to your medical dossier • Time-stamped auto-expiry • Real-time visit tracking
+              </div>
+            </div>
+
+            <div className="space-y-4">
+              {grants.map(grant => (
+                <div key={grant.id} className="border border-slate-200 dark:border-slate-800 rounded-2xl p-5 bg-slate-50/50 dark:bg-slate-800/40 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                  <div>
+                    <div className="flex items-center gap-3 mb-1.5">
+                      <strong className="text-sm font-extrabold text-slate-900 dark:text-white">{grant.granted_to_role}</strong>
+                      <span className={`text-[10px] font-black uppercase font-mono px-2 py-0.5 rounded-md ${grant.status === 'ACTIVE' ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800'}`}>
+                        {grant.status}
+                      </span>
+                      {grant.is_live && (
+                        <span className="text-[10px] font-black uppercase font-mono px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-300 animate-pulse">
+                          🟢 ACCESSED LIVE NOW
+                        </span>
+                      )}
+                    </div>
+                    
+                    <div className="text-xs text-slate-600 dark:text-slate-300 mb-2">{grant.purpose}</div>
+
+                    <div className="flex items-center gap-3 text-xs font-mono text-slate-500">
+                      <span className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 px-2.5 py-1 rounded-md text-emerald-700 dark:text-emerald-400 font-bold">
+                        ⏳ Expiry: {grant.expiry_date}
+                      </span>
+                      <span>👁️ Total Profile Visits: {grant.access_count || 4}</span>
+                    </div>
+                  </div>
+
+                  <div>
+                    {grant.status === 'ACTIVE' ? (
+                      <button 
+                        onClick={() => handleRevokeGrant(grant.id)}
+                        className="bg-rose-50 text-rose-700 hover:bg-rose-600 hover:text-white border border-rose-300 font-bold text-xs px-4 py-2 rounded-xl transition shadow-xs"
+                      >
+                        🚫 Revoke Access
+                      </button>
+                    ) : (
+                      <span className="text-xs text-slate-400 font-mono italic">Access Revoked</span>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* ====================================================================
+            TAB 6: CLAIMS TRACKER (MOVING LINE STEPPER)
+            ==================================================================== */}
+        {activeTab === 'claims' && (
+          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 shadow-xs">
+            <div className="flex justify-between items-center mb-6 pb-4 border-b border-slate-200 dark:border-slate-800">
+              <div>
+                <h2 className="text-lg font-black text-slate-900 dark:text-white flex items-center gap-2">
+                  <span>📋</span> <span>ECHS Disability Claim Progress Tracker</span>
+                </h2>
+                <div className="text-xs text-slate-500 mt-1">
+                  Adjutant General's Branch &bull; Left Knee Meniscus Disability Claim #CLM-2024-910
+                </div>
+              </div>
+              <span className="bg-amber-100 text-amber-800 border border-amber-300 text-xs font-black px-3 py-1 rounded-full uppercase">
+                STAGE 3: PENDING MEDICAL SCRUTINY
+              </span>
+            </div>
+
+            {/* Moving Line Animated Stepper */}
+            <div className="relative py-8 px-4 mb-6">
+              <div className="absolute top-12 left-10 right-10 h-1.5 bg-slate-200 dark:bg-slate-700 rounded-full"></div>
+              <div className="absolute top-12 left-10 h-1.5 bg-gradient-to-r from-emerald-600 via-amber-500 to-orange-500 rounded-full transition-all duration-700" style={{ width: '54%' }}></div>
+              <div className="absolute top-11 left-[54%] w-3.5 h-3.5 rounded-full bg-white shadow-[0_0_12px_4px_#fbbf24] animate-pulse"></div>
+
+              <div className="relative flex justify-between z-10 text-center">
+                <div className="max-w-[120px]">
+                  <div className="w-10 h-10 rounded-full bg-emerald-700 text-white flex items-center justify-center font-bold text-sm mx-auto mb-2 shadow-sm border-2 border-white">✓</div>
+                  <div className="text-xs font-extrabold text-slate-900 dark:text-white">1. Submitted</div>
+                  <div className="text-[11px] text-slate-400">Apr 10, 2024</div>
+                </div>
+
+                <div className="max-w-[120px]">
+                  <div className="w-10 h-10 rounded-full bg-emerald-700 text-white flex items-center justify-center font-bold text-sm mx-auto mb-2 shadow-sm border-2 border-white">✓</div>
+                  <div className="text-xs font-extrabold text-slate-900 dark:text-white">2. Verification</div>
+                  <div className="text-[11px] text-slate-400">Base Hospital</div>
+                </div>
+
+                <div className="max-w-[120px]">
+                  <div className="w-10 h-10 rounded-full bg-orange-600 text-white flex items-center justify-center font-bold text-sm mx-auto mb-2 shadow-md border-2 border-white animate-bounce">3</div>
+                  <div className="text-xs font-extrabold text-orange-600">3. Pending Scrutiny</div>
+                  <div className="text-[11px] text-slate-400">Active Review</div>
+                </div>
+
+                <div className="max-w-[120px]">
+                  <div className="w-10 h-10 rounded-full bg-slate-200 dark:bg-slate-700 text-slate-500 flex items-center justify-center font-bold text-sm mx-auto mb-2 border-2 border-white">4</div>
+                  <div className="text-xs font-extrabold text-slate-400">4. Approval</div>
+                  <div className="text-[11px] text-slate-400">PCDA Clearance</div>
+                </div>
+
+                <div className="max-w-[120px]">
+                  <div className="w-10 h-10 rounded-full bg-slate-200 dark:bg-slate-700 text-slate-500 flex items-center justify-center font-bold text-sm mx-auto mb-2 border-2 border-white">5</div>
+                  <div className="text-xs font-extrabold text-slate-400">5. Sanctioned</div>
+                  <div className="text-[11px] text-slate-400">PPO Payout</div>
+                </div>
+              </div>
+            </div>
+
+            {/* Linked Bank Account Card */}
+            <div className="bg-slate-50 dark:bg-slate-800/60 p-5 rounded-2xl border border-slate-200 dark:border-slate-700 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+              <div>
+                <strong className="text-xs font-extrabold uppercase tracking-wider text-slate-400 block mb-1">
+                  Disability Pension Disbursement Account:
+                </strong>
+                <div className="text-sm font-extrabold text-slate-900 dark:text-white">
+                  {soldierProfile.bankAccount.bankName} • A/C: {soldierProfile.bankAccount.accountNo} • IFSC: {soldierProfile.bankAccount.ifsc}
+                </div>
+                <div className="text-xs text-emerald-600 font-bold mt-1">✓ {soldierProfile.dspPackage}</div>
+              </div>
+
+              <button 
+                onClick={() => setIsSettingsOpen(true)}
+                className="bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 text-xs font-bold px-4 py-2 rounded-xl hover:bg-slate-100 transition shadow-xs"
+              >
+                ✏️ Manage Bank A/C in Settings
+              </button>
+            </div>
+          </div>
+        )}
+
+      </main>
+
+      {/* ====================================================================
+          SETTINGS DRAWER (WITH RICH SOLDIER PROFILE!)
+          ==================================================================== */}
+      {isSettingsOpen && (
+        <div className="fixed inset-0 bg-slate-950/70 backdrop-blur-sm z-50 flex justify-end transition-opacity">
+          <div className="w-full max-w-md bg-white dark:bg-slate-900 h-full overflow-y-auto p-6 shadow-2xl flex flex-col justify-between">
+            
+            <div className="space-y-6">
+              {/* Drawer Header */}
+              <div className="flex justify-between items-center pb-4 border-b border-slate-200 dark:border-slate-800">
+                <h3 className="text-base font-black text-slate-900 dark:text-white flex items-center gap-2">
+                  <span>⚙️</span> <span>Soldier Terminal Settings</span>
+                </h3>
+                <button 
+                  onClick={() => setIsSettingsOpen(false)}
+                  className="w-8 h-8 rounded-full border border-slate-200 dark:border-slate-700 flex items-center justify-center text-sm font-bold hover:bg-slate-100 dark:hover:bg-slate-800"
+                >
+                  ✕
+                </button>
+              </div>
+
+              {/* USER REQUEST: SOLDIER PROFILE CARD IN SETTINGS! */}
+              <div className="bg-gradient-to-br from-emerald-800 to-emerald-950 text-white p-5 rounded-2xl shadow-md relative overflow-hidden">
+                <div className="flex items-center gap-3.5 mb-3.5">
+                  <div className="w-12 h-12 rounded-full bg-white text-emerald-900 font-black text-base flex items-center justify-center shadow-md">
+                    AV
+                  </div>
+                  <div>
+                    <h4 className="font-extrabold text-sm">{soldierProfile.name}</h4>
+                    <div className="text-xs text-emerald-200 font-mono">Service No: {soldierProfile.serviceNo}</div>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-2 text-xs border-t border-emerald-700/60 pt-3">
+                  <div>
+                    <span className="text-[10px] text-emerald-300 uppercase block">Regiment</span>
+                    <strong>{soldierProfile.unit}</strong>
+                  </div>
+                  <div>
+                    <span className="text-[10px] text-emerald-300 uppercase block">Blood Group</span>
+                    <strong>{soldierProfile.bloodGroup}</strong>
+                  </div>
+                  <div className="col-span-2">
+                    <span className="text-[10px] text-emerald-300 uppercase block">Allergies</span>
+                    <strong className="text-rose-200">{soldierProfile.allergies}</strong>
+                  </div>
+                  <div className="col-span-2">
+                    <span className="text-[10px] text-emerald-300 uppercase block">Emergency Next-of-Kin (ICE)</span>
+                    <strong>{soldierProfile.nextOfKin}</strong>
+                  </div>
+                </div>
+
+                <button 
+                  onClick={() => alert('Opening soldier personal details editor...')}
+                  className="mt-3.5 w-full bg-white/10 hover:bg-white/20 border border-white/30 text-white font-bold text-xs py-1.5 rounded-xl transition"
+                >
+                  ✏️ Edit Profile &amp; Contact Details
+                </button>
+              </div>
+
+              {/* Language Selection Toggle */}
+              <div className="space-y-2">
+                <label className="text-xs font-extrabold uppercase tracking-wider text-slate-400 block">
+                  🌐 Language (भाषा चयन):
+                </label>
+                <div className="grid grid-cols-2 gap-2">
+                  <button 
+                    onClick={() => setLanguage('en')}
+                    className={`py-2 rounded-xl text-xs font-bold border transition ${language === 'en' ? 'bg-emerald-800 text-white border-emerald-800' : 'bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-700'}`}
+                  >
+                    English
+                  </button>
+                  <button 
+                    onClick={() => setLanguage('hi')}
+                    className={`py-2 rounded-xl text-xs font-bold border transition ${language === 'hi' ? 'bg-emerald-800 text-white border-emerald-800' : 'bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-700'}`}
+                  >
+                    हिन्दी (Hindi)
+                  </button>
+                </div>
+              </div>
+
+              {/* Tactical Dark Mode Toggle */}
+              <div className="flex justify-between items-center py-3 border-y border-slate-200 dark:border-slate-800">
+                <span className="text-xs font-bold text-slate-700 dark:text-slate-300">🌙 Tactical Dark Mode</span>
+                <button 
+                  onClick={() => setIsDarkMode(!isDarkMode)}
+                  className="px-3.5 py-1.5 rounded-xl border border-slate-300 dark:border-slate-600 text-xs font-bold hover:bg-slate-100 dark:hover:bg-slate-800 transition"
+                >
+                  {isDarkMode ? '☀️ Light' : '🌙 Dark'}
+                </button>
+              </div>
+
+              {/* Linked Bank Account Section */}
+              <div className="space-y-2">
+                <label className="text-xs font-extrabold uppercase tracking-wider text-slate-400 block">
+                  🏦 Linked Disability Bank Account:
+                </label>
+                <div className="bg-slate-50 dark:bg-slate-800 p-3.5 rounded-xl border border-slate-200 dark:border-slate-700 text-xs">
+                  <div className="font-bold text-slate-900 dark:text-white">{soldierProfile.bankAccount.bankName}</div>
+                  <div className="text-slate-500 font-mono mt-0.5">A/C: {soldierProfile.bankAccount.accountNo}</div>
+                  <div className="text-slate-500 font-mono">IFSC: {soldierProfile.bankAccount.ifsc}</div>
+                  <div className="text-emerald-600 font-bold mt-1 text-[11px]">✓ Defence Salary Package Verified</div>
+                </div>
+              </div>
+
+              {/* Security Credentials */}
+              <div>
+                <button 
+                  onClick={() => alert('Password update form initialized.')}
+                  className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 py-2.5 rounded-xl text-xs font-bold text-slate-700 dark:text-slate-200 hover:bg-slate-100 transition"
+                >
+                  🔐 Change Military PIN / Password
+                </button>
+              </div>
+
+            </div>
+
+            {/* Logout Button */}
+            <div className="pt-6 border-t border-slate-200 dark:border-slate-800">
+              <button 
+                onClick={() => {
+                  localStorage.clear();
+                  window.location.href = '../../auth/login.html';
+                }}
+                className="w-full bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs py-2.5 rounded-xl transition shadow-xs"
+              >
+                🚪 LOGOUT OF KAVACH TERMINAL
+              </button>
+            </div>
+
+          </div>
+        </div>
+      )}
+
+      {/* ====================================================================
+          SIMULATED LIVE VIDEO TELECONSULTATION MODAL (USER REQUESTED!)
+          ==================================================================== */}
+      {activeVideoCall && (
+        <div className="fixed inset-0 bg-slate-950/85 backdrop-blur-md z-50 flex items-center justify-center p-4">
+          <div className="bg-slate-900 border border-slate-700 rounded-2xl max-w-2xl w-full p-6 text-white shadow-2xl relative">
+            <div className="flex justify-between items-center pb-4 border-b border-slate-800 mb-4">
+              <div className="flex items-center gap-2.5">
+                <span className="w-3 h-3 rounded-full bg-emerald-500 animate-ping"></span>
+                <span className="text-xs font-black uppercase font-mono tracking-wider text-emerald-400">
+                  LIVE ENCRYPTED AFMS TELE-HEALTH CALL
+                </span>
+              </div>
+              <button 
+                onClick={() => setActiveVideoCall(null)}
+                className="text-slate-400 hover:text-white font-bold"
+              >
+                ✕ Close
+              </button>
+            </div>
+
+            {/* Doctor Video Call Feed Mockup */}
+            <div className="bg-slate-950 rounded-xl h-64 flex flex-col items-center justify-center border border-slate-800 relative overflow-hidden mb-4">
+              <div className="w-20 h-20 rounded-full bg-emerald-800 text-white text-2xl font-black flex items-center justify-center shadow-lg border-2 border-emerald-400 mb-2">
+                PN
+              </div>
+              <div className="font-extrabold text-sm">{activeVideoCall.doctor_name || 'Capt. Dr. Priya Nair, AMC'}</div>
+              <div className="text-xs text-slate-400 font-mono">{activeVideoCall.specialty} • {activeVideoCall.hospital}</div>
+              <div className="text-[11px] text-emerald-400 font-mono mt-2">● Call Duration: 04:12 • 1080p HD Encrypted</div>
+
+              {/* Soldier Picture-in-Picture */}
+              <div className="absolute bottom-3 right-3 w-24 h-18 bg-slate-800 border-2 border-slate-600 rounded-lg flex flex-col items-center justify-center text-[10px] text-slate-300">
+                <span>Rfn. Arjun Verma</span>
+                <span className="text-emerald-400 text-[8px]">● Live Feed</span>
+              </div>
+            </div>
+
+            {/* Live Diagnosis & Prescription Directives */}
+            <div className="bg-slate-800/80 p-4 rounded-xl border border-slate-700 text-xs mb-4">
+              <strong className="text-emerald-400 block mb-1">Doctor's Clinical Notes (Auto-Saved to Health Wallet):</strong>
+              <p className="text-slate-300 leading-relaxed">
+                "Patient evaluated for knee stiffness. Range of motion improved to 115°. Prescribed continuation of Quad setting drills. Tab Glucosamine-Chondroitin OD x 30 days. Follow-up scheduled in 14 days."
+              </p>
+            </div>
+
+            <div className="flex justify-end gap-3">
+              <button 
+                onClick={() => {
+                  setActiveVideoCall(null);
+                  setActiveTab('wallet');
+                }}
+                className="bg-emerald-800 hover:bg-emerald-700 text-white font-bold text-xs px-4 py-2 rounded-xl transition"
+              >
+                ✓ View Auto-Saved Record in Health Wallet
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ====================================================================
+          CERTIFIED CLINICAL DOCUMENT MODAL (POPUP ON RECORD CLICK)
+          ==================================================================== */}
+      {activeRecordModal && (
+        <div className="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-2xl max-w-xl w-full p-6 text-slate-900 dark:text-slate-100 shadow-2xl relative">
+            
+            <div className="flex justify-between items-center pb-3 border-b border-slate-200 dark:border-slate-800 mb-4">
+              <span className="text-xs font-mono font-extrabold uppercase bg-emerald-100 text-emerald-800 px-2.5 py-1 rounded-md">
+                {activeRecordModal.type} • OFFICIAL MEDICAL DOSSIER
+              </span>
+              <button 
+                onClick={() => setActiveRecordModal(null)}
+                className="w-8 h-8 rounded-full border border-slate-200 dark:border-slate-700 flex items-center justify-center text-sm font-bold hover:bg-slate-100 dark:hover:bg-slate-800"
+              >
+                ✕
+              </button>
+            </div>
+
+            <h3 className="text-base font-black mb-1">{activeRecordModal.title}</h3>
+            <div className="text-xs text-slate-500 font-mono mb-4">
+              Posting: {activeRecordModal.posting} • Date: {activeRecordModal.date}
+            </div>
+
+            <div className="bg-slate-50 dark:bg-slate-800 p-4 rounded-xl border border-slate-200 dark:border-slate-700 text-xs leading-relaxed mb-4">
+              <strong className="block text-slate-900 dark:text-white mb-1">Clinical Evaluation &amp; Diagnosis:</strong>
+              {activeRecordModal.diagnosis}
+            </div>
+
+            <div className="grid grid-cols-2 gap-3 text-xs mb-4 font-mono">
+              <div>
+                <span className="text-[10px] text-slate-400 block uppercase">Authoring Medical Officer</span>
+                <strong>{activeRecordModal.doctor_name || 'Capt. Dr. Priya Nair, AMC'}</strong>
+              </div>
+              <div>
+                <span className="text-[10px] text-slate-400 block uppercase">Military Hospital</span>
+                <strong>{activeRecordModal.hospital || 'Base Hospital Delhi Cantt'}</strong>
+              </div>
+            </div>
+
+            <div className="bg-emerald-50 dark:bg-emerald-950/30 p-3 rounded-xl border border-emerald-200 dark:border-emerald-800 text-[11px] font-mono text-emerald-800 dark:text-emerald-300 mb-4">
+              <strong>SHA-256 HMAC Checksum:</strong><br />
+              <span className="break-all text-[10px]">{activeRecordModal.tamper_hash || '3a49182bcf01934e817290adbc14839201948301984210928340192834190823'}</span>
+            </div>
+
+            <div className="flex justify-end gap-2">
+              <button 
+                onClick={() => alert('Exporting claim-ready PDF certificate...')}
+                className="bg-emerald-800 hover:bg-emerald-900 text-white font-bold text-xs px-4 py-2 rounded-xl transition"
+              >
+                📥 Download Certified ECHS PDF
+              </button>
+            </div>
+
+          </div>
+        </div>
+      )}
+
     </div>
-  `;
+  );
 }
 
-function startGrantCountdownTicker() {
-  setInterval(() => {
-    document.querySelectorAll('.grant-countdown').forEach(el => {
-      const expiryStr = el.getAttribute('data-expiry') || '2026-12-31T23:59:59Z';
-      const diff = new Date(expiryStr).getTime() - new Date().getTime();
-      if (diff > 0) {
-        const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-        const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
-        const mins = Math.floor((diff / (1000 * 60)) % 60);
-        const secs = Math.floor((diff / 1000) % 60);
-        el.textContent = `⏳ Expires in: ${days}d ${hours}h ${mins}m ${secs}s`;
-      } else {
-        el.textContent = '⏱️ Access Expired';
-      }
-    });
-  }, 1000);
-}
-
-async function revokeGrant(grantId) {
-  if (!confirm('Revoke access immediately? Provider will be blocked instantly.')) return;
-  try {
-    const headers = getAuthHeaders();
-    const res = await fetch('/api/access-grants/revoke', {
-      method: 'POST',
-      headers,
-      body: JSON.stringify({ grant_id: grantId })
-    });
-    if (res.ok) {
-      alert('✓ Access permission revoked immediately!');
-      await loadSoldierData();
-      renderSoldierTab();
-    }
-  } catch (err) {
-    console.error(err);
-  }
-}
-
-// ============================================================================
-// 5. CLAIMS TRACKER WITH MOVING LINE STEPPER
-// ============================================================================
-function renderClaimsTab(container) {
-  const claim = (state.claims && state.claims[0]) || {
-    title: 'Left Knee Meniscus Post-Operative Disability Claim',
-    current_stage: 3,
-    status_label: 'Pending Medical Scrutiny',
-    stages: [
-      { id: 1, name: 'Submitted', date: '2024-04-10', completed: true },
-      { id: 2, name: 'Waiting for Verification', date: '2024-06-15', completed: true },
-      { id: 3, name: 'Pending Medical Scrutiny', date: '2024-11-01', completed: true, current: true },
-      { id: 4, name: 'Waiting for Approval', date: 'Est. Dec 2024', completed: false },
-      { id: 5, name: 'Claim Sanctioned', date: 'Pending', completed: false }
-    ]
-  };
-
-  container.innerHTML = `
-    <div class="card">
-      <div class="card-header">
-        <div>
-          <h2 class="card-title">📋 ECHS Disability Claim Tracker</h2>
-          <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 2px;">
-            Claim: ${claim.title} &bull; PCDA / AG Branch
-          </div>
-        </div>
-        <span class="badge-tag badge-surgery" style="font-size: 0.85rem; padding: 6px 14px;">
-          STAGE 3: ${claim.status_label}
-        </span>
-      </div>
-
-      <!-- Moving Line Animated Stepper -->
-      <div class="claims-stepper-wrap">
-        <div class="claims-track-bg"></div>
-        <div class="claims-track-progress" style="width: 54%;"></div>
-        <div class="claims-track-pulse"></div>
-
-        <div class="claims-step-nodes">
-          <div class="claim-step-node done">
-            <div class="step-node-icon">✓</div>
-            <div class="step-node-label">1. Submitted</div>
-            <div class="step-node-date">Apr 10, 2024</div>
-          </div>
-
-          <div class="claim-step-node done">
-            <div class="step-node-icon">✓</div>
-            <div class="step-node-label">2. Verification</div>
-            <div class="step-node-date">Base Hospital</div>
-          </div>
-
-          <div class="claim-step-node current">
-            <div class="step-node-icon">3</div>
-            <div class="step-node-label" style="color: #ea580c;">3. Pending Scrutiny</div>
-            <div class="step-node-date">Active Review</div>
-          </div>
-
-          <div class="claim-step-node">
-            <div class="step-node-icon">4</div>
-            <div class="step-node-label">4. Approval</div>
-            <div class="step-node-date">PCDA Clearance</div>
-          </div>
-
-          <div class="claim-step-node">
-            <div class="step-node-icon">5</div>
-            <div class="step-node-label">5. Sanctioned</div>
-            <div class="step-node-date">PPO Payout</div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Bank Disbursement Account Display -->
-      <div style="background: var(--bg-main); border: 1.5px solid var(--border-color); border-radius: 8px; padding: 16px; margin-top: 20px; display: flex; justify-content: space-between; align-items: center;">
-        <div>
-          <strong style="font-size: 0.95rem; color: var(--olive-900);">Linked Disability Pension Disbursement Account:</strong>
-          <div style="font-size: 0.82rem; color: var(--text-main); margin-top: 4px;">
-            State Bank of India (SBI) &bull; A/C: 30491829401 &bull; IFSC: SBIN0001234 (DSP Gold)
-          </div>
-        </div>
-        <button class="btn-outline" style="font-size: 0.8rem;" onclick="toggleSettingsDrawer()">
-          Manage Bank A/C in Settings
-        </button>
-      </div>
-    </div>
-  `;
-}
-
-// ============================================================================
-// 6. SETTINGS DRAWER HELPERS (LANGUAGE, BANK, PASSWORD, PROFILE)
-// ============================================================================
-function toggleSettingsDrawer() {
-  const drawer = document.getElementById('settingsDrawerBackdrop');
-  drawer.classList.toggle('active');
-}
-
-function changeSoldierLanguage(lang) {
-  state.lang = lang;
-  const t = I18N_SOLDIER[lang];
-
-  document.getElementById('headerAppTitle').innerHTML = `${t.appTitle} <span style="font-size: 0.7rem; background: var(--olive-100); color: var(--olive-900); padding: 2px 7px; border-radius: 4px;">${t.appSub}</span>`;
-  document.getElementById('headerTagline').textContent = `"${t.tagline}"`;
-  document.getElementById('navWalletTxt').textContent = t.navWallet;
-  document.getElementById('navStressTxt').textContent = t.navStress;
-  document.getElementById('navRehabTxt').textContent = t.navRehab;
-  document.getElementById('navGrantsTxt').textContent = t.navGrants;
-  document.getElementById('navClaimsTxt').textContent = t.navClaims;
-  document.getElementById('sidebarVaultTxt').textContent = t.vaultDesc;
-  document.getElementById('statRecLabel').textContent = t.recLabel;
-  document.getElementById('statRecSub').textContent = t.recSub;
-  document.getElementById('statRehabLabel').textContent = t.rehabLabel;
-  document.getElementById('statRehabSub').textContent = t.rehabSub;
-  document.getElementById('statStressLabel').textContent = t.stressLabel;
-  document.getElementById('statStressSub').textContent = t.stressSub;
-  document.getElementById('statNextApptLabel').textContent = t.nextApptLabel;
-  document.getElementById('drawerTitleTxt').textContent = t.drawerTitle;
-  document.getElementById('txtDarkModeLabel').textContent = t.darkMode;
-
-  document.getElementById('btnLangEN').className = lang === 'en' ? 'btn-primary' : 'btn-outline';
-  document.getElementById('btnLangHI').className = lang === 'hi' ? 'btn-primary' : 'btn-outline';
-
-  renderSoldierTab();
-}
-
-function toggleDarkMode() {
-  const current = document.body.getAttribute('data-theme');
-  const next = current === 'dark' ? 'light' : 'dark';
-  document.body.setAttribute('data-theme', next);
-  document.getElementById('themeToggleBtn').textContent = next === 'dark' ? '☀️ Dark Mode On' : '🌙 Light Theme';
-}
-
-function openUpdateBankModal() {
-  const bankName = prompt('Enter Bank Name:', 'State Bank of India (SBI)');
-  const accNo = prompt('Enter Account Number:', '30491829401');
-  const ifsc = prompt('Enter IFSC Code:', 'SBIN0001234');
-
-  if (bankName && accNo) {
-    document.getElementById('bankNameDisp').textContent = bankName;
-    document.getElementById('bankAccNoDisp').textContent = accNo;
-    document.getElementById('bankIfscDisp').textContent = ifsc;
-    alert('✓ Bank Account linked successfully for ECHS claim disbursement!');
-  }
-}
-
-function openUpdateProfileModal() {
-  const phone = prompt('Enter Contact Phone Number:', '+91-9876543210');
-  const ice = prompt('Enter Emergency Contact (ICE):', 'Sunita Verma (Wife) - +91-9876543211');
-  if (phone) {
-    alert('✓ Emergency contact details updated and encrypted in Kavach Vault.');
-  }
-}
-
-function openChangePasswordModal() {
-  const pw = prompt('Enter New Military PIN / Password:');
-  if (pw && pw.length >= 6) {
-    alert('✓ Military PIN updated successfully.');
-  } else if (pw) {
-    alert('PIN must be at least 6 characters.');
-  }
-}
-
-function togglePrivacyCurtain() {
-  document.getElementById('privacyCurtain').classList.toggle('active');
-}
-
-function openAssessmentModal(type) {
-  alert(`Opening ${type} self-assessment. Responses are private and encrypted at rest with AES-256.`);
+// Mount React 18 Application
+const container = document.getElementById('root');
+if (container) {
+  const root = ReactDOM.createRoot(container);
+  root.render(<SoldierApp />);
 }

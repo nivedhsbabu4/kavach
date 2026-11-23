@@ -133,15 +133,18 @@ async function handleRegisterSubmit(event) {
   const blood = document.getElementById('regBlood').value;
   const branch = document.getElementById('regBranch').value;
   const password = document.getElementById('regPassword').value.trim();
-  const btn = document.getElementById('registerSubmitBtn');
+  const posting = document.getElementById('regPosting') ? document.getElementById('regPosting').value.trim() : unit;
+  const btn = document.getElementById('regSubmitBtn') || document.getElementById('registerSubmitBtn');
 
   if (!serviceNo || !name || !password) {
     showAlert('Please fill in all mandatory fields.', 'error');
     return;
   }
 
-  btn.disabled = true;
-  btn.textContent = 'ENROLLING IN KAVACH NETWORK...';
+  if (btn) {
+    btn.disabled = true;
+    btn.textContent = 'ENROLLING IN KAVACH NETWORK...';
+  }
 
   try {
     const res = await fetch('/api/auth/register', {
@@ -153,7 +156,7 @@ async function handleRegisterSubmit(event) {
         service_no: serviceNo,
         rank,
         unit,
-        posting: unit,
+        posting: posting || unit,
         blood_group: blood,
         branch,
         password
@@ -164,12 +167,14 @@ async function handleRegisterSubmit(event) {
 
     if (!res.ok) {
       showAlert(data.error || 'Registration failed. Service number may already be enrolled.', 'error');
-      btn.disabled = false;
-      btn.textContent = 'CREATE ACCOUNT & ENROLL IN KAVACH →';
+      if (btn) {
+        btn.disabled = false;
+        btn.textContent = 'REGISTER & INITIALIZE WALLET →';
+      }
       return;
     }
 
-    // Auto-login registered user
+    // Auto-login registered user into localStorage
     localStorage.setItem('kavach_jwt_token', data.token);
     localStorage.setItem('kavach_user_role', data.user.role);
     localStorage.setItem('kavach_user_name', data.user.name);
@@ -177,7 +182,12 @@ async function handleRegisterSubmit(event) {
     localStorage.setItem('kavach_user_id', data.user.id);
     localStorage.setItem('kavach_user_posting', data.user.posting || unit);
 
-    showAlert(`✓ Registration Successful! Welcome ${data.user.name}. Opening your ${data.user.role} console...`, 'success');
+    showAlert(`✓ Registration Successful! Welcome ${data.user.name} (${data.user.service_no}). Opening your ${data.user.role} console...`, 'success');
+
+    // Pre-fill login form too in case user returns to login tab
+    document.getElementById('loginRole').value = data.user.role;
+    document.getElementById('loginServiceNo').value = data.user.service_no;
+    document.getElementById('loginPassword').value = password;
 
     setTimeout(() => {
       window.location.href = DASHBOARD_ROUTES[data.user.role] || '../dashboards/soldier/soldier.html';
@@ -186,7 +196,9 @@ async function handleRegisterSubmit(event) {
   } catch (err) {
     console.error('Registration error:', err);
     showAlert('Network error during registration.', 'error');
-    btn.disabled = false;
-    btn.textContent = 'CREATE ACCOUNT & ENROLL IN KAVACH →';
+    if (btn) {
+      btn.disabled = false;
+      btn.textContent = 'REGISTER & INITIALIZE WALLET →';
+    }
   }
 }

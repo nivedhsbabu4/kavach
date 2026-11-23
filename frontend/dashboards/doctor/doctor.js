@@ -328,3 +328,17 @@ async function submitPainDiagnosis(soldierId) {
   }
 }
 
+function toggleDoctorNotifDrawer() {
+  const drawer = document.getElementById('doctorNotifDrawer');
+  if (drawer) {
+    drawer.style.display = drawer.style.display === 'none' || drawer.style.display === '' ? 'block' : 'none';
+  }
+}
+
+function sendDoctorNudge(soldierId) {
+  alert('🔔 HIGH-PRIORITY CLINICAL NUDGE DISPATCHED:\n\nTo: Rifleman Arjun Verma (15489201A)\nFrom: Capt. Dr. Priya Nair, AMC (Base Hospital Delhi)\nMessage: "Session #14 Knee Rehab was missed yesterday. Continued adherence is vital to prevent arthrofibrosis and preserve your SHAPE-1 military classification. Please resume regimen or request priority teleconsult if joint swelling occurs."\n\n✓ Successfully transmitted via Kavach Secure Push & SMS Gateway.');
+  const drawer = document.getElementById('doctorNotifDrawer');
+  if (drawer) drawer.style.display = 'none';
+}
+
+

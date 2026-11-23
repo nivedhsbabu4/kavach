@@ -583,6 +583,12 @@ class KavachRequestHandler(http.server.SimpleHTTPRequestHandler):
             claims = [c for c in DB.get('claims', []) if c['soldier_id'] == soldier_id]
             return self.send_json(200, claims)
 
+        # 9. API: Consultations
+        elif path == '/api/consultations':
+            soldier_id = params.get('soldier_id', ['usr-soldier-1'])[0]
+            res = [c for c in DB.get('consultations', []) if c['soldier_id'] == soldier_id]
+            return self.send_json(200, res)
+
         # Static file delivery for frontend
         return self.serve_static_files(path)
 
@@ -868,7 +874,68 @@ class KavachRequestHandler(http.server.SimpleHTTPRequestHandler):
                 return self.send_json(200, {"message": "Password successfully updated"})
             return self.send_json(400, {"error": "Invalid password"})
 
+        # 11. Book Teleconsultation (Branch, Hospital, Specialty, Doctor, Date, Slot, Reason)
+        elif path == '/api/consultations':
+            user = self.get_auth_user()
+            soldier_id = payload.get('soldier_id', 'usr-soldier-1')
+            branch = payload.get('branch', 'Indian Army')
+            hospital = payload.get('hospital', 'Base Hospital, Delhi Cantt')
+            specialty = payload.get('specialty', 'Orthopedics')
+            doctor_name = payload.get('doctor_name', 'Capt. Dr. Priya Nair, AMC')
+            doctor_id = payload.get('doctor_id', 'usr-doctor-1')
+            date = payload.get('date', datetime.date.today().isoformat())
+            time_slot = payload.get('time_slot', '10:30 AM')
+            reason = payload.get('reason', 'Post-operative knee rehabilitation & joint mobility check-up')
+
+            consult_id = f"cns-{int(time.time()*1000)}"
+            record_id = f"rec-tele-{int(time.time()*1000)}"
+
+            diag = f"Teleconsultation confirmed with {doctor_name} ({specialty}) at {hospital}. Slot: {date} @ {time_slot}. Clinical reason: {reason}. Directives issued via AFMS Tele-Health Gateway."
+            rec = {
+                "id": record_id,
+                "soldier_id": soldier_id,
+                "doctor_id": doctor_id,
+                "type": "TELECONSULT",
+                "title": f"Teleconsultation: {specialty} ({doctor_name})",
+                "date": date,
+                "posting": hospital,
+                "doctor_name": doctor_name,
+                "hospital": hospital,
+                "diagnosis": diag,
+                "file_url": "records/teleconsult_signed_e_prescription.pdf",
+                "is_mental_health": False,
+                "encrypted_data": None,
+                "version": 1,
+                "created_at": datetime.datetime.now(datetime.timezone.utc).isoformat()
+            }
+            rec["tamper_hash"] = generate_tamper_hash(rec)
+            DB['records'].insert(0, rec)
+
+            consult = {
+                "id": consult_id,
+                "soldier_id": soldier_id,
+                "branch": branch,
+                "hospital": hospital,
+                "specialty": specialty,
+                "doctor_name": doctor_name,
+                "doctor_id": doctor_id,
+                "date": date,
+                "time_slot": time_slot,
+                "reason": reason,
+                "status": "CONFIRMED",
+                "record_id": record_id,
+                "created_at": datetime.datetime.now(datetime.timezone.utc).isoformat()
+            }
+            DB.setdefault('consultations', []).insert(0, consult)
+
+            log_audit(user['id'], user['role'], soldier_id, 'BOOK_TELECONSULT', 'SUCCESS',
+                      f"Booked teleconsultation with {doctor_name} ({hospital}). Auto-persisted record {record_id} to Health Wallet.",
+                      record_id=record_id)
+
+            return self.send_json(201, {"consultation": consult, "record": rec})
+
         return self.send_json(404, {"error": "Endpoint not found"})
+
 
     def do_PUT(self):
         # Update existing record (only authoring doctor can edit)

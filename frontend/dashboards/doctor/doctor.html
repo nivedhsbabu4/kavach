@@ -51,12 +51,71 @@
           </div>
         </div>
       </div>
+      <!-- Notification Bell with Alert Badge -->
+      <div style="position: relative;">
+        <button class="header-action-btn" id="docNotifBellBtn" onclick="toggleDoctorNotifDrawer()" title="Clinical Notifications (1 Alert)" style="position: relative; width: 40px; height: 40px; border-radius: 8px; border: 1.5px solid var(--border-color); background: var(--bg-card); cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 1.15rem;">
+          🔔
+          <span style="position: absolute; top: -4px; right: -4px; background: #e11d48; color: white; font-size: 0.65rem; font-weight: 900; width: 18px; height: 18px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 2px solid var(--bg-card);">1</span>
+        </button>
+
+        <!-- Dropdown Notifications Menu -->
+        <div id="doctorNotifDrawer" style="display: none; position: absolute; right: 0; top: 48px; width: 360px; background: var(--bg-card); border: 1.5px solid var(--border-color); border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.25); z-index: 100; padding: 16px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; border-bottom: 1px solid var(--border-subtle); padding-bottom: 8px;">
+            <strong style="font-size: 0.88rem;">🚨 Clinical Notifications</strong>
+            <span style="font-size: 0.7rem; background: #fee2e2; color: #991b1b; padding: 2px 6px; border-radius: 4px; font-weight: 800;">1 HIGH PRIORITY</span>
+          </div>
+
+          <div style="background: #fff1f2; border: 1px solid #fecdd3; border-radius: 8px; padding: 12px; margin-bottom: 8px;">
+            <div style="display: flex; justify-content: space-between; font-size: 0.72rem; color: #9f1239; font-weight: 800; margin-bottom: 4px;">
+              <span>🏃 MISSED REHAB SESSION</span>
+              <span>YESTERDAY</span>
+            </div>
+            <div style="font-size: 0.82rem; font-weight: 700; color: #881337;">
+              Rifleman Arjun Verma (15489201A) missed Session #14
+            </div>
+            <div style="font-size: 0.74rem; color: #475569; margin: 4px 0;">
+              Left Knee Arthroscopy Recovery &bull; VAS Pain Level: 4/10. Adherence reminder needed.
+            </div>
+            <button class="btn-primary" style="background: #e11d48; border-color: #be123c; font-size: 0.75rem; padding: 6px 10px; width: 100%; margin-top: 6px; font-weight: 800;" onclick="sendDoctorNudge('usr-soldier-1')">
+              🔔 Send Direct Adherence Nudge
+            </button>
+          </div>
+
+          <div style="font-size: 0.72rem; color: var(--text-muted); text-align: center; margin-top: 8px;">
+            All other patients adhering to treatment protocols.
+          </div>
+        </div>
+      </div>
+
       <button class="btn-logout" onclick="logoutUser()">LOGOUT</button>
     </div>
   </header>
 
   <div class="dashboard-layout">
     <main class="main-content" style="padding: 24px;">
+      <!-- Prominent Missed Rehab Session Alert Banner -->
+      <div style="background: #fff1f2; border: 2px solid #e11d48; border-radius: 12px; padding: 18px 22px; margin-bottom: 24px; display: flex; align-items: center; justify-content: space-between; gap: 16px; box-shadow: 0 4px 15px rgba(225, 29, 72, 0.12);">
+        <div style="display: flex; align-items: center; gap: 14px;">
+          <div style="width: 48px; height: 48px; border-radius: 50%; background: #fee2e2; display: flex; align-items: center; justify-content: center; font-size: 1.6rem; flex-shrink: 0;">
+            🚨
+          </div>
+          <div>
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <strong style="color: #9f1239; font-size: 1.05rem; font-weight: 900;">HIGH-PRIORITY CLINICAL REHAB ALERT: MISSED SESSION #14</strong>
+              <span style="background: #e11d48; color: #fff; font-size: 0.7rem; font-weight: 800; padding: 2px 7px; border-radius: 4px; letter-spacing: 0.5px;">ACTION REQUIRED</span>
+            </div>
+            <div style="font-size: 0.85rem; color: #881337; margin-top: 4px; line-height: 1.45;">
+              Patient <strong>Rifleman Arjun Verma</strong> (15489201A &bull; Rajasthan Desert Sector) missed scheduled <strong>Knee Mobility Session #14</strong> yesterday. Current VAS Pain Index: <strong>4/10</strong>. Intervention required to prevent joint stiffness relapse.
+            </div>
+          </div>
+        </div>
+        <div style="display: flex; gap: 8px; flex-shrink: 0;">
+          <button class="btn-primary" style="background: #e11d48; border-color: #be123c; white-space: nowrap; font-weight: 800;" onclick="sendDoctorNudge('usr-soldier-1')">
+            🔔 Send Clinical Nudge &amp; Reminder
+          </button>
+        </div>
+      </div>
+
       <!-- Active Patients with Time-Stamped Access -->
       <div class="card">
         <div class="card-header">
