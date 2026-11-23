@@ -478,27 +478,33 @@ function renderRehabTab(container) {
   const secs = String(state.routineTimerSeconds % 60).padStart(2, '0');
 
   container.innerHTML = `
-    <!-- Doctor's Prescribed Pain Diagnosis Card -->
-    <div style="background: var(--bg-card); border: 2px solid var(--olive-600); border-radius: 10px; padding: 18px 22px; margin-bottom: 20px; box-shadow: var(--shadow-sm);">
-      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-        <span style="font-size: 0.8rem; font-weight: 800; background: var(--olive-100); color: var(--olive-900); padding: 3px 10px; border-radius: 4px;">
-          👨‍⚕️ DOCTOR'S PRESCRIBED PAIN DIAGNOSIS (READ-ONLY FOR PATIENT)
+    <!-- Doctor's Prescribed Pain Diagnosis Certified Box -->
+    <div class="pain-diagnosis-certified-box">
+      <div class="pain-diagnosis-header">
+        <span class="pain-diagnosis-badge">
+          🩺 CERTIFIED CLINICAL PAIN DIAGNOSIS &bull; MEDICAL OFFICER RECORD
         </span>
-        <span style="font-size: 0.78rem; color: var(--text-muted);">Entered by: ${plan.diagnosed_by || 'Capt. Dr. Priya Nair'}</span>
+        <span style="font-size: 0.76rem; color: var(--text-muted); font-family: var(--font-mono);">
+          ATTENDING: ${plan.diagnosed_by || 'Capt. Dr. Priya Nair, AMC'}
+        </span>
       </div>
 
-      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px; font-size: 0.88rem; line-height: 1.5;">
-        <div>
-          <span style="color: var(--text-muted); font-size: 0.76rem; font-weight: 700; text-transform: uppercase; display: block;">Pain Location:</span>
-          <strong>📍 ${plan.pain_location || 'Left Knee (Medial Joint Line)'}</strong>
+      <div class="pain-grid-layout">
+        <div class="pain-grid-cell">
+          <div class="pain-grid-label">Pain Location</div>
+          <div class="pain-grid-value">📍 ${plan.pain_location || 'Left Knee (Medial Joint Line)'}</div>
         </div>
-        <div>
-          <span style="color: var(--text-muted); font-size: 0.76rem; font-weight: 700; text-transform: uppercase; display: block;">Pain Nature &amp; Type:</span>
-          <strong>⚡ ${plan.pain_type || 'Sharp throbbing on 90° flexion & stiffness'}</strong>
+        <div class="pain-grid-cell">
+          <div class="pain-grid-label">Pain Nature &amp; Symptoms</div>
+          <div class="pain-grid-value">⚡ ${plan.pain_type || 'Sharp throbbing on 90° flexion & stiffness'}</div>
         </div>
-        <div>
-          <span style="color: var(--text-muted); font-size: 0.76rem; font-weight: 700; text-transform: uppercase; display: block;">Onset / Since When:</span>
-          <strong>📅 ${plan.since_when || '19 Aug 2023 - Tawang Snow Patrol'}</strong>
+        <div class="pain-grid-cell">
+          <div class="pain-grid-label">Onset &amp; Context</div>
+          <div class="pain-grid-value">📅 ${plan.since_when || '19 Aug 2023 - Tawang Snow Patrol'}</div>
+        </div>
+        <div class="pain-grid-cell">
+          <div class="pain-grid-label">Clinical Grade</div>
+          <div class="pain-grid-value" style="color: var(--status-amber);">⚠️ ${plan.pain_severity || 'Moderate (VAS 4/10)'}</div>
         </div>
       </div>
     </div>
@@ -671,38 +677,40 @@ function renderGrantsTab(container) {
         ${state.grants.map(g => {
           const isLive = g.is_live;
           return `
-            <div class="grant-item" style="border-left: 5px solid ${g.status === 'ACTIVE' ? 'var(--olive-600)' : '#dc2626'};">
+            <div class="grant-item-card">
               <div>
-                <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 4px;">
-                  <strong style="font-size: 1.05rem;">${g.granted_to_role}</strong>
+                <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 6px;">
+                  <strong style="font-size: 1.05rem; font-weight: 800; color: var(--text-main);">${g.granted_to_role}</strong>
                   <span class="badge-tag ${g.status === 'ACTIVE' ? 'badge-vaccine' : 'badge-injury'}">${g.status}</span>
                   ${isLive ? `
-                    <span style="font-size: 0.72rem; background: #dcfce7; color: #166534; padding: 2px 8px; border-radius: 999px; font-weight: 800; animation: pulseGreen 1.5s infinite;">
+                    <span style="font-size: 0.72rem; background: var(--status-emerald-bg); color: var(--status-emerald); border: 1px solid var(--status-emerald-border); padding: 2px 8px; border-radius: 999px; font-weight: 800; animation: pulseGreen 1.5s infinite; font-family: var(--font-mono);">
                       🟢 ACCESSED LIVE NOW
                     </span>
                   ` : `
-                    <span style="font-size: 0.72rem; color: var(--text-muted);">
+                    <span style="font-size: 0.72rem; color: var(--text-muted); font-family: var(--font-mono);">
                       Last viewed: ${g.last_accessed_at || 'Yesterday'}
                     </span>
                   `}
                 </div>
 
-                <div style="font-size: 0.85rem; color: var(--text-main); margin-bottom: 6px;">
+                <div style="font-size: 0.88rem; color: var(--text-body); margin-bottom: 10px; line-height: 1.45;">
                   ${g.purpose}
                 </div>
 
-                <div style="font-size: 0.78rem; display: flex; flex-wrap: wrap; gap: 14px; color: var(--text-muted);">
+                <div style="display: flex; flex-wrap: wrap; gap: 12px; align-items: center;">
                   <!-- Real-time Expiry Countdown Timer -->
-                  <span style="color: var(--olive-700); font-weight: 800;" class="grant-countdown" data-expiry="${g.expiry_date}">
-                    ⏳ Expiry Countdown: Computing...
+                  <span class="grant-timer-pill grant-countdown" data-expiry="${g.expiry_date}">
+                    ⏳ Computing...
                   </span>
-                  <span>👁️ <strong>Visits Count:</strong> Viewed ${g.access_count || 1} times</span>
+                  <span class="grant-visit-pill">
+                    👁️ Viewed ${g.access_count || 1} times
+                  </span>
                 </div>
               </div>
 
               <div>
                 ${g.status === 'ACTIVE' ? `
-                  <button class="btn-outline" style="color: #dc2626; border-color: #fca5a5;" onclick="revokeGrant('${g.id}')">
+                  <button class="btn-revoke" onclick="revokeGrant('${g.id}')">
                     🚫 Revoke Access
                   </button>
                 ` : `
@@ -794,32 +802,32 @@ function renderClaimsTab(container) {
         <div class="claims-step-nodes">
           <div class="claim-step-node done">
             <div class="step-node-icon">✓</div>
-            <strong style="font-size: 0.82rem; display: block;">1. Submitted</strong>
-            <span style="font-size: 0.72rem; color: var(--text-muted);">Apr 10, 2024</span>
+            <div class="step-node-label">1. Submitted</div>
+            <div class="step-node-date">Apr 10, 2024</div>
           </div>
 
           <div class="claim-step-node done">
             <div class="step-node-icon">✓</div>
-            <strong style="font-size: 0.82rem; display: block;">2. Verification</strong>
-            <span style="font-size: 0.72rem; color: var(--text-muted);">Base Hospital</span>
+            <div class="step-node-label">2. Verification</div>
+            <div class="step-node-date">Base Hospital</div>
           </div>
 
           <div class="claim-step-node current">
             <div class="step-node-icon">3</div>
-            <strong style="font-size: 0.82rem; color: #f97316; display: block;">3. Pending Scrutiny</strong>
-            <span style="font-size: 0.72rem; color: var(--text-muted);">Active Review</span>
+            <div class="step-node-label" style="color: #ea580c;">3. Pending Scrutiny</div>
+            <div class="step-node-date">Active Review</div>
           </div>
 
           <div class="claim-step-node">
             <div class="step-node-icon">4</div>
-            <strong style="font-size: 0.82rem; display: block;">4. Approval</strong>
-            <span style="font-size: 0.72rem; color: var(--text-muted);">PCDA Clearance</span>
+            <div class="step-node-label">4. Approval</div>
+            <div class="step-node-date">PCDA Clearance</div>
           </div>
 
           <div class="claim-step-node">
             <div class="step-node-icon">5</div>
-            <strong style="font-size: 0.82rem; display: block;">5. Sanctioned</strong>
-            <span style="font-size: 0.72rem; color: var(--text-muted);">PPO Disbursement</span>
+            <div class="step-node-label">5. Sanctioned</div>
+            <div class="step-node-date">PPO Payout</div>
           </div>
         </div>
       </div>

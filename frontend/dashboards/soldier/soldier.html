@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>KAVACH — Soldier &amp; Veteran Health Console</title>
+  <title>KAVACH — Soldier &amp; Veteran Sovereign Health Console</title>
   <link rel="stylesheet" href="../../shared/shared.css" />
   <link rel="stylesheet" href="soldier.css" />
   <link rel="icon" href="../../assets/logo.svg" />
@@ -13,19 +13,36 @@
 <body data-theme="light">
 
   <!-- 1. DYNAMIC MOVING HELPLINE NUMBERS TICKER -->
-  <aside class="dynamic-ticker-wrap">
-    <div class="dynamic-ticker-move">
-      <span>🚨 24x7 ARMED FORCES HELPLINES:</span>
-      <span style="margin: 0 15px;">&bull;</span>
-      <span>📞 Tele-MANAS: 14416</span>
-      <span style="margin: 0 15px;">&bull;</span>
-      <span>📞 Army Sanjeevani: 1800-120-0012</span>
-      <span style="margin: 0 15px;">&bull;</span>
-      <span>📞 ECHS Toll-Free: 1800-114-115</span>
-      <span style="margin: 0 15px;">&bull;</span>
-      <span>📞 Army Medical Welfare Cell: 1904</span>
-      <span style="margin: 0 15px;">&bull;</span>
-      <span>🛡️ Sovereign Health Wallet Active &bull; AES-256 GCM Encrypted</span>
+  <aside class="crisis-topbar">
+    <div class="crisis-left-badge">
+      <span style="font-size: 1.1rem;">🛡️</span>
+      <strong style="letter-spacing: 0.04em;">AFMS TACTICAL HEALTH NETWORK</strong>
+      <span class="crisis-node-tag">NODE 14-RR // DESERT SECTOR</span>
+    </div>
+
+    <div class="dynamic-ticker-wrap" style="flex: 1; margin: 0 16px; background: transparent; border: none; padding: 0;">
+      <div class="dynamic-ticker-move">
+        <span>🚨 24x7 ARMED FORCES HELPLINES:</span>
+        <span style="margin: 0 12px;">&bull;</span>
+        <span>📞 AFMS Tele-MANAS: 14416</span>
+        <span style="margin: 0 12px;">&bull;</span>
+        <span>📞 Army Sanjeevani Crisis: 1800-120-0012</span>
+        <span style="margin: 0 12px;">&bull;</span>
+        <span>📞 ECHS Toll-Free Support: 1800-114-115</span>
+        <span style="margin: 0 12px;">&bull;</span>
+        <span>📞 Army Medical Welfare Cell: 1904</span>
+        <span style="margin: 0 12px;">&bull;</span>
+        <span>🔒 AES-256-GCM Sovereign Encrypted &bull; Append-Only Sealed Records</span>
+      </div>
+    </div>
+
+    <div style="display: flex; align-items: center; gap: 8px; flex-shrink: 0;">
+      <a href="tel:14416" class="crisis-pill">
+        <span>📞</span> <span>Crisis Line: 14416</span>
+      </a>
+      <button class="quick-exit-btn" onclick="togglePrivacyCurtain()" title="Instant Privacy Blur (ESC)">
+        <span>🔒</span> <span>PRIVACY EXIT</span>
+      </button>
     </div>
   </aside>
 
@@ -36,32 +53,38 @@
         <img src="../../assets/logo.svg" alt="Kavach Shield Logo" />
       </div>
       <div class="brand-text">
-        <h1 id="headerAppTitle">KAVACH <span style="font-size: 0.7rem; background: var(--olive-100); color: var(--olive-900); padding: 2px 7px; border-radius: 4px;">SOLDIER WALLET</span></h1>
+        <h1 id="headerAppTitle">
+          KAVACH 
+          <span class="brand-classification-pill">SOLDIER WALLET</span>
+        </h1>
         <div class="brand-tagline-sub" id="headerTagline">"Health that follows the soldier."</div>
       </div>
     </div>
 
+    <!-- Center Security Clearance Pill -->
+    <div class="header-center-info">
+      <div class="security-seal-chip">
+        <span>🛡️</span>
+        <span>SOVEREIGN ENCRYPTED &bull; AES-256-GCM</span>
+      </div>
+    </div>
+
     <!-- RIGHT CORNER: NAME, PLACE, LIVE BADGE & 3-LINE SETTINGS BUTTON -->
-    <div style="display: flex; align-items: center; gap: 14px; margin-left: auto;">
-      <!-- Soldier Identity Block -->
-      <div style="text-align: right; line-height: 1.25;">
-        <div style="font-weight: 800; font-size: 0.95rem; color: var(--text-main);" id="topSoldierName">
-          Rfn. Arjun Verma
-        </div>
-        <div style="font-size: 0.74rem; color: var(--text-muted); display: flex; align-items: center; justify-content: flex-end; gap: 6px;">
-          <span id="topSoldierPlace">📍 Rajasthan</span>
-          <span>&bull;</span>
-          <span class="sync-badge synced" style="padding: 2px 7px; font-size: 0.68rem;">🟢 LIVE</span>
+    <div class="header-profile-cluster">
+      <div class="user-identity-card">
+        <div class="user-avatar-badge">AV</div>
+        <div class="user-details-text">
+          <div class="user-name-title" id="topSoldierName">Rfn. Arjun Verma</div>
+          <div class="user-meta-sub">
+            <span id="topSoldierPlace">📍 Rajasthan</span>
+            <span>&bull;</span>
+            <span class="sync-badge synced"><span class="sync-pulse-dot"></span> <span>LIVE NODE</span></span>
+          </div>
         </div>
       </div>
 
-      <!-- Quick Exit Privacy Button -->
-      <button class="quick-exit-btn" onclick="togglePrivacyCurtain()" title="Instant Privacy Blur">
-        🔒 EXIT
-      </button>
-
       <!-- 3 Small Lines / Settings Symbol Button (Opens Drawer) -->
-      <button class="icon-btn" id="openSettingsBtn" onclick="toggleSettingsDrawer()" title="Settings, Language, Bank &amp; Account" style="width: 40px; height: 40px; font-size: 1.25rem; font-weight: 900; background: var(--bg-card); border: 2px solid var(--border-color);">
+      <button class="hamburger-toggle-btn" id="openSettingsBtn" onclick="toggleSettingsDrawer()" title="Settings, Language, Bank &amp; Account">
         ☰
       </button>
     </div>
@@ -69,29 +92,55 @@
 
   <!-- 3. DASHBOARD MAIN LAYOUT -->
   <div class="dashboard-layout">
-    <!-- Left Navigation -->
+    <!-- Left Navigation Sidebar -->
     <nav class="dashboard-sidebar">
-      <div class="sidebar-nav-group">
-        <a class="sidebar-link active" data-tab="wallet" onclick="switchSoldierTab('wallet')">
-          <span>💼</span> <span id="navWalletTxt">Health Wallet</span>
-        </a>
-        <a class="sidebar-link" data-tab="stress" onclick="switchSoldierTab('stress')">
-          <span>🧠</span> <span id="navStressTxt">Stress &amp; PTSD</span>
-        </a>
-        <a class="sidebar-link" data-tab="rehab" onclick="switchSoldierTab('rehab')">
-          <span>🏃</span> <span id="navRehabTxt">Rehab Tracker</span>
-        </a>
-        <a class="sidebar-link" data-tab="grants" onclick="switchSoldierTab('grants')">
-          <span>🔐</span> <span id="navGrantsTxt">Access Grants</span>
-        </a>
-        <a class="sidebar-link" data-tab="claims" onclick="switchSoldierTab('claims')">
-          <span>📋</span> <span id="navClaimsTxt">Claims Tracker</span>
-        </a>
+      <div>
+        <div class="sidebar-group-title">SOLDIER HEALTH MODULES</div>
+        <div class="sidebar-nav-group">
+          <a class="sidebar-link active" data-tab="wallet" onclick="switchSoldierTab('wallet')">
+            <div class="sidebar-link-content">
+              <span>💼</span> <span id="navWalletTxt">Health Wallet</span>
+            </div>
+            <span class="sidebar-nav-badge">6</span>
+          </a>
+          <a class="sidebar-link" data-tab="stress" onclick="switchSoldierTab('stress')">
+            <div class="sidebar-link-content">
+              <span>🧠</span> <span id="navStressTxt">Stress &amp; PTSD</span>
+            </div>
+            <span class="sidebar-nav-badge" style="background: #ffedd5; color: #c2410c;">13/27</span>
+          </a>
+          <a class="sidebar-link" data-tab="rehab" onclick="switchSoldierTab('rehab')">
+            <div class="sidebar-link-content">
+              <span>🏃</span> <span id="navRehabTxt">Rehab Tracker</span>
+            </div>
+            <span class="sidebar-nav-badge" style="background: #e0f2fe; color: #0369a1;">70%</span>
+          </a>
+          <a class="sidebar-link" data-tab="grants" onclick="switchSoldierTab('grants')">
+            <div class="sidebar-link-content">
+              <span>🔐</span> <span id="navGrantsTxt">Access Grants</span>
+            </div>
+            <span class="sidebar-nav-badge">2 Active</span>
+          </a>
+          <a class="sidebar-link" data-tab="claims" onclick="switchSoldierTab('claims')">
+            <div class="sidebar-link-content">
+              <span>📋</span> <span id="navClaimsTxt">Claims Tracker</span>
+            </div>
+            <span class="sidebar-nav-badge" style="background: #fef3c7; color: #92400e;">Stage 3</span>
+          </a>
+        </div>
       </div>
 
-      <div style="padding-top: 16px; border-top: 1px solid var(--border-subtle); font-size: 0.74rem; color: var(--text-muted);">
-        <div style="font-weight: 800; color: var(--olive-700); margin-bottom: 2px;">🛡️ Sovereign Field Vault</div>
-        <div id="sidebarVaultTxt">Records stay with you through every posting and ECHS retirement.</div>
+      <!-- Sovereign Vault Guarantee Box -->
+      <div class="sidebar-vault-box">
+        <div class="sidebar-vault-title">
+          <span>🛡️</span> <span>Sovereign Field Vault</span>
+        </div>
+        <div style="color: var(--text-muted); font-size: 0.72rem; line-height: 1.45;" id="sidebarVaultTxt">
+          Your records are permanently attached to you, not hospitals. Follows you across postings and ECHS retirement.
+        </div>
+        <div style="margin-top: 8px; font-size: 0.68rem; font-family: var(--font-mono); color: var(--mil-olive-600); font-weight: 700;">
+          KEY: SHA256-HMAC-VERIFIED
+        </div>
       </div>
     </nav>
 
@@ -111,7 +160,7 @@
         <div class="stat-card gold">
           <div class="stat-icon">🏃</div>
           <div class="stat-info">
-            <div class="stat-label" id="statRehabLabel">Rehab Sessions</div>
+            <div class="stat-label" id="statRehabLabel">Rehab Recovery</div>
             <div class="stat-number" id="statRehabProgress">14 / 20</div>
             <div class="stat-desc" id="statRehabSub">Left Knee Protocol &bull; 70% Done</div>
           </div>
@@ -148,8 +197,8 @@
   <div class="settings-drawer-backdrop" id="settingsDrawerBackdrop" onclick="toggleSettingsDrawer()">
     <div class="settings-drawer-panel" onclick="event.stopPropagation()">
       <div class="drawer-header">
-        <h3><span>⚙️</span> <span id="drawerTitleTxt">Settings &amp; Preferences</span></h3>
-        <button class="icon-btn" onclick="toggleSettingsDrawer()" style="font-size: 1.2rem; font-weight: bold;">✕</button>
+        <h3><span>⚙️</span> <span id="drawerTitleTxt">Terminal Settings &amp; Preferences</span></h3>
+        <button class="hamburger-toggle-btn" onclick="toggleSettingsDrawer()" style="width: 34px; height: 34px; font-size: 1rem;">✕</button>
       </div>
 
       <div class="drawer-body">
@@ -178,13 +227,13 @@
         <!-- 3. Add / Manage Bank Account for Disability Pension & ECHS Claims -->
         <div class="drawer-section">
           <div class="drawer-section-title">🏦 Bank Account for Claims Disbursement</div>
-          <div style="background: var(--bg-main); padding: 12px; border-radius: 8px; border: 1px solid var(--border-color); margin-bottom: 10px;" id="bankAccountDisplay">
-            <div style="font-weight: 800; font-size: 0.95rem; color: var(--olive-700);" id="bankNameDisp">State Bank of India (SBI)</div>
-            <div style="font-size: 0.8rem; color: var(--text-main); margin-top: 2px;">
+          <div style="background: var(--bg-main); padding: 14px; border-radius: var(--radius-md); border: 1px solid var(--border-color); margin-bottom: 10px;" id="bankAccountDisplay">
+            <div style="font-weight: 800; font-size: 0.95rem; color: var(--mil-olive-800);" id="bankNameDisp">State Bank of India (SBI)</div>
+            <div style="font-size: 0.8rem; color: var(--text-main); margin-top: 4px; font-family: var(--font-mono);">
               A/C: <span id="bankAccNoDisp">30491829401</span> &bull; IFSC: <span id="bankIfscDisp">SBIN0001234</span>
             </div>
-            <div style="font-size: 0.75rem; color: #15803d; font-weight: 700; margin-top: 4px;">
-              ✓ Defence Salary Package (DSP) - Gold Verified
+            <div style="font-size: 0.74rem; color: var(--status-emerald); font-weight: 800; margin-top: 6px; display: flex; align-items: center; gap: 6px;">
+              <span>✓</span> <span>Defence Salary Package (DSP) - Gold Verified</span>
             </div>
           </div>
           <button class="btn-outline" style="width: 100%; font-size: 0.8rem;" onclick="openUpdateBankModal()">
@@ -195,7 +244,7 @@
         <!-- 4. Update Personal & Service Details -->
         <div class="drawer-section">
           <div class="drawer-section-title">🪖 Service Profile &amp; Emergency Next-of-Kin</div>
-          <div style="font-size: 0.82rem; line-height: 1.5; color: var(--text-main); margin-bottom: 10px;">
+          <div style="font-size: 0.82rem; line-height: 1.6; color: var(--text-main); margin-bottom: 10px;">
             <div><strong>Unit:</strong> 14 Rajputana Rifles</div>
             <div><strong>Posting:</strong> Rajasthan (Desert Sector)</div>
             <div><strong>Next of Kin:</strong> Sunita Verma (Wife) - +91-9876543211</div>
@@ -217,10 +266,10 @@
         <!-- 6. Medical Referrals -->
         <div class="drawer-section">
           <div class="drawer-section-title">🩺 Active ECHS / Specialist Referrals</div>
-          <div style="padding: 10px; border: 1px solid var(--border-color); border-radius: 6px; font-size: 0.8rem; background: var(--bg-main);">
+          <div style="padding: 12px; border: 1px solid var(--border-color); border-radius: var(--radius-md); font-size: 0.8rem; background: var(--bg-main);">
             <strong>Referral #REF-2024-984</strong><br />
             Referred to: <em>Base Hospital Delhi Cantt (Orthopedic Rehabilitation)</em><br />
-            <span style="color: #15803d; font-weight: 700;">Status: Active until 31 Dec 2026</span>
+            <span style="color: var(--status-emerald); font-weight: 800;">Status: Active until 31 Dec 2026</span>
           </div>
         </div>
 
@@ -229,7 +278,7 @@
           <div class="drawer-section-title">⚡ Software Updates &amp; Integrity</div>
           <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.8rem;">
             <span>Kavach Version: <strong>v2.4.0 (Latest)</strong></span>
-            <button class="btn-outline" style="font-size: 0.72rem; padding: 4px 8px;" onclick="alert('✓ Kavach Node is fully up to date. SHA-256 integrity check verified.')">
+            <button class="btn-outline" style="font-size: 0.72rem; padding: 4px 10px;" onclick="alert('✓ Kavach Node is fully up to date. SHA-256 integrity check verified.')">
               Check Update
             </button>
           </div>
@@ -237,7 +286,7 @@
 
         <!-- 8. Logout Button -->
         <div style="margin-top: 10px;">
-          <button class="btn-submit" style="background: #dc2626; border-color: #ef4444; width: 100%;" onclick="logoutUser()">
+          <button class="btn-primary" style="background: linear-gradient(135deg, #be123c 0%, #9f1239 100%); border-color: #881337; width: 100%; justify-content: center;" onclick="logoutUser()">
             🚪 LOGOUT OF KAVACH TERMINAL
           </button>
         </div>
@@ -247,10 +296,10 @@
 
   <!-- 5. PRIVACY CURTAIN -->
   <div class="privacy-curtain" id="privacyCurtain" onclick="togglePrivacyCurtain()">
-    <div style="font-size: 4rem; margin-bottom: 12px;">🛡️</div>
-    <h2 style="font-size: 1.6rem; font-weight: 900; letter-spacing: 2px; color: var(--gold-light);">KAVACH PRIVACY CURTAIN ACTIVE</h2>
-    <p style="font-size: 0.95rem; color: #d6e4d2; text-align: center; max-width: 500px; margin-top: 8px;">
-      Medical and stress data blurred to preserve operational security. Click anywhere to resume session.
+    <div style="font-size: 4rem; margin-bottom: 14px;">🛡️</div>
+    <h2 style="font-size: 1.6rem; font-weight: 900; letter-spacing: 0.05em; color: var(--brass-400);">KAVACH PRIVACY CURTAIN ACTIVE</h2>
+    <p style="font-size: 0.95rem; color: #cbd5e1; text-align: center; max-width: 520px; margin-top: 10px; line-height: 1.6;">
+      Clinical and psychological records obfuscated to preserve sovereign operational security. Click anywhere to resume session.
     </p>
   </div>
 

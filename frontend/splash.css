@@ -1,6 +1,9 @@
 /* ==========================================================================
-   KAVACH DYNAMIC OLIVE GREEN 5-SECOND SPLASH SCREEN
+   KAVACH DYNAMIC 5-SECOND TACTICAL SPLASH BOOT SEQUENCE
+   Executive Military Precision, Obsidian & Brass Radar Sweep
    ========================================================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@500;600;700&display=swap');
 
 * {
   box-sizing: border-box;
@@ -12,25 +15,25 @@ body, html {
   width: 100%;
   height: 100%;
   overflow: hidden;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-  background-color: #122110;
+  font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+  background-color: #060e08;
 }
 
 .splash-container {
   width: 100vw;
   height: 100vh;
-  background: radial-gradient(circle at center, #243d20 0%, #172b15 50%, #0d1a0b 100%);
+  background: radial-gradient(circle at center, #142a18 0%, #0b180e 55%, #050b07 100%);
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   position: relative;
-  transition: opacity 0.8s cubic-bezier(0.4, 0, 0.2, 1), transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .splash-container.fade-out {
   opacity: 0;
-  transform: scale(1.05);
+  transform: scale(1.04);
   pointer-events: none;
 }
 
@@ -42,21 +45,33 @@ body, html {
   width: 100%;
   height: 100%;
   background-image: 
-    linear-gradient(rgba(194, 178, 128, 0.05) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(194, 178, 128, 0.05) 1px, transparent 1px);
-  background-size: 50px 50px;
+    linear-gradient(rgba(184, 147, 65, 0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(184, 147, 65, 0.04) 1px, transparent 1px);
+  background-size: 40px 40px;
   pointer-events: none;
 }
 
-/* Rotating radar sweep */
+/* Rotating radar sweep ring */
 .radar-sweep {
   position: absolute;
-  width: 480px;
-  height: 480px;
+  width: 520px;
+  height: 520px;
   border-radius: 50%;
-  border: 1px solid rgba(194, 178, 128, 0.15);
+  border: 1px solid rgba(184, 147, 65, 0.15);
   animation: radar-spin 12s linear infinite;
   pointer-events: none;
+}
+
+.radar-sweep::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 320px;
+  height: 320px;
+  border-radius: 50%;
+  border: 1px dashed rgba(184, 147, 65, 0.12);
 }
 
 .radar-sweep::after {
@@ -66,7 +81,7 @@ body, html {
   left: 0;
   width: 50%;
   height: 50%;
-  background: linear-gradient(135deg, rgba(194, 178, 128, 0.15) 0%, transparent 80%);
+  background: linear-gradient(135deg, rgba(184, 147, 65, 0.18) 0%, transparent 80%);
   border-top-left-radius: 100%;
 }
 
@@ -82,21 +97,21 @@ body, html {
   align-items: center;
   z-index: 10;
   text-align: center;
-  padding: 20px;
+  padding: 24px;
 }
 
 .logo-wrapper {
-  width: 180px;
-  height: 180px;
+  width: 150px;
+  height: 150px;
   position: relative;
   margin-bottom: 24px;
-  animation: logo-entrance 1.2s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+  animation: logo-entrance 1.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
-.logo-wrapper img, .logo-wrapper svg {
+.logo-wrapper img {
   width: 100%;
   height: 100%;
-  filter: drop-shadow(0 15px 25px rgba(0, 0, 0, 0.6));
+  filter: drop-shadow(0 12px 28px rgba(0, 0, 0, 0.7));
   user-select: none;
   pointer-events: none;
 }
@@ -104,7 +119,7 @@ body, html {
 @keyframes logo-entrance {
   0% {
     opacity: 0;
-    transform: scale(0.65) translateY(20px);
+    transform: scale(0.7) translateY(20px);
   }
   100% {
     opacity: 1;
@@ -115,53 +130,52 @@ body, html {
 .brand-title {
   font-size: 2.8rem;
   font-weight: 900;
-  letter-spacing: 6px;
-  color: #fae084;
-  text-shadow: 0 4px 12px rgba(0, 0, 0, 0.7);
-  margin-bottom: 6px;
-  text-transform: uppercase;
+  letter-spacing: -0.01em;
+  color: #ffffff;
+  text-shadow: 0 4px 16px rgba(0, 0, 0, 0.8);
+  margin-bottom: 4px;
   animation: text-reveal 1.2s ease forwards;
 }
 
 .brand-subtitle {
-  font-size: 1.05rem;
-  font-weight: 500;
-  color: #d6e4d2;
-  letter-spacing: 1.5px;
-  margin-bottom: 12px;
+  font-size: 0.82rem;
+  font-weight: 800;
+  color: #cfaa5e;
+  letter-spacing: 0.1em;
+  margin-bottom: 8px;
+  font-family: 'JetBrains Mono', monospace;
   animation: text-reveal 1.4s ease forwards;
 }
 
 .brand-tagline {
-  font-size: 0.92rem;
+  font-size: 0.95rem;
   font-style: italic;
-  color: #c2b280;
-  letter-spacing: 1px;
-  margin-bottom: 30px;
+  color: #94a3b8;
+  margin-bottom: 28px;
   animation: text-reveal 1.6s ease forwards;
 }
 
 @keyframes text-reveal {
-  0% { opacity: 0; transform: translateY(10px); }
+  0% { opacity: 0; transform: translateY(12px); }
   100% { opacity: 1; transform: translateY(0); }
 }
 
 /* 5-Second Animated Progress Bar */
 .progress-container {
-  width: 280px;
+  width: 320px;
   height: 6px;
-  background: rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.1);
   border-radius: 999px;
   overflow: hidden;
   position: relative;
-  margin-bottom: 16px;
-  border: 1px solid rgba(194, 178, 128, 0.3);
+  margin-bottom: 14px;
+  border: 1px solid rgba(184, 147, 65, 0.3);
 }
 
 .progress-bar {
   height: 100%;
   width: 0%;
-  background: linear-gradient(90deg, #c2b280 0%, #fae084 70%, #16a34a 100%);
+  background: linear-gradient(90deg, #b89341 0%, #cfaa5e 60%, #10b981 100%);
   border-radius: 999px;
   animation: loadProgress 5s linear forwards;
 }
@@ -172,29 +186,34 @@ body, html {
 }
 
 .timer-text {
-  font-size: 0.8rem;
-  color: #a3b89f;
-  font-family: monospace;
-  letter-spacing: 1px;
+  font-size: 0.76rem;
+  color: #829aa8;
+  font-family: 'JetBrains Mono', monospace;
+  letter-spacing: 0.05em;
+  font-weight: 600;
 }
 
 .enter-skip-btn {
-  margin-top: 18px;
-  background: rgba(194, 178, 128, 0.15);
-  border: 1px solid #c2b280;
-  color: #fae084;
-  padding: 7px 18px;
-  border-radius: 6px;
+  margin-top: 20px;
+  background: rgba(184, 147, 65, 0.12);
+  border: 1.5px solid rgba(184, 147, 65, 0.5);
+  color: #faebd0;
+  padding: 8px 22px;
+  border-radius: 8px;
   font-size: 0.8rem;
-  font-weight: 600;
+  font-weight: 800;
   cursor: pointer;
-  letter-spacing: 1px;
+  letter-spacing: 0.05em;
+  font-family: 'JetBrains Mono', monospace;
   transition: all 0.2s ease;
 }
 
 .enter-skip-btn:hover {
-  background: #c2b280;
-  color: #142412;
+  background: #cfaa5e;
+  color: #060e08;
+  border-color: #cfaa5e;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(184, 147, 65, 0.3);
 }
 
 .security-badge {
@@ -203,15 +222,16 @@ body, html {
   display: flex;
   align-items: center;
   gap: 10px;
-  font-size: 0.75rem;
-  color: #8c9e88;
-  letter-spacing: 0.5px;
+  font-size: 0.72rem;
+  color: #64748b;
+  font-family: 'JetBrains Mono', monospace;
+  letter-spacing: 0.04em;
 }
 
 .security-badge span.dot {
-  width: 8px;
-  height: 8px;
-  background: #16a34a;
+  width: 7px;
+  height: 7px;
+  background: #10b981;
   border-radius: 50%;
-  box-shadow: 0 0 8px #16a34a;
+  box-shadow: 0 0 10px #10b981;
 }

@@ -3,167 +3,215 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>KAVACH — Military Terminal Authentication</title>
+  <title>KAVACH — Military Terminal Authentication (AFMS)</title>
   <link rel="stylesheet" href="auth.css" />
   <link rel="icon" href="../assets/logo.svg" />
 </head>
 <body>
 
-  <div class="auth-wrapper">
-    <!-- Fixed Emblem Logo Header -->
-    <div class="auth-logo-header">
-      <div class="auth-logo">
-        <img src="../assets/logo.svg" alt="Kavach Military Shield & Cross Logo" />
+  <div class="auth-container-grid">
+    <!-- Left Showcase Column: Identity & Pillars -->
+    <div class="auth-showcase-panel">
+      <div>
+        <div class="showcase-brand-header">
+          <div class="auth-logo-box">
+            <img src="../assets/logo.svg" alt="Kavach Shield &amp; Cross Crest" />
+          </div>
+          <div class="showcase-title">
+            KAVACH
+            <span class="showcase-badge">SECURE v2.4</span>
+          </div>
+          <div class="showcase-tagline">"Health that follows the soldier."</div>
+        </div>
+
+        <div class="showcase-pillars">
+          <div class="pillar-item">
+            <span class="pillar-icon">💼</span>
+            <div>
+              <div class="pillar-title">Sovereign Health Wallet</div>
+              <div class="pillar-desc">Records follow the soldier across every posting and into ECHS retirement.</div>
+            </div>
+          </div>
+
+          <div class="pillar-item">
+            <span class="pillar-icon">🔒</span>
+            <div>
+              <div class="pillar-title">Strict Role-Based Access Control</div>
+              <div class="pillar-desc">Doctors see clinical data; Claims officers are blocked from private mental health.</div>
+            </div>
+          </div>
+
+          <div class="pillar-item">
+            <span class="pillar-icon">🛡️</span>
+            <div>
+              <div class="pillar-title">Cryptographic Integrity</div>
+              <div class="pillar-desc">AES-256-GCM encryption at rest with immutable SHA-256 HMAC checksums.</div>
+            </div>
+          </div>
+
+          <div class="pillar-item">
+            <span class="pillar-icon">🧠</span>
+            <div>
+              <div class="pillar-title">Confidential Mental Health &amp; Rehab</div>
+              <div class="pillar-desc">PCL-5, PHQ-9, GAD-7 screening and structured physiotherapy tracking.</div>
+            </div>
+          </div>
+        </div>
       </div>
-      <h1 class="auth-title">KAVACH</h1>
-      <div class="auth-tagline">"Health that follows the soldier."</div>
+
+      <div class="showcase-footer">
+        <span class="dot-green-live"></span>
+        <span>AFMS NODE 14-RR ONLINE // TLS 1.3 256-BIT</span>
+      </div>
     </div>
 
-    <!-- Tab Switcher: Login vs Registration -->
-    <div class="auth-tabs">
-      <button class="auth-tab-btn active" id="tabLoginBtn" onclick="switchAuthTab('login')">
-        🔐 SECURE LOGIN
-      </button>
-      <button class="auth-tab-btn" id="tabRegisterBtn" onclick="switchAuthTab('register')">
-        ✚ NEW REGISTRATION
-      </button>
-    </div>
-
-    <!-- Alert / Error message display -->
-    <div class="auth-alert" id="authAlert"></div>
-
-    <!-- ==================== 1. LOGIN FORM ==================== -->
-    <form id="loginForm" onsubmit="handleLoginSubmit(event)">
-      <div class="form-group">
-        <label class="form-label" for="loginRole">Select Your Role (RBAC Target):</label>
-        <select class="form-control" id="loginRole" required onchange="handleLoginRoleChange()">
-          <option value="SOLDIER">🪖 Soldier / Veteran Patient</option>
-          <option value="DOCTOR">🩺 Medical Officer / Doctor (AMC)</option>
-          <option value="PHYSIOTHERAPIST">🏃 Physiotherapist (Rehabilitation Wing)</option>
-          <option value="COUNSELOR">🧠 Mental Health Counselor (AFMS)</option>
-          <option value="CLAIMS_OFFICER">⚖️ Claims Officer (ECHS / AG Branch)</option>
-          <option value="COMMANDING_OFFICER">🎖️ Commanding Officer (Unit Command)</option>
-        </select>
+    <!-- Right Authentication Form Panel -->
+    <div class="auth-form-panel">
+      <!-- Tab Switcher: Login vs Register -->
+      <div class="auth-tabs">
+        <button type="button" class="auth-tab-btn active" id="tabLoginBtn" onclick="switchAuthTab('login')">
+          🔐 SECURE LOGIN
+        </button>
+        <button type="button" class="auth-tab-btn" id="tabRegisterBtn" onclick="switchAuthTab('register')">
+          ✚ ENROLL PERSONNEL
+        </button>
       </div>
 
-      <div class="form-group">
-        <label class="form-label" for="loginServiceNo">Service Number / Army ID:</label>
-        <input type="text" class="form-control" id="loginServiceNo" value="15489201A" placeholder="e.g. 15489201A or MR-09824X" required />
-      </div>
+      <!-- Alert Banner -->
+      <div class="auth-alert" id="authAlert"></div>
 
-      <div class="form-group">
-        <label class="form-label" for="loginPassword">Military Access Code / Password:</label>
-        <input type="password" class="form-control" id="loginPassword" value="kavach123" placeholder="Enter password" required />
-      </div>
-
-      <button type="submit" class="btn-submit" id="loginSubmitBtn">
-        AUTHENTICATE VIA JWT →
-      </button>
-
-      <!-- Fast One-Click Demo Logins for Hackathon Evaluators -->
-      <div class="demo-fast-logins">
-        <div class="demo-fast-title">⚡ Instant Demo Logins (Click to Fill & Enter):</div>
-        <div class="fast-login-grid">
-          <button type="button" class="fast-pill" onclick="quickFillLogin('SOLDIER', '15489201A')">
-            <span>🪖</span> <span>Rfn. Arjun Verma</span>
-          </button>
-          <button type="button" class="fast-pill" onclick="quickFillLogin('DOCTOR', 'MR-09824X')">
-            <span>🩺</span> <span>Capt. Priya Nair</span>
-          </button>
-          <button type="button" class="fast-pill" onclick="quickFillLogin('PHYSIOTHERAPIST', 'MR-11204K')">
-            <span>🏃</span> <span>Lt. Rajesh Kumar</span>
-          </button>
-          <button type="button" class="fast-pill" onclick="quickFillLogin('COUNSELOR', 'CIV-PSY-042')">
-            <span>🧠</span> <span>Dr. Sunita Rao</span>
-          </button>
-          <button type="button" class="fast-pill" onclick="quickFillLogin('CLAIMS_OFFICER', 'IC-48291M')">
-            <span>⚖️</span> <span>Col. V.K. Singh</span>
-          </button>
-          <button type="button" class="fast-pill" onclick="quickFillLogin('COMMANDING_OFFICER', 'IC-51920P')">
-            <span>🎖️</span> <span>Col. R.S. Rathore</span>
-          </button>
-        </div>
-      </div>
-    </form>
-
-    <!-- ==================== 2. REGISTRATION FORM ==================== -->
-    <form id="registerForm" style="display: none;" onsubmit="handleRegisterSubmit(event)">
-      <div class="form-group">
-        <label class="form-label" for="regRole">Select Role for this Account:</label>
-        <select class="form-control" id="regRole" required>
-          <option value="SOLDIER">🪖 Soldier / Veteran Patient</option>
-          <option value="DOCTOR">🩺 Medical Officer / Doctor (AMC)</option>
-          <option value="PHYSIOTHERAPIST">🏃 Physiotherapist (Rehabilitation Wing)</option>
-          <option value="COUNSELOR">🧠 Mental Health Counselor (AFMS)</option>
-          <option value="CLAIMS_OFFICER">⚖️ Claims Officer (ECHS / AG Branch)</option>
-          <option value="COMMANDING_OFFICER">🎖️ Commanding Officer (Unit Command)</option>
-        </select>
-      </div>
-
-      <div class="form-group">
-        <label class="form-label" for="regName">Full Name &amp; Title:</label>
-        <input type="text" class="form-control" id="regName" placeholder="e.g. Havildar Ramesh Yadav" required />
-      </div>
-
-      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+      <!-- 1. LOGIN FORM -->
+      <form id="loginForm" onsubmit="handleLoginSubmit(event)">
         <div class="form-group">
-          <label class="form-label" for="regServiceNo">Service Number:</label>
-          <input type="text" class="form-control" id="regServiceNo" placeholder="e.g. 15998241K" required />
-        </div>
-        <div class="form-group">
-          <label class="form-label" for="regRank">Rank:</label>
-          <input type="text" class="form-control" id="regRank" placeholder="e.g. Havildar" required />
-        </div>
-      </div>
-
-      <div class="form-group">
-        <label class="form-label" for="regUnit">Unit &amp; Posting Location:</label>
-        <input type="text" class="form-control" id="regUnit" placeholder="e.g. 9 Para SF • Tawang Sector" required />
-      </div>
-
-      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
-        <div class="form-group">
-          <label class="form-label" for="regBlood">Blood Group:</label>
-          <select class="form-control" id="regBlood">
-            <option value="O+">O+</option>
-            <option value="A+">A+</option>
-            <option value="B+">B+</option>
-            <option value="AB+">AB+</option>
-            <option value="O-">O-</option>
-            <option value="A-">A-</option>
-            <option value="B-">B-</option>
-            <option value="AB-">AB-</option>
+          <label class="form-label" for="loginRole">Select Your Role (RBAC Portal):</label>
+          <select class="form-control" id="loginRole" required onchange="handleLoginRoleChange()">
+            <option value="SOLDIER">🪖 Soldier / Veteran Patient</option>
+            <option value="DOCTOR">🩺 Medical Officer / Doctor (AMC)</option>
+            <option value="PHYSIOTHERAPIST">🏃 Physiotherapist (Rehab Wing)</option>
+            <option value="COUNSELOR">🧠 Mental Health Counselor (AFMS)</option>
+            <option value="CLAIMS_OFFICER">⚖️ Claims Officer (ECHS / AG Branch)</option>
+            <option value="COMMANDING_OFFICER">🎖️ Commanding Officer (Unit Command)</option>
           </select>
         </div>
+
         <div class="form-group">
-          <label class="form-label" for="regBranch">Service Branch:</label>
-          <select class="form-control" id="regBranch">
-            <option value="Indian Army">Indian Army</option>
-            <option value="Indian Navy">Indian Navy</option>
-            <option value="Indian Air Force">Indian Air Force</option>
-            <option value="CRPF">CRPF (Paramilitary)</option>
-            <option value="BSF">BSF (Paramilitary)</option>
-            <option value="ITBP">ITBP (Paramilitary)</option>
-            <option value="CISF">CISF (Paramilitary)</option>
+          <label class="form-label" for="loginServiceNo">Service Number / Army ID:</label>
+          <input type="text" class="form-control" id="loginServiceNo" value="15489201A" placeholder="e.g. 15489201A or MR-09824X" required />
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="loginPassword">Military PIN / Password:</label>
+          <input type="password" class="form-control" id="loginPassword" value="kavach123" placeholder="Enter password" required />
+        </div>
+
+        <button type="submit" class="btn-submit" id="loginSubmitBtn">
+          AUTHENTICATE VIA JWT →
+        </button>
+
+        <!-- Fast Demo Logins -->
+        <div class="demo-fast-logins">
+          <div class="demo-fast-title">⚡ 1-Click Fast Logins for Evaluators:</div>
+          <div class="fast-login-grid">
+            <button type="button" class="fast-pill" onclick="quickFillLogin('SOLDIER', '15489201A')">
+              <span>🪖</span> <span>Soldier (Arjun)</span>
+            </button>
+            <button type="button" class="fast-pill" onclick="quickFillLogin('DOCTOR', 'MR-09824X')">
+              <span>🩺</span> <span>Dr. Priya Nair</span>
+            </button>
+            <button type="button" class="fast-pill" onclick="quickFillLogin('PHYSIOTHERAPIST', 'MR-11204K')">
+              <span>🏃</span> <span>Physio Rajesh</span>
+            </button>
+            <button type="button" class="fast-pill" onclick="quickFillLogin('COUNSELOR', 'CIV-PSY-042')">
+              <span>🧠</span> <span>Counselor Rao</span>
+            </button>
+            <button type="button" class="fast-pill" onclick="quickFillLogin('CLAIMS_OFFICER', 'IC-48291M')">
+              <span>⚖️</span> <span>Claims Col. Singh</span>
+            </button>
+            <button type="button" class="fast-pill" onclick="quickFillLogin('COMMANDING_OFFICER', 'IC-51920P')">
+              <span>🎖️</span> <span>CO Rathore</span>
+            </button>
+          </div>
+        </div>
+      </form>
+
+      <!-- 2. REGISTRATION FORM -->
+      <form id="registerForm" style="display: none;" onsubmit="handleRegisterSubmit(event)">
+        <div class="form-group">
+          <label class="form-label" for="regRole">Role Assignment:</label>
+          <select class="form-control" id="regRole" required>
+            <option value="SOLDIER">🪖 Soldier / Veteran Patient</option>
+            <option value="DOCTOR">🩺 Medical Officer / Doctor (AMC)</option>
+            <option value="PHYSIOTHERAPIST">🏃 Physiotherapist (Rehabilitation Wing)</option>
+            <option value="COUNSELOR">🧠 Mental Health Counselor (AFMS)</option>
+            <option value="CLAIMS_OFFICER">⚖️ Claims Officer (ECHS / AG Branch)</option>
+            <option value="COMMANDING_OFFICER">🎖️ Commanding Officer (Unit Command)</option>
           </select>
         </div>
-      </div>
 
-      <div class="form-group">
-        <label class="form-label" for="regPassword">Set Password / Military PIN:</label>
-        <input type="password" class="form-control" id="regPassword" placeholder="Minimum 6 characters" required />
-      </div>
+        <div class="form-group">
+          <label class="form-label" for="regName">Full Name &amp; Rank:</label>
+          <input type="text" class="form-control" id="regName" placeholder="e.g. Havildar Ramesh Yadav" required />
+        </div>
 
-      <button type="submit" class="btn-submit" id="registerSubmitBtn">
-        CREATE ACCOUNT &amp; ENROLL IN KAVACH →
-      </button>
-    </form>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+          <div class="form-group">
+            <label class="form-label" for="regServiceNo">Service Number:</label>
+            <input type="text" class="form-control" id="regServiceNo" placeholder="e.g. 15998241K" required />
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="regRank">Rank:</label>
+            <input type="text" class="form-control" id="regRank" placeholder="e.g. Havildar" required />
+          </div>
+        </div>
 
-    <div class="auth-footer">
-      <div>ARMED FORCES MEDICAL SERVICES (AFMS) &bull; ECHS COMPLIANT</div>
-      <div style="margin-top: 4px; color: var(--khaki-400);">
-        Enforced RBAC &bull; AES-256 Tamper-Proof Health Wallet
-      </div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+          <div class="form-group">
+            <label class="form-label" for="regUnit">Regiment / Unit:</label>
+            <input type="text" class="form-control" id="regUnit" placeholder="e.g. 14 Rajputana Rifles" required />
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="regPosting">Posting Location:</label>
+            <input type="text" class="form-control" id="regPosting" placeholder="e.g. Rajasthan (Desert Sector)" required />
+          </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+          <div class="form-group">
+            <label class="form-label" for="regBranch">Armed Force Branch:</label>
+            <select class="form-control" id="regBranch">
+              <option value="Indian Army">Indian Army</option>
+              <option value="Indian Navy">Indian Navy</option>
+              <option value="Indian Air Force">Indian Air Force</option>
+              <option value="CRPF">CRPF</option>
+              <option value="BSF">BSF</option>
+              <option value="ITBP">ITBP</option>
+              <option value="CISF">CISF</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="regBlood">Blood Group:</label>
+            <select class="form-control" id="regBlood">
+              <option value="O+">O+</option>
+              <option value="O-">O-</option>
+              <option value="A+">A+</option>
+              <option value="A-">A-</option>
+              <option value="B+">B+</option>
+              <option value="B-">B-</option>
+              <option value="AB+">AB+</option>
+              <option value="AB-">AB-</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="regPassword">Set Terminal Password:</label>
+          <input type="password" class="form-control" id="regPassword" value="kavach123" required />
+        </div>
+
+        <button type="submit" class="btn-submit" id="regSubmitBtn">
+          REGISTER &amp; INITIALIZE WALLET →
+        </button>
+      </form>
     </div>
   </div>
 

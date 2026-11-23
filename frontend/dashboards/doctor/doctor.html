@@ -27,23 +27,31 @@
         <img src="../../assets/logo.svg" alt="Kavach Shield Logo" />
       </div>
       <div class="brand-text">
-        <h1>KAVACH <span style="font-size: 0.7rem; background: #e0f2fe; color: #0369a1; padding: 2px 7px; border-radius: 4px;">MEDICAL OFFICER</span></h1>
+        <h1>KAVACH <span class="brand-classification-pill" style="background: #e0f2fe; color: #0369a1; border-color: #bae6fd;">AMC MEDICAL OFFICER</span></h1>
         <div class="brand-tagline-sub">"Health that follows the soldier."</div>
       </div>
     </div>
 
     <div class="header-center-info">
-      <div class="role-tag-badge" style="background: #e0f2fe; color: #075985; border-color: #bae6fd;">
-        <span>🩺</span>
-        <div>
-          <div style="line-height: 1.2;">Capt. Dr. Priya Nair, AMC</div>
-          <div style="font-size: 0.72rem; color: var(--text-muted);">Orthopedic Specialist &bull; MR-09824X</div>
-        </div>
+      <div class="security-seal-chip">
+        <span>🛡️</span>
+        <span>AFMS CLINICAL ACCESS &bull; RESTRICTED DOSSIER</span>
       </div>
     </div>
 
-    <div class="header-actions">
-      <div class="sync-badge synced"><span>🟢</span> <span>AFMS SECURE NODE</span></div>
+    <div class="header-profile-cluster">
+      <div class="user-identity-card">
+        <div class="user-avatar-badge" style="background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);">PN</div>
+        <div class="user-details-text">
+          <div class="user-name-title">Capt. Dr. Priya Nair, AMC</div>
+          <div class="user-meta-sub">
+            <span>Orthopedic Specialist &bull; MR-09824X</span>
+            <span>&bull;</span>
+            <span class="sync-badge synced"><span class="sync-pulse-dot"></span> <span>BASE HOSPITAL DELHI</span></span>
+          </div>
+        </div>
+      </div>
+      <button class="btn-logout" onclick="logoutUser()">LOGOUT</button>
     </div>
   </header>
 

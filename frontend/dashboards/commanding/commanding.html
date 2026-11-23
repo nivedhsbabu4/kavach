@@ -25,23 +25,31 @@
         <img src="../../assets/logo.svg" alt="Kavach Shield Logo" />
       </div>
       <div class="brand-text">
-        <h1>KAVACH <span style="font-size: 0.7rem; background: var(--olive-100); color: var(--olive-900); padding: 2px 7px; border-radius: 4px;">UNIT COMMAND</span></h1>
+        <h1>KAVACH <span class="brand-classification-pill" style="background: var(--mil-olive-100); color: var(--mil-olive-900); border-color: var(--mil-olive-600);">UNIT REGIMENTAL COMMAND</span></h1>
         <div class="brand-tagline-sub">"Regimental Physical Fitness &bull; Operational Readiness"</div>
       </div>
     </div>
 
     <div class="header-center-info">
-      <div class="role-tag-badge" style="background: var(--olive-100); color: var(--olive-900); border-color: var(--olive-300);">
+      <div class="security-seal-chip">
         <span>🎖️</span>
-        <div>
-          <div style="line-height: 1.2;">Col. R.S. Rathore</div>
-          <div style="font-size: 0.72rem; color: var(--text-muted);">Commanding Officer &bull; 14 Raj Rif &bull; IC-51920P</div>
-        </div>
+        <span>14 RAJPUTANA RIFLES &bull; BATTLE GROUP READINESS</span>
       </div>
     </div>
 
-    <div class="header-actions">
-      <div class="sync-badge synced"><span>🟢</span> <span>UNIT BATTLE READINESS: 96%</span></div>
+    <div class="header-profile-cluster">
+      <div class="user-identity-card">
+        <div class="user-avatar-badge" style="background: linear-gradient(135deg, var(--mil-olive-700) 0%, var(--mil-olive-900) 100%);">RR</div>
+        <div class="user-details-text">
+          <div class="user-name-title">Col. R.S. Rathore</div>
+          <div class="user-meta-sub">
+            <span>Commanding Officer &bull; IC-51920P</span>
+            <span>&bull;</span>
+            <span class="sync-badge synced"><span class="sync-pulse-dot"></span> <span>READINESS: 96%</span></span>
+          </div>
+        </div>
+      </div>
+      <button class="btn-logout" onclick="logoutUser()">LOGOUT</button>
     </div>
   </header>
 
