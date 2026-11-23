@@ -3,11 +3,13 @@
 // ============================================================================
 
 let claimsRecords = [];
+let claimsData = [];
 let currentGrantStatus = 'ACTIVE';
 
 document.addEventListener('DOMContentLoaded', async () => {
   await loadClaimsRecords();
   await loadGrantStatus();
+  await loadClaimsPipeline();
 });
 
 function showToast(message, type = 'success') {
@@ -177,4 +179,47 @@ function renderRevokedNotice() {
 
 function advanceClaimStage() {
   showToast('✓ Disability Claim CLM-2024-8841 advanced to PCDA Final Sanction! Notification dispatched to Soldier Health Wallet.', 'success');
+}
+
+async function loadClaimsPipeline() {
+  try {
+    const headers = getAuthHeaders();
+    const res = await fetch('/api/claims?role=CLAIMS_OFFICER&soldier_id=usr-soldier-1', { headers });
+    if (res.ok) {
+      claimsData = await res.json();
+      renderDisputes();
+    }
+  } catch (err) {
+    console.warn('Error loading claims data:', err);
+  }
+}
+
+function renderDisputes() {
+  const container = document.getElementById('claimsDisputeContainer');
+  if (!container) return;
+  const activeDisputeClaim = claimsData.find(c => c.dispute_report || c.has_dispute);
+  if (activeDisputeClaim && activeDisputeClaim.dispute_report) {
+    const d = activeDisputeClaim.dispute_report;
+    container.innerHTML = `
+      <div style="background: #fffbeb; border: 1.5px solid #f59e0b; border-radius: 10px; padding: 14px; color: #92400e;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+          <strong style="font-size: 0.88rem; display: flex; align-items: center; gap: 6px;">
+            <span>⚠️</span> <span>SOLDIER GRIEVANCE / APPEAL DOSSIER FILED</span>
+          </strong>
+          <span style="font-size: 0.72rem; font-family: monospace; background: #fde68a; color: #78350f; font-weight: 800; padding: 2px 8px; border-radius: 4px;">
+            ${d.dispute_id || 'ECHS-DISP-2026-8812'}
+          </span>
+        </div>
+        <div style="font-size: 0.82rem; font-weight: 700; margin-bottom: 4px;">Title: ${d.report_title}</div>
+        <div style="font-size: 0.78rem; line-height: 1.4; margin-bottom: 8px;"><strong>Reason:</strong> ${d.dispute_reason}</div>
+        <div style="font-size: 0.74rem; color: #b45309; font-family: monospace;">Evidence Summary: ${d.evidence_summary || 'SHA-256 records referenced from personal Health Wallet.'}</div>
+      </div>
+    `;
+  } else {
+    container.innerHTML = `
+      <div style="font-size: 0.78rem; color: var(--text-muted); display: flex; align-items: center; gap: 6px;">
+        <span>✓</span> <span>No active soldier appeals or grievances pending on this claim.</span>
+      </div>
+    `;
+  }
 }

@@ -95,6 +95,113 @@ const TRANSLATIONS = {
   }
 };
 
+// 2. Clinical Department to Doctor Mapping
+const DEPARTMENT_DOCTORS = {
+  'Orthopedics & Joint Reconstruction': [
+    { id: 'usr-doctor-1', name: 'Capt. Dr. Priya Nair, AMC (Orthopedic Specialist)' },
+    { id: 'usr-doctor-sengupta', name: 'Col. S. Sengupta, AMC (Chief Ortho Surgeon)' }
+  ],
+  'PTSD & Clinical Psychology': [
+    { id: 'usr-counselor-1', name: 'Dr. Sunita Rao, AFMS (Senior Clinical Psychologist)' }
+  ],
+  'Physiotherapy & Musculoskeletal Rehab': [
+    { id: 'usr-physio-1', name: 'Lt. Rajesh Kumar, AMC (Physical Therapist)' }
+  ],
+  'General & Combat Medicine': [
+    { id: 'usr-doctor-sharma', name: 'Maj. Dr. A. Sharma, AMC (Combat Physician)' },
+    { id: 'usr-doctor-deshmukh', name: 'Lt. Col. P. Deshmukh, AMC (Senior Physician)' }
+  ],
+  'Cardiology': [
+    { id: 'usr-doctor-verma', name: 'Col. Dr. R. Verma, AMC (Chief Cardiologist)' }
+  ],
+  'Combat Audiology & ENT': [
+    { id: 'usr-doctor-chopra', name: 'Lt. Col. Dr. Chopra, AMC (ENT Specialist)' }
+  ]
+};
+
+// 3. Globally Validated Clinical Questionnaires (DSM-5 & AFMS Protocol)
+const QUESTIONNAIRE_DEFS = {
+  'PHQ-9': {
+    id: 'PHQ-9',
+    title: 'PHQ-9 (Patient Health Questionnaire - Depression Screening)',
+    subtitle: 'Globally validated 9-item psychometric screen for depressive symptoms in active personnel.',
+    instruction: 'Over the last 2 weeks, how often have you been bothered by any of the following problems?',
+    options: [
+      { score: 0, label: '0 - Not at all' },
+      { score: 1, label: '1 - Several days' },
+      { score: 2, label: '2 - More than half the days' },
+      { score: 3, label: '3 - Nearly every day' }
+    ],
+    questions: [
+      { id: 'phq_1', text: 'Little interest or pleasure in doing things' },
+      { id: 'phq_2', text: 'Feeling down, depressed, or hopeless' },
+      { id: 'phq_3', text: 'Trouble falling or staying asleep, or sleeping too much' },
+      { id: 'phq_4', text: 'Feeling tired or having little energy' },
+      { id: 'phq_5', text: 'Poor appetite or overeating' },
+      { id: 'phq_6', text: 'Feeling bad about yourself — or that you are a failure or have let yourself or your family/unit down' },
+      { id: 'phq_7', text: 'Trouble concentrating on tasks, such as reading briefings or operating equipment' },
+      { id: 'phq_8', text: 'Moving or speaking so slowly that other people noticed, or being so fidgety/restless that you moved a lot more than usual' },
+      { id: 'phq_9', text: 'Thoughts that you would be better off dead, or of hurting yourself in some way' }
+    ]
+  },
+  'GAD-7': {
+    id: 'GAD-7',
+    title: 'GAD-7 (Generalized Anxiety Disorder Screening)',
+    subtitle: 'Validated 7-item clinical tool assessing hyperarousal, tension, and apprehension.',
+    instruction: 'Over the last 2 weeks, how often have you been bothered by the following problems?',
+    options: [
+      { score: 0, label: '0 - Not at all' },
+      { score: 1, label: '1 - Several days' },
+      { score: 2, label: '2 - More than half the days' },
+      { score: 3, label: '3 - Nearly every day' }
+    ],
+    questions: [
+      { id: 'gad_1', text: 'Feeling nervous, anxious, or on edge' },
+      { id: 'gad_2', text: 'Not being able to stop or control worrying' },
+      { id: 'gad_3', text: 'Worrying too much about different operational and personal issues' },
+      { id: 'gad_4', text: 'Trouble relaxing during off-duty hours' },
+      { id: 'gad_5', text: 'Being so restless that it is hard to sit still' },
+      { id: 'gad_6', text: 'Becoming easily annoyed or irritable with colleagues or family' },
+      { id: 'gad_7', text: 'Feeling afraid, as if something awful might happen' }
+    ]
+  },
+  'PCL-5': {
+    id: 'PCL-5',
+    title: 'PCL-5 (PTSD Checklist for DSM-5 Military Screening)',
+    subtitle: 'Official 20-item DSM-5 gold-standard symptom checklist for combat and operational trauma.',
+    instruction: 'In the past month, how much have you been bothered by the following problems regarding stressful/combat experiences?',
+    options: [
+      { score: 0, label: '0 - Not at all' },
+      { score: 1, label: '1 - A little bit' },
+      { score: 2, label: '2 - Moderately' },
+      { score: 3, label: '3 - Quite a bit' },
+      { score: 4, label: '4 - Extremely' }
+    ],
+    questions: [
+      { id: 'pcl_1', text: 'Repeated, disturbing, and unwanted memories of the stressful experience?' },
+      { id: 'pcl_2', text: 'Repeated, disturbing dreams of the stressful experience?' },
+      { id: 'pcl_3', text: 'Suddenly feeling or acting as if the stressful experience were happening again (flashbacks)?' },
+      { id: 'pcl_4', text: 'Feeling very upset when something reminded you of the stressful experience?' },
+      { id: 'pcl_5', text: 'Strong physical reactions when reminded of the stressful experience (sweating, heart pounding)?' },
+      { id: 'pcl_6', text: 'Avoiding memories, thoughts, or feelings related to the stressful experience?' },
+      { id: 'pcl_7', text: 'Avoiding external reminders of the stressful experience (people, places, military situations)?' },
+      { id: 'pcl_8', text: 'Trouble remembering important parts of the stressful experience?' },
+      { id: 'pcl_9', text: 'Strong negative beliefs about yourself, other people, or the world?' },
+      { id: 'pcl_10', text: 'Blaming yourself or someone else for the stressful experience or what happened after?' },
+      { id: 'pcl_11', text: 'Strong negative feelings such as fear, horror, anger, guilt, or shame?' },
+      { id: 'pcl_12', text: 'Loss of interest in activities that you used to enjoy?' },
+      { id: 'pcl_13', text: 'Feeling distant or cut off from other people (unit comrades, family)?' },
+      { id: 'pcl_14', text: 'Trouble experiencing positive feelings (being unable to feel happiness or love)?' },
+      { id: 'pcl_15', text: 'Irritable behavior, angry outbursts, or acting aggressively?' },
+      { id: 'pcl_16', text: 'Taking too many risks or doing things that could cause you harm?' },
+      { id: 'pcl_17', text: "Being 'super-alert', watchful, or on guard (hypervigilance)?" },
+      { id: 'pcl_18', text: 'Feeling jumpy or easily startled?' },
+      { id: 'pcl_19', text: 'Having difficulty concentrating on tasks?' },
+      { id: 'pcl_20', text: 'Trouble falling or staying asleep?' }
+    ]
+  }
+};
+
 function SoldierApp() {
   // Navigation State
   const [activeTab, setActiveTab] = useState('wallet');
@@ -149,6 +256,14 @@ function SoldierApp() {
   const [activeRecordModal, setActiveRecordModal] = useState(null);
   const [activeVideoCall, setActiveVideoCall] = useState(null);
   const [isDarkMode, setIsDarkMode] = useState(false);
+
+  // Interactive Questionnaires, Dispute & Notification Modals
+  const [activeQuestionnaire, setActiveQuestionnaire] = useState(null);
+  const [questionnaireAnswers, setQuestionnaireAnswers] = useState({});
+  const [selectedNotification, setSelectedNotification] = useState(null);
+  const [disputeModalClaim, setDisputeModalClaim] = useState(null);
+  const [disputeForm, setDisputeForm] = useState({ report_title: '', dispute_reason: '', evidence_summary: '' });
+  const [bookingConfirmedSlip, setBookingConfirmedSlip] = useState(null);
 
   // Toast Notification State (Eliminates Browser Alerts!)
   const [toast, setToast] = useState(null);
@@ -282,7 +397,7 @@ function SoldierApp() {
         method: 'POST',
         headers,
         body: JSON.stringify({
-          soldier_id: soldierProfile.serviceNo,
+          soldier_id: soldierProfile.id || soldierProfile.serviceNo,
           ...bookingForm
         })
       });
@@ -291,14 +406,81 @@ function SoldierApp() {
         const data = await res.json();
         setRecords(prev => [data.record, ...prev]);
         setConsultations(prev => [data.consultation, ...prev]);
-        setActiveVideoCall(data.consultation);
-        showToast('✓ Teleconsultation confirmed & cryptographically auto-saved to Health Wallet!', 'success');
+        setBookingConfirmedSlip(data);
+        showToast(`✓ Teleconsultation Booked! Reference No: ${data.reference_no || 'AFMS-TC-2026-8819'}`, 'success');
       } else {
         showToast('Failed to book teleconsultation.', 'warn');
       }
     } catch (err) {
       console.error(err);
       showToast('Network error while booking consultation.', 'warn');
+    }
+  }
+
+  // Handle Submit Screening Questionnaire
+  async function submitScreeningQuestionnaire() {
+    if (!activeQuestionnaire) return;
+    const questions = activeQuestionnaire.questions;
+    const answersList = questions.map(q => parseInt(questionnaireAnswers[q.id] !== undefined ? questionnaireAnswers[q.id] : 0, 10));
+
+    try {
+      const headers = getAuthHeaders();
+      const res = await fetch('/api/screenings', {
+        method: 'POST',
+        headers,
+        body: JSON.stringify({
+          soldier_id: soldierProfile.id || 'usr-soldier-1',
+          questionnaire_type: activeQuestionnaire.id,
+          answers: answersList
+        })
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        setScreenings(prev => [data, ...prev]);
+        setActiveQuestionnaire(null);
+        setQuestionnaireAnswers({});
+        showToast(`✓ ${data.questionnaire_type} Complete! Score: ${data.score}/${data.max_score} (${data.severity})`, 'success');
+      } else {
+        showToast('Failed to record assessment.', 'warn');
+      }
+    } catch (err) {
+      console.error(err);
+      showToast('Network error submitting screening.', 'warn');
+    }
+  }
+
+  // Handle File Claim Grievance / Appeal Report
+  async function handleFileDispute(e) {
+    e.preventDefault();
+    if (!disputeModalClaim || !disputeForm.report_title || !disputeForm.dispute_reason) {
+      showToast('Please enter report title and reason for appeal.', 'warn');
+      return;
+    }
+
+    try {
+      const headers = getAuthHeaders();
+      const res = await fetch('/api/claims/dispute', {
+        method: 'POST',
+        headers,
+        body: JSON.stringify({
+          claim_id: disputeModalClaim.id,
+          ...disputeForm
+        })
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        setClaims(prev => prev.map(c => c.id === disputeModalClaim.id ? { ...c, dispute_report: data.dispute, has_dispute: true } : c));
+        setDisputeModalClaim(null);
+        setDisputeForm({ report_title: '', dispute_reason: '', evidence_summary: '' });
+        showToast(`✓ Appeal Report Submitted! Official Tracking ID: ${data.dispute.dispute_id}`, 'success');
+      } else {
+        showToast('Failed to file appeal report.', 'warn');
+      }
+    } catch (err) {
+      console.error(err);
+      showToast('Network error filing dispute.', 'warn');
     }
   }
 
@@ -626,7 +808,11 @@ function SoldierApp() {
                     notifications.map(n => (
                       <div 
                         key={n.id}
-                        className={`p-3 rounded-xl border transition text-xs ${
+                        onClick={() => {
+                          setSelectedNotification(n);
+                          setIsNotifOpen(false);
+                        }}
+                        className={`p-3 rounded-xl border transition text-xs cursor-pointer hover:border-emerald-500 hover:shadow-xs ${
                           n.priority === 'HIGH' 
                             ? 'bg-rose-50/70 border-rose-200 dark:bg-rose-950/20 dark:border-rose-900' 
                             : 'bg-slate-50 border-slate-200 dark:bg-slate-800/40 dark:border-slate-700'
@@ -643,8 +829,11 @@ function SoldierApp() {
                           </span>
                         </div>
                         <div className="font-extrabold text-slate-900 dark:text-white mb-0.5">{n.title}</div>
-                        <div className="text-[11px] text-slate-600 dark:text-slate-300 leading-snug">{n.message}</div>
-                        <div className="mt-2 text-[10px] font-mono text-slate-400">From: {n.sender_name}</div>
+                        <div className="text-[11px] text-slate-600 dark:text-slate-300 leading-snug line-clamp-2">{n.message}</div>
+                        <div className="mt-2 flex justify-between items-center text-[10px] font-mono text-slate-400">
+                          <span>From: {n.sender_name}</span>
+                          <span className="text-emerald-700 dark:text-emerald-400 font-bold">Open Detail →</span>
+                        </div>
                       </div>
                     ))
                   )}
@@ -979,11 +1168,21 @@ function SoldierApp() {
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
                     <label className="text-xs font-extrabold uppercase tracking-wider text-slate-500 dark:text-slate-400 block mb-1.5">
-                      Clinical Specialty:
+                      Clinical Department / Specialty:
                     </label>
                     <select 
                       value={bookingForm.specialty} 
-                      onChange={e => setBookingForm({ ...bookingForm, specialty: e.target.value })}
+                      onChange={e => {
+                        const newSpec = e.target.value;
+                        const docList = DEPARTMENT_DOCTORS[newSpec] || [];
+                        const firstDoc = docList[0] || { id: 'usr-doctor-1', name: 'Medical Officer' };
+                        setBookingForm({
+                          ...bookingForm,
+                          specialty: newSpec,
+                          doctorId: firstDoc.id,
+                          doctorName: firstDoc.name
+                        });
+                      }}
                       className="w-full px-3 py-2 text-xs rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-slate-100 font-bold"
                     >
                       <option value="Orthopedics & Joint Reconstruction">Orthopedics & Joint Reconstruction</option>
@@ -997,17 +1196,21 @@ function SoldierApp() {
 
                   <div>
                     <label className="text-xs font-extrabold uppercase tracking-wider text-slate-500 dark:text-slate-400 block mb-1.5">
-                      Attending Medical Officer:
+                      Attending Medical Officer ({bookingForm.specialty.split(' ')[0]}):
                     </label>
                     <select 
                       value={bookingForm.doctorName} 
-                      onChange={e => setBookingForm({ ...bookingForm, doctorName: e.target.value })}
+                      onChange={e => {
+                        const selName = e.target.value;
+                        const docList = DEPARTMENT_DOCTORS[bookingForm.specialty] || [];
+                        const match = docList.find(d => d.name === selName) || { id: 'usr-doctor-1', name: selName };
+                        setBookingForm({ ...bookingForm, doctorName: match.name, doctorId: match.id });
+                      }}
                       className="w-full px-3 py-2 text-xs rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-slate-100 font-bold"
                     >
-                      <option value="Capt. Dr. Priya Nair, AMC">Capt. Dr. Priya Nair, AMC (Orthopedic Specialist)</option>
-                      <option value="Col. S. Sengupta, AMC">Col. S. Sengupta, AMC (Chief Surgeon)</option>
-                      <option value="Dr. Sunita Rao">Dr. Sunita Rao (AFMS Psychological Cell)</option>
-                      <option value="Lt. Rajesh Kumar">Lt. Rajesh Kumar (Rehabilitation Officer)</option>
+                      {(DEPARTMENT_DOCTORS[bookingForm.specialty] || []).map(d => (
+                        <option key={d.id} value={d.name}>{d.name}</option>
+                      ))}
                     </select>
                   </div>
                 </div>
@@ -1102,115 +1305,173 @@ function SoldierApp() {
         {activeTab === 'stress' && (
           <div className="space-y-6">
             
-            {/* Proactive Counselor Nudge Banner */}
-            <div className="bg-gradient-to-r from-amber-50 to-amber-100/60 dark:from-amber-950/40 dark:to-amber-900/20 border border-amber-300 dark:border-amber-800 rounded-2xl p-5 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-xs">
-              <div className="flex items-start gap-4">
-                <span className="text-3xl">⚠️</span>
-                <div>
-                  <strong className="text-sm font-extrabold text-amber-900 dark:text-amber-200 block mb-1">
-                    Your stress scores have climbed 3 weeks in a row — a confidential counselor is one tap away.
-                  </strong>
-                  <span className="text-xs text-amber-800 dark:text-amber-300">
-                    PHQ-9 rose from 5 to 13 during Desert patrol. AFMS Psychological Support Cell (Dr. Sunita Rao) is available. Completely private.
-                  </span>
+            {screenings.length === 0 ? (
+              /* UNASSESSED STATE FOR NEW PERSONNEL */
+              <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-8 shadow-xs text-center">
+                <div className="w-16 h-16 rounded-full bg-emerald-50 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 flex items-center justify-center text-3xl mx-auto mb-4 border border-emerald-200 dark:border-emerald-800">
+                  🌱
+                </div>
+                <h3 className="text-lg font-black text-slate-900 dark:text-white mb-2">
+                  No Psychological Assessments on Record Yet
+                </h3>
+                <p className="text-xs text-slate-500 max-w-lg mx-auto mb-6 leading-relaxed">
+                  Regular private self-assessments protect operational readiness and detect psychological strain early with zero command stigma. Your screening responses are strictly confidential and sealed under AFMS mental health separation.
+                </p>
+                <div className="flex justify-center gap-3 flex-wrap">
+                  <button 
+                    onClick={() => { setActiveQuestionnaire(QUESTIONNAIRE_DEFS['PHQ-9']); setQuestionnaireAnswers({}); }} 
+                    className="bg-emerald-800 hover:bg-emerald-900 text-white font-bold text-xs px-4 py-2.5 rounded-xl transition shadow-xs flex items-center gap-1.5"
+                  >
+                    <span>🧠</span> <span>Take PHQ-9 (Depression Check) →</span>
+                  </button>
+                  <button 
+                    onClick={() => { setActiveQuestionnaire(QUESTIONNAIRE_DEFS['PCL-5']); setQuestionnaireAnswers({}); }} 
+                    className="bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs px-4 py-2.5 rounded-xl transition shadow-xs flex items-center gap-1.5"
+                  >
+                    <span>🛡️</span> <span>Take PCL-5 (Combat Trauma) →</span>
+                  </button>
+                  <button 
+                    onClick={() => { setActiveQuestionnaire(QUESTIONNAIRE_DEFS['GAD-7']); setQuestionnaireAnswers({}); }} 
+                    className="bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs px-4 py-2.5 rounded-xl transition shadow-xs flex items-center gap-1.5"
+                  >
+                    <span>📈</span> <span>Take GAD-7 (Anxiety) →</span>
+                  </button>
                 </div>
               </div>
-              <button 
-                onClick={() => showToast('Direct Confidential Line to Dr. Sunita Rao (AFMS Psychological Cell) connected.', 'success')}
-                className="bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs px-4 py-2.5 rounded-xl whitespace-nowrap transition shadow-xs flex items-center gap-1.5"
-              >
-                <span>📞</span> <span>Connect with Counselor</span>
-              </button>
-            </div>
+            ) : (() => {
+              const latestScr = screenings[0];
+              const plotScr = screenings.slice(0, 6).reverse();
+              const indicatorColor = latestScr.color_code || (latestScr.score >= 10 ? '#ef4444' : (latestScr.score >= 5 ? '#f59e0b' : '#10b981'));
+              const pts = plotScr.map((s, idx) => ({
+                x: 60 + (idx * (530 / Math.max(plotScr.length - 1, 1))),
+                y: 165 - ((s.score / (s.max_score || 27)) * 125),
+                score: s.score,
+                label: s.date ? s.date.slice(5) : `Wk ${idx + 1}`,
+                type: s.questionnaire_type
+              }));
 
-            {/* Stress Graphs Grid */}
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-              
-              {/* Dynamic Line Graph */}
-              <div className="lg:col-span-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 shadow-xs">
-                <div className="flex justify-between items-center mb-4 pb-3 border-b border-slate-200 dark:border-slate-800">
-                  <div>
-                    <h3 className="text-sm font-black text-slate-900 dark:text-white">📈 Dynamic 6-Week Stress Score Trend (PHQ-9)</h3>
-                    <div className="text-xs text-slate-500">Rising curve indicates psychological strain from high-tempo drills</div>
+              const minimalCount = screenings.filter(s => s.score < 5).length;
+              const mildCount = screenings.filter(s => s.score >= 5 && s.score < 10).length;
+              const modCount = screenings.filter(s => s.score >= 10 && s.score < 15).length;
+              const sevCount = screenings.filter(s => s.score >= 15).length;
+              const totalCount = screenings.length || 1;
+
+              return (
+                <div className="space-y-6">
+                  {/* Proactive Counselor Nudge Banner if elevated */}
+                  {screenings.some(s => s.counselor_nudge_triggered) && (
+                    <div className="bg-gradient-to-r from-amber-50 to-amber-100/60 dark:from-amber-950/40 dark:to-amber-900/20 border border-amber-300 dark:border-amber-800 rounded-2xl p-5 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-xs">
+                      <div className="flex items-start gap-4">
+                        <span className="text-3xl">⚠️</span>
+                        <div>
+                          <strong className="text-sm font-extrabold text-amber-900 dark:text-amber-200 block mb-1">
+                            Your recent stress scores indicate elevated tension — a confidential counselor is available.
+                          </strong>
+                          <span className="text-xs text-amber-800 dark:text-amber-300">
+                            AFMS Psychological Support Cell (Dr. Sunita Rao) is on duty. Completely private with zero command exposure.
+                          </span>
+                        </div>
+                      </div>
+                      <button 
+                        onClick={() => showToast('Direct Confidential Line to Dr. Sunita Rao (AFMS Psychological Cell) connected.', 'success')}
+                        className="bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs px-4 py-2.5 rounded-xl whitespace-nowrap transition shadow-xs flex items-center gap-1.5"
+                      >
+                        <span>📞</span> <span>Connect with Counselor</span>
+                      </button>
+                    </div>
+                  )}
+
+                  {/* Stress Graphs Grid */}
+                  <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    {/* Dynamic Line Graph */}
+                    <div className="lg:col-span-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 shadow-xs">
+                      <div className="flex justify-between items-center mb-4 pb-3 border-b border-slate-200 dark:border-slate-800">
+                        <div>
+                          <h3 className="text-sm font-black text-slate-900 dark:text-white flex items-center gap-2">
+                            <span>📈</span> <span>Dynamic Stress Score Trend ({latestScr.questionnaire_type})</span>
+                          </h3>
+                          <div className="text-xs text-slate-500">Calculated from validated self-assessments over operational timeline</div>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <span className="w-2.5 h-2.5 rounded-full animate-ping" style={{ backgroundColor: indicatorColor }}></span>
+                          <span className="px-2.5 py-1 rounded-md text-[10px] font-black font-mono" style={{ backgroundColor: `${indicatorColor}20`, color: indicatorColor }}>
+                            {latestScr.severity.toUpperCase()} ({latestScr.score}/{latestScr.max_score})
+                          </span>
+                        </div>
+                      </div>
+
+                      <div className="relative h-56 flex items-center justify-center">
+                        <svg width="100%" height="100%" viewBox="0 0 650 200" className="overflow-visible">
+                          <line x1="50" y1="170" x2="620" y2="170" stroke="#cbd5e1" strokeWidth="1" />
+                          <line x1="50" y1="115" x2="620" y2="115" stroke="#e2e8f0" strokeDasharray="4 4" />
+                          <line x1="50" y1="60" x2="620" y2="60" stroke="#fecaca" strokeDasharray="4 4" />
+
+                          <path 
+                            d={pts.length > 1 ? `M ${pts.map(p => `${p.x} ${p.y}`).join(' L ')}` : `M 50 ${pts[0]?.y || 120} L 600 ${pts[0]?.y || 120}`} 
+                            fill="none" 
+                            stroke={indicatorColor} 
+                            strokeWidth="3.5" 
+                          />
+
+                          {pts.map((pt, i) => (
+                            <g key={i}>
+                              <circle cx={pt.x} cy={pt.y} r={i === pts.length - 1 ? 7 : 4.5} fill={i === pts.length - 1 ? indicatorColor : '#15803d'} stroke="#fff" strokeWidth="2" />
+                              <text x={pt.x} y={pt.y - 10} textAnchor="middle" fontSize="11" fontWeight="800" fill="#334155">{pt.score}</text>
+                              <text x={pt.x} y="190" textAnchor="middle" fontSize="10" fontWeight="600" fill="#94a3b8">{pt.label}</text>
+                            </g>
+                          ))}
+
+                          {pts.length > 0 && (
+                            <circle cx={pts[pts.length - 1].x} cy={pts[pts.length - 1].y} r="14" fill="none" stroke={indicatorColor} strokeWidth="2.5" opacity="0.8">
+                              <animate attributeName="r" values="7;18;7" dur="1.5s" repeatCount="indefinite" />
+                              <animate attributeName="opacity" values="1;0;1" dur="1.5s" repeatCount="indefinite" />
+                            </circle>
+                          )}
+                        </svg>
+                      </div>
+                    </div>
+
+                    {/* Donut Symptom Breakdown */}
+                    <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 shadow-xs flex flex-col justify-between">
+                      <div className="border-b border-slate-200 dark:border-slate-800 pb-3">
+                        <h3 className="text-sm font-black text-slate-900 dark:text-white">🥧 Symptom Distribution</h3>
+                        <div className="text-xs text-slate-500">Historical Check-in Assessment</div>
+                      </div>
+
+                      <div className="flex flex-col items-center justify-center my-4">
+                        <svg width="140" height="140" viewBox="0 0 200 200">
+                          <circle cx="100" cy="100" r="70" fill="transparent" stroke="#10b981" strokeWidth="26" strokeDasharray="110 330" />
+                          <circle cx="100" cy="100" r="70" fill="transparent" stroke="#f59e0b" strokeWidth="26" strokeDasharray="154 286" strokeDashoffset="-110" />
+                          <circle cx="100" cy="100" r="70" fill="transparent" stroke="#ea580c" strokeWidth="26" strokeDasharray="132 308" strokeDashoffset="-264" />
+                          <circle cx="100" cy="100" r="70" fill="transparent" stroke="#e11d48" strokeWidth="26" strokeDasharray="44 396" strokeDashoffset="-396" />
+                          <text x="100" y="105" textAnchor="middle" fontSize="14" fontWeight="900" fill="#0f172a">{latestScr.questionnaire_type}</text>
+                        </svg>
+
+                        <div className="grid grid-cols-2 gap-2 text-[10px] text-slate-600 dark:text-slate-300 mt-3 font-medium">
+                          <span><span className="text-emerald-600">●</span> Minimal ({Math.round(minimalCount/totalCount*100)}%)</span>
+                          <span><span className="text-amber-500">●</span> Mild ({Math.round(mildCount/totalCount*100)}%)</span>
+                          <span><span className="text-orange-500">●</span> Moderate ({Math.round(modCount/totalCount*100)}%)</span>
+                          <span><span className="text-rose-600">●</span> Severe ({Math.round(sevCount/totalCount*100)}%)</span>
+                        </div>
+                      </div>
+                    </div>
                   </div>
-                  <span className="px-2.5 py-1 rounded-md text-[10px] font-black font-mono bg-orange-100 text-orange-800 dark:bg-orange-950 dark:text-orange-300">
-                    MODERATE STRAIN (13/27)
-                  </span>
                 </div>
-
-                <div className="relative h-56 flex items-center justify-center">
-                  <svg width="100%" height="100%" viewBox="0 0 650 200" className="overflow-visible">
-                    <line x1="50" y1="180" x2="620" y2="180" stroke="#cbd5e1" strokeWidth="1" />
-                    <line x1="50" y1="120" x2="620" y2="120" stroke="#e2e8f0" strokeDasharray="4 4" />
-                    <line x1="50" y1="60" x2="620" y2="60" stroke="#fecaca" strokeDasharray="4 4" />
-
-                    <path 
-                      d="M 50 150 Q 160 140 270 120 T 380 95 T 490 85 T 600 65" 
-                      fill="none" 
-                      stroke="#ea580c" 
-                      strokeWidth="3.5" 
-                    />
-
-                    {[
-                      { x: 50, y: 150, score: 5, label: 'Wk 1' },
-                      { x: 160, y: 140, score: 6, label: 'Wk 2' },
-                      { x: 270, y: 120, score: 8, label: 'Wk 3' },
-                      { x: 380, y: 95, score: 10, label: 'Wk 4' },
-                      { x: 490, y: 85, score: 11, label: 'Wk 5' },
-                      { x: 600, y: 65, score: 13, label: 'Wk 6' }
-                    ].map((pt, i) => (
-                      <g key={i}>
-                        <circle cx={pt.x} cy={pt.y} r={i === 5 ? 7 : 4} fill={i === 5 ? '#ea580c' : '#15803d'} stroke="#fff" strokeWidth="2" />
-                        <text x={pt.x} y={pt.y - 10} textAnchor="middle" fontSize="11" fontWeight="800" fill="#334155">{pt.score}</text>
-                        <text x={pt.x} y="195" textAnchor="middle" fontSize="10" fontWeight="600" fill="#94a3b8">{pt.label}</text>
-                      </g>
-                    ))}
-
-                    <circle cx="600" cy="65" r="14" fill="none" stroke="#ea580c" strokeWidth="2.5" opacity="0.8">
-                      <animate attributeName="r" values="7;18;7" dur="1.5s" repeatCount="indefinite" />
-                      <animate attributeName="opacity" values="1;0;1" dur="1.5s" repeatCount="indefinite" />
-                    </circle>
-                  </svg>
-                </div>
-              </div>
-
-              {/* Donut Symptom Breakdown */}
-              <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 shadow-xs flex flex-col justify-between">
-                <div className="border-b border-slate-200 dark:border-slate-800 pb-3">
-                  <h3 className="text-sm font-black text-slate-900 dark:text-white">🥧 Symptom Distribution</h3>
-                  <div className="text-xs text-slate-500">Historical Check-in Assessment</div>
-                </div>
-
-                <div className="flex flex-col items-center justify-center my-4">
-                  <svg width="140" height="140" viewBox="0 0 200 200">
-                    <circle cx="100" cy="100" r="70" fill="transparent" stroke="#10b981" strokeWidth="26" strokeDasharray="110 330" />
-                    <circle cx="100" cy="100" r="70" fill="transparent" stroke="#f59e0b" strokeWidth="26" strokeDasharray="154 286" strokeDashoffset="-110" />
-                    <circle cx="100" cy="100" r="70" fill="transparent" stroke="#ea580c" strokeWidth="26" strokeDasharray="132 308" strokeDashoffset="-264" />
-                    <circle cx="100" cy="100" r="70" fill="transparent" stroke="#e11d48" strokeWidth="26" strokeDasharray="44 396" strokeDashoffset="-396" />
-                    <text x="100" y="105" textAnchor="middle" fontSize="14" fontWeight="900" fill="#0f172a">PHQ-9</text>
-                  </svg>
-
-                  <div className="grid grid-cols-2 gap-2 text-[10px] text-slate-600 dark:text-slate-300 mt-3 font-medium">
-                    <span><span className="text-emerald-600">●</span> Minimal (25%)</span>
-                    <span><span className="text-amber-500">●</span> Mild (35%)</span>
-                    <span><span className="text-orange-500">●</span> Moderate (30%)</span>
-                    <span><span className="text-rose-600">●</span> Severe (10%)</span>
-                  </div>
-                </div>
-              </div>
-
-            </div>
+              );
+            })()}
 
             {/* Globally Validated Questionnaires Grid */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 shadow-xs">
                 <div className="flex justify-between items-center mb-2">
                   <strong className="text-sm font-extrabold text-slate-900 dark:text-white">PHQ-9 Depression</strong>
-                  <span className="text-xs font-mono font-black text-rose-600">13/27</span>
+                  <span className="text-xs font-mono font-black text-rose-600">
+                    {screenings.find(s => s.questionnaire_type === 'PHQ-9') ? `${screenings.find(s => s.questionnaire_type === 'PHQ-9').score}/27` : 'Unassessed'}
+                  </span>
                 </div>
-                <p className="text-xs text-slate-500 mb-4">Evaluates mood, sleep quality, and energy over the previous 14 days.</p>
+                <p className="text-xs text-slate-500 mb-4">Evaluates mood, sleep quality, and energy over the previous 14 days (9 questions).</p>
                 <button 
-                  onClick={() => showToast('Starting confidential PHQ-9 self-assessment...', 'success')}
+                  onClick={() => { setActiveQuestionnaire(QUESTIONNAIRE_DEFS['PHQ-9']); setQuestionnaireAnswers({}); }}
                   className="w-full bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 text-slate-800 dark:text-slate-200 font-bold text-xs py-2 rounded-xl transition"
                 >
                   Take PHQ-9 Check-in →
@@ -1220,11 +1481,13 @@ function SoldierApp() {
               <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 shadow-xs">
                 <div className="flex justify-between items-center mb-2">
                   <strong className="text-sm font-extrabold text-slate-900 dark:text-white">PCL-5 Combat PTSD</strong>
-                  <span className="text-xs font-mono font-black text-amber-600">32/80</span>
+                  <span className="text-xs font-mono font-black text-amber-600">
+                    {screenings.find(s => s.questionnaire_type === 'PCL-5') ? `${screenings.find(s => s.questionnaire_type === 'PCL-5').score}/80` : 'Unassessed'}
+                  </span>
                 </div>
-                <p className="text-xs text-slate-500 mb-4">Screens combat trauma recall, hyperarousal, and emotional numbing.</p>
+                <p className="text-xs text-slate-500 mb-4">Screens combat trauma recall, hyperarousal, and emotional numbing (20 questions).</p>
                 <button 
-                  onClick={() => showToast('Starting confidential PCL-5 self-assessment...', 'success')}
+                  onClick={() => { setActiveQuestionnaire(QUESTIONNAIRE_DEFS['PCL-5']); setQuestionnaireAnswers({}); }}
                   className="w-full bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 text-slate-800 dark:text-slate-200 font-bold text-xs py-2 rounded-xl transition"
                 >
                   Take PCL-5 Assessment →
@@ -1234,11 +1497,13 @@ function SoldierApp() {
               <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 shadow-xs">
                 <div className="flex justify-between items-center mb-2">
                   <strong className="text-sm font-extrabold text-slate-900 dark:text-white">GAD-7 Anxiety Scale</strong>
-                  <span className="text-xs font-mono font-black text-emerald-600">9/21</span>
+                  <span className="text-xs font-mono font-black text-emerald-600">
+                    {screenings.find(s => s.questionnaire_type === 'GAD-7') ? `${screenings.find(s => s.questionnaire_type === 'GAD-7').score}/21` : 'Unassessed'}
+                  </span>
                 </div>
-                <p className="text-xs text-slate-500 mb-4">Measures generalized somatic tension, nervousness, and restlessness.</p>
+                <p className="text-xs text-slate-500 mb-4">Measures generalized somatic tension, nervousness, and restlessness (7 questions).</p>
                 <button 
-                  onClick={() => showToast('Starting confidential GAD-7 self-assessment...', 'success')}
+                  onClick={() => { setActiveQuestionnaire(QUESTIONNAIRE_DEFS['GAD-7']); setQuestionnaireAnswers({}); }}
                   className="w-full bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 text-slate-800 dark:text-slate-200 font-bold text-xs py-2 rounded-xl transition"
                 >
                   Take GAD-7 Assessment →
@@ -1455,23 +1720,46 @@ function SoldierApp() {
                       </div>
                     </div>
 
-                    {g.status === 'ACTIVE' && (
-                      <button 
-                        onClick={async () => {
-                          const headers = getAuthHeaders();
-                          await fetch('/api/access-grants/revoke', {
-                            method: 'POST',
-                            headers,
-                            body: JSON.stringify({ grant_id: g.id })
-                          });
-                          setGrants(prev => prev.map(item => item.id === g.id ? { ...item, status: 'REVOKED' } : item));
-                          showToast('✓ Access Grant instantly revoked! Clinician barred from reading records.', 'success');
-                        }}
-                        className="bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs px-3.5 py-2 rounded-xl transition shadow-xs whitespace-nowrap"
-                      >
-                        🔒 Revoke Access Now
-                      </button>
-                    )}
+                    <div>
+                      {g.status === 'ACTIVE' ? (
+                        <button 
+                          onClick={async () => {
+                            const headers = getAuthHeaders();
+                            const res = await fetch('/api/access-grants/toggle', {
+                              method: 'POST',
+                              headers,
+                              body: JSON.stringify({ grant_id: g.id, role: g.granted_to_role, soldier_id: soldierProfile.id || soldierProfile.serviceNo })
+                            });
+                            if (res.ok) {
+                              setGrants(prev => prev.map(item => item.id === g.id ? { ...item, status: 'REVOKED' } : item));
+                              showToast('✓ Access Grant instantly revoked! Clinician barred from reading records.', 'success');
+                            }
+                          }}
+                          className="bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs px-3.5 py-2 rounded-xl transition shadow-xs whitespace-nowrap"
+                        >
+                          🔒 Revoke Access Now
+                        </button>
+                      ) : (
+                        <button 
+                          onClick={async () => {
+                            const headers = getAuthHeaders();
+                            const res = await fetch('/api/access-grants/toggle', {
+                              method: 'POST',
+                              headers,
+                              body: JSON.stringify({ grant_id: g.id, role: g.granted_to_role, soldier_id: soldierProfile.id || soldierProfile.serviceNo })
+                            });
+                            if (res.ok) {
+                              const data = await res.json();
+                              setGrants(prev => prev.map(item => item.id === g.id ? { ...item, status: 'ACTIVE', expiry_date: data.grant.expiry_date } : item));
+                              showToast('✓ Access Re-Granted! Valid for 30 days.', 'success');
+                            }
+                          }}
+                          className="bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs px-3.5 py-2 rounded-xl transition shadow-xs whitespace-nowrap"
+                        >
+                          🔓 Re-Grant Access (30 Days)
+                        </button>
+                      )}
+                    </div>
                   </div>
                 ))
               )}
@@ -1489,59 +1777,113 @@ function SoldierApp() {
                 <span>📋</span> <span>ECHS Disability Claim Tracker</span>
               </h2>
               <div className="text-xs text-slate-500 mt-1">
-                Real-time tracking of battle casualty disability pension &bull; Tamper-proof medical dossier attached
+                Real-time tracking of battle casualty disability pension &bull; Tamper-proof medical dossier attached &bull; Transparent Dispute &amp; Appeal Redressal
               </div>
             </div>
 
-            <div className="p-5 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700 mb-6">
-              <div className="flex justify-between items-center mb-4">
-                <div>
-                  <div className="text-xs font-mono font-bold text-slate-400">CLAIM ID: CLM-2024-8841</div>
-                  <h3 className="text-base font-black text-slate-900 dark:text-white">
-                    40% Disability Pension: Shrapnel Wound &amp; Left Knee Meniscectomy
-                  </h3>
-                </div>
-                <span className="bg-amber-100 text-amber-800 font-bold text-xs px-3 py-1 rounded-full font-mono">
-                  STAGE 3: IN ADJUDICATION
-                </span>
+            {claims.length === 0 ? (
+              <div className="text-center py-10 bg-slate-50 dark:bg-slate-800/40 rounded-2xl border border-slate-200 dark:border-slate-800">
+                <span className="text-3xl block mb-2">📋</span>
+                <p className="text-sm font-bold text-slate-600 dark:text-slate-300">No active ECHS claims found for your service profile.</p>
+                <p className="text-xs text-slate-400 mt-1">Disability claims filed during medical discharge or annual board will synchronize here.</p>
               </div>
+            ) : (
+              claims.map(claim => (
+                <div key={claim.id} className="p-5 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700 mb-6">
+                  <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 mb-4">
+                    <div>
+                      <div className="text-xs font-mono font-bold text-slate-400 uppercase">CLAIM ID: {claim.id}</div>
+                      <h3 className="text-base font-black text-slate-900 dark:text-white">
+                        {claim.title}
+                      </h3>
+                    </div>
+                    <span className="bg-amber-100 text-amber-800 font-bold text-xs px-3 py-1 rounded-full font-mono">
+                      STAGE {claim.current_stage || 3}: {claim.status_label || 'UNDER ADJUDICATION'}
+                    </span>
+                  </div>
 
-              {/* 4-Stage Moving Line */}
-              <div className="grid grid-cols-1 sm:grid-cols-4 gap-3 text-xs">
-                <div className="p-3 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-900">
-                  <div className="font-bold text-[10px] uppercase text-emerald-700">Stage 1: Submitted</div>
-                  <div className="font-extrabold mt-1">10 Oct 2024</div>
-                  <div className="text-[10px] text-emerald-600">✓ Records Verified</div>
+                  {/* 5-Stage Moving Line */}
+                  <div className="grid grid-cols-1 sm:grid-cols-5 gap-2 text-xs mb-6">
+                    {(claim.stages || [
+                      { id: 1, name: "Submitted", date: "10 Oct 2024", completed: true, note: "Records Verified" },
+                      { id: 2, name: "Waiting for Verification", date: "28 Oct 2024", completed: true, note: "Base Hospital Board" },
+                      { id: 3, name: "Pending", date: "Current Review", completed: true, current: true, note: "Disability Directorate" },
+                      { id: 4, name: "Waiting for Approval", date: "Pending", completed: false, note: "Financial Sanction" },
+                      { id: 5, name: "Claim Sanctioned / Rejected", date: "Pending", completed: false, note: "PPO Order" }
+                    ]).map((stg, sIdx) => {
+                      const isDone = stg.completed && !stg.current;
+                      const isCurr = stg.current || stg.id === claim.current_stage;
+                      return (
+                        <div 
+                          key={sIdx}
+                          className={`p-3 rounded-xl border transition ${
+                            isCurr ? 'bg-blue-50 border-2 border-blue-500 text-blue-900 shadow-xs dark:bg-blue-950/40 dark:text-blue-200' :
+                            isDone ? 'bg-emerald-50 border border-emerald-200 text-emerald-900 dark:bg-emerald-950/30 dark:text-emerald-300' :
+                            'bg-slate-100 border border-slate-200 text-slate-400 dark:bg-slate-800/60 dark:border-slate-700'
+                          }`}
+                        >
+                          <div className={`font-bold text-[10px] uppercase ${isCurr ? 'text-blue-700 dark:text-blue-300' : isDone ? 'text-emerald-700 dark:text-emerald-400' : 'text-slate-400'}`}>
+                            Stage {stg.id}: {stg.name}
+                          </div>
+                          <div className="font-extrabold mt-1 text-xs">{stg.date || 'Pending'}</div>
+                          <div className="text-[10px] opacity-80 mt-0.5">{stg.note || (isDone ? '✓ Verified' : 'In Queue')}</div>
+                        </div>
+                      );
+                    })}
+                  </div>
+
+                  {/* Grievance / Appeal Dispute Column */}
+                  <div className="border-t border-slate-200 dark:border-slate-700 pt-4 flex flex-col md:flex-row justify-between items-start md:items-center gap-3">
+                    <div className="flex-1">
+                      <div className="text-xs font-black uppercase tracking-wider text-slate-500 mb-1">
+                        Dispute &amp; Grievance Redressal Status:
+                      </div>
+                      {claim.dispute_report || claim.has_dispute ? (
+                        <div className="bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 p-3 rounded-xl">
+                          <div className="flex items-center gap-2 mb-1">
+                            <span className="text-xs font-bold text-amber-800 dark:text-amber-300">
+                              ⚠️ Active Grievance Report: {claim.dispute_report?.report_title || 'Disability Board Percentage Dispute'}
+                            </span>
+                            <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-amber-200 text-amber-900 font-extrabold">
+                              {claim.dispute_report?.status || 'UNDER_ECHS_GRIEVANCE_BOARD'}
+                            </span>
+                          </div>
+                          <div className="text-xs text-amber-900 dark:text-amber-200">
+                            <strong>Reason:</strong> {claim.dispute_report?.dispute_reason || 'Medical board assessment dispute.'}
+                          </div>
+                          <div className="text-[10px] text-amber-700 dark:text-amber-400 font-mono mt-1">
+                            Tracking ID: {claim.dispute_report?.dispute_id || 'ECHS-DISP-2026-8812'} &bull; Date: {claim.dispute_report?.created_at?.slice(0, 10) || 'Today'}
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="text-xs text-slate-500">
+                          No dispute filed. If your claim percentage is contested or rejected by the Medical Board, you may file an official ECHS Grievance Report with supporting wallet records.
+                        </div>
+                      )}
+                    </div>
+
+                    <div className="flex items-center gap-2 flex-shrink-0">
+                      <button 
+                        onClick={() => {
+                          setDisputeModalClaim(claim);
+                          setDisputeForm({ report_title: '', dispute_reason: '', evidence_summary: '' });
+                        }}
+                        className="bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs px-3.5 py-2 rounded-xl transition shadow-xs flex items-center gap-1.5"
+                      >
+                        <span>📝</span>
+                        <span>File Grievance / Appeal Report</span>
+                      </button>
+                      <button 
+                        onClick={() => window.print()}
+                        className="bg-emerald-800 hover:bg-emerald-900 text-white font-bold text-xs px-3.5 py-2 rounded-xl transition shadow-xs"
+                      >
+                        🖨️ Export PDF
+                      </button>
+                    </div>
+                  </div>
                 </div>
-
-                <div className="p-3 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-900">
-                  <div className="font-bold text-[10px] uppercase text-emerald-700">Stage 2: Medical Board</div>
-                  <div className="font-extrabold mt-1">28 Oct 2024</div>
-                  <div className="text-[10px] text-emerald-600">✓ 40% Assessed</div>
-                </div>
-
-                <div className="p-3 rounded-xl bg-blue-50 border-2 border-blue-400 text-blue-900 shadow-xs">
-                  <div className="font-bold text-[10px] uppercase text-blue-700">Stage 3: Adjudication</div>
-                  <div className="font-extrabold mt-1">Current Review</div>
-                  <div className="text-[10px] text-blue-600">ECHS Central Cell</div>
-                </div>
-
-                <div className="p-3 rounded-xl bg-slate-100 border border-slate-200 text-slate-400">
-                  <div className="font-bold text-[10px] uppercase">Stage 4: PCDA Sanction</div>
-                  <div className="font-extrabold mt-1">Pending</div>
-                  <div className="text-[10px]">₹18,500/mo Proposed</div>
-                </div>
-              </div>
-            </div>
-
-            <div className="flex justify-end">
-              <button 
-                onClick={() => window.print()}
-                className="bg-emerald-800 hover:bg-emerald-900 text-white font-bold text-xs px-4 py-2.5 rounded-xl transition shadow-xs"
-              >
-                🖨️ Export Claim-Ready Medical Packet (PDF)
-              </button>
-            </div>
+              ))
+            )}
           </div>
         )}
 
@@ -2238,6 +2580,308 @@ function SoldierApp() {
                 className="bg-emerald-800 hover:bg-emerald-900 text-white font-bold text-xs px-4 py-2 rounded-xl transition"
               >
                 📥 Download Certified ECHS PDF
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ====================================================================
+          MODAL: INTERACTIVE PSYCHOMETRIC QUESTIONNAIRE (PHQ-9, GAD-7, PCL-5)
+          ==================================================================== */}
+      {activeQuestionnaire && (
+        <div className="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 overflow-y-auto">
+          <div className="bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-2xl max-w-2xl w-full p-6 text-slate-900 dark:text-slate-100 shadow-2xl relative my-8 max-h-[90vh] flex flex-col">
+            <div className="flex justify-between items-center pb-3 border-b border-slate-200 dark:border-slate-800 mb-4 flex-shrink-0">
+              <div>
+                <span className="text-[10px] font-mono font-black uppercase bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300 px-2.5 py-1 rounded-md">
+                  CLINICAL SELF-ASSESSMENT &bull; {activeQuestionnaire.id}
+                </span>
+                <h3 className="text-base font-black text-slate-900 dark:text-white mt-1">
+                  {activeQuestionnaire.title}
+                </h3>
+              </div>
+              <button 
+                onClick={() => { setActiveQuestionnaire(null); setQuestionnaireAnswers({}); }} 
+                className="w-8 h-8 rounded-full border border-slate-200 dark:border-slate-700 flex items-center justify-center font-bold text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800"
+              >
+                ✕
+              </button>
+            </div>
+
+            <div className="text-xs text-slate-600 dark:text-slate-300 bg-slate-50 dark:bg-slate-800/60 p-3 rounded-xl border border-slate-200 dark:border-slate-700 mb-4 flex-shrink-0">
+              <strong>Instructions: </strong>{activeQuestionnaire.description}
+            </div>
+
+            {/* Questions List */}
+            <div className="overflow-y-auto flex-1 space-y-4 pr-1">
+              {activeQuestionnaire.questions.map((q, idx) => {
+                const currentVal = questionnaireAnswers[q.id] !== undefined ? questionnaireAnswers[q.id] : null;
+                return (
+                  <div key={q.id} className="p-3.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800/40">
+                    <div className="text-xs font-bold text-slate-900 dark:text-white mb-2 flex items-start gap-2">
+                      <span className="text-emerald-700 dark:text-emerald-400 font-mono font-black">{idx + 1}.</span>
+                      <span>{q.text}</span>
+                    </div>
+
+                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                      {activeQuestionnaire.options.map(opt => (
+                        <button
+                          key={opt.val}
+                          type="button"
+                          onClick={() => setQuestionnaireAnswers(prev => ({ ...prev, [q.id]: opt.val }))}
+                          className={`p-2 rounded-lg text-[11px] font-bold border transition text-center ${
+                            currentVal === opt.val 
+                              ? 'bg-emerald-800 text-white border-emerald-900 shadow-xs' 
+                              : 'bg-slate-50 hover:bg-slate-100 text-slate-700 dark:bg-slate-800 dark:hover:bg-slate-700 dark:text-slate-200 border-slate-200 dark:border-slate-700'
+                          }`}
+                        >
+                          <div className="font-mono text-[10px] opacity-75">Score: {opt.val}</div>
+                          <div className="leading-tight mt-0.5">{opt.label}</div>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* Bottom Actions */}
+            <div className="border-t border-slate-200 dark:border-slate-800 pt-4 mt-4 flex items-center justify-between flex-shrink-0">
+              <div className="text-xs font-mono text-slate-500">
+                Answered: {Object.keys(questionnaireAnswers).length} / {activeQuestionnaire.questions.length} questions
+              </div>
+
+              <div className="flex gap-2">
+                <button
+                  type="button"
+                  onClick={() => { setActiveQuestionnaire(null); setQuestionnaireAnswers({}); }}
+                  className="px-4 py-2 rounded-xl text-xs font-bold border border-slate-300 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 transition"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  onClick={submitScreeningQuestionnaire}
+                  disabled={Object.keys(questionnaireAnswers).length < activeQuestionnaire.questions.length}
+                  className="bg-emerald-800 hover:bg-emerald-900 disabled:opacity-40 disabled:cursor-not-allowed text-white font-bold text-xs px-5 py-2 rounded-xl transition shadow-xs flex items-center gap-1.5"
+                >
+                  <span>✓</span>
+                  <span>Submit Certified Assessment</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ====================================================================
+          MODAL: INDIVIDUAL NOTIFICATION DETAIL (ONE-BY-ONE DRAWER VIEWER)
+          ==================================================================== */}
+      {selectedNotification && (
+        <div className="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-2xl max-w-lg w-full p-6 text-slate-900 dark:text-slate-100 shadow-2xl relative">
+            <div className="flex justify-between items-center pb-3 border-b border-slate-200 dark:border-slate-800 mb-4">
+              <div className="flex items-center gap-2">
+                <span className={`text-[10px] font-mono font-black uppercase px-2.5 py-1 rounded-md ${
+                  selectedNotification.priority === 'HIGH' ? 'bg-rose-100 text-rose-800 dark:bg-rose-950 dark:text-rose-200' : 'bg-slate-100 text-slate-800 dark:bg-slate-800 dark:text-slate-200'
+                }`}>
+                  {selectedNotification.priority || 'NORMAL'} PRIORITY
+                </span>
+                <span className="text-[10px] font-mono text-slate-400">
+                  {selectedNotification.created_at ? selectedNotification.created_at.slice(0, 16).replace('T', ' ') : 'Recent'}
+                </span>
+              </div>
+              <button 
+                onClick={() => setSelectedNotification(null)}
+                className="w-8 h-8 rounded-full border border-slate-200 dark:border-slate-700 flex items-center justify-center font-bold text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800"
+              >
+                ✕
+              </button>
+            </div>
+
+            <h3 className="text-base font-black text-slate-900 dark:text-white mb-2">
+              {selectedNotification.title}
+            </h3>
+
+            <div className="bg-slate-50 dark:bg-slate-800/60 p-4 rounded-xl border border-slate-200 dark:border-slate-700 text-xs leading-relaxed text-slate-700 dark:text-slate-200 mb-4">
+              {selectedNotification.message}
+            </div>
+
+            {selectedNotification.reference_no && (
+              <div className="bg-emerald-50 dark:bg-emerald-950/40 p-3 rounded-xl border border-emerald-200 dark:border-emerald-800 text-xs font-mono text-emerald-800 dark:text-emerald-300 mb-4">
+                <strong>Booking Reference ID: </strong>{selectedNotification.reference_no}
+              </div>
+            )}
+
+            <div className="flex justify-between items-center text-xs text-slate-500 mb-4 font-mono">
+              <span>Dispatched by: <strong>{selectedNotification.sender_name || 'AFMS Medical Officer'}</strong></span>
+              <span>Role: {selectedNotification.sender_role || 'MEDICAL_OFFICER'}</span>
+            </div>
+
+            <div className="flex justify-end gap-2">
+              <button
+                onClick={() => {
+                  setNotifications(prev => prev.map(n => n.id === selectedNotification.id ? { ...n, is_read: true } : n));
+                  setSelectedNotification(null);
+                  showToast('Notification marked as read.', 'success');
+                }}
+                className="bg-emerald-800 hover:bg-emerald-900 text-white font-bold text-xs px-4 py-2 rounded-xl transition shadow-xs"
+              >
+                ✓ Acknowledge &amp; Mark Read
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ====================================================================
+          MODAL: ECHS CLAIM DISPUTE / APPEAL REPORT FILING
+          ==================================================================== */}
+      {disputeModalClaim && (
+        <div className="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-2xl max-w-lg w-full p-6 text-slate-900 dark:text-slate-100 shadow-2xl relative">
+            <div className="flex justify-between items-center pb-3 border-b border-slate-200 dark:border-slate-800 mb-4">
+              <div>
+                <span className="text-[10px] font-mono font-black uppercase bg-amber-100 text-amber-800 px-2 py-0.5 rounded">
+                  ECHS GRIEVANCE &bull; DISPUTE REDRESSAL
+                </span>
+                <h3 className="text-base font-black text-slate-900 dark:text-white mt-1">
+                  File Official Dispute / Appeal Report
+                </h3>
+              </div>
+              <button 
+                onClick={() => setDisputeModalClaim(null)}
+                className="w-8 h-8 rounded-full border border-slate-200 dark:border-slate-700 flex items-center justify-center font-bold text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800"
+              >
+                ✕
+              </button>
+            </div>
+
+            <div className="text-xs text-slate-500 mb-4">
+              Contesting Claim: <strong>{disputeModalClaim.title}</strong> (ID: {disputeModalClaim.id})
+            </div>
+
+            <form onSubmit={handleFileDispute} className="space-y-3.5">
+              <div>
+                <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
+                  Appeal Report Title / Subject
+                </label>
+                <input
+                  type="text"
+                  required
+                  placeholder="e.g. Disability Assessment Percentage Appeal (40% to 50%)"
+                  value={disputeForm.report_title}
+                  onChange={e => setDisputeForm(prev => ({ ...prev, report_title: e.target.value }))}
+                  className="w-full text-xs p-3 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:border-emerald-600"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
+                  Clinical &amp; Legal Reason for Appeal
+                </label>
+                <textarea
+                  rows="3"
+                  required
+                  placeholder="Describe why the decision or percentage should be reviewed (e.g. subsequent degenerative meniscal loss not credited during stage 2 board)..."
+                  value={disputeForm.dispute_reason}
+                  onChange={e => setDisputeForm(prev => ({ ...prev, dispute_reason: e.target.value }))}
+                  className="w-full text-xs p-3 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:border-emerald-600"
+                ></textarea>
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
+                  Attached Medical Wallet Evidence Summary
+                </label>
+                <input
+                  type="text"
+                  placeholder="e.g. SHA-256 records rec-001, rec-002, MRI Scan Base Hospital attached"
+                  value={disputeForm.evidence_summary}
+                  onChange={e => setDisputeForm(prev => ({ ...prev, evidence_summary: e.target.value }))}
+                  className="w-full text-xs p-3 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:border-emerald-600"
+                />
+              </div>
+
+              <div className="flex justify-end gap-2 pt-2">
+                <button
+                  type="button"
+                  onClick={() => setDisputeModalClaim(null)}
+                  className="px-4 py-2 rounded-xl text-xs font-bold border border-slate-300 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 transition"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs px-5 py-2 rounded-xl transition shadow-xs flex items-center gap-1.5"
+                >
+                  <span>📝</span>
+                  <span>Submit Official Grievance Dossier</span>
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* ====================================================================
+          MODAL: TELECONSULTATION BOOKING CONFIRMATION SLIP
+          ==================================================================== */}
+      {bookingConfirmedSlip && (
+        <div className="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-2xl max-w-md w-full p-6 text-slate-900 dark:text-slate-100 shadow-2xl relative text-center">
+            <div className="w-14 h-14 rounded-full bg-emerald-100 dark:bg-emerald-950/60 border border-emerald-300 dark:border-emerald-700 text-emerald-700 dark:text-emerald-300 flex items-center justify-center text-2xl mx-auto mb-3 shadow-inner">
+              ✓
+            </div>
+            
+            <h3 className="text-lg font-black text-slate-900 dark:text-white mb-1">
+              Teleconsultation Confirmed!
+            </h3>
+            <div className="text-xs text-slate-500 mb-4">
+              High-priority booking notification dispatched to treating Medical Officer.
+            </div>
+
+            <div className="bg-slate-50 dark:bg-slate-800/60 p-4 rounded-xl border border-slate-200 dark:border-slate-700 text-left space-y-2 mb-4">
+              <div className="flex justify-between items-center pb-2 border-b border-slate-200 dark:border-slate-700">
+                <span className="text-[11px] text-slate-400 uppercase font-mono">Military Booking Ref:</span>
+                <span className="text-xs font-black font-mono text-emerald-700 dark:text-emerald-400">
+                  {bookingConfirmedSlip.reference_no || 'AFMS-TC-2026-8819'}
+                </span>
+              </div>
+              <div className="flex justify-between items-center text-xs">
+                <span className="text-slate-500">Medical Officer:</span>
+                <span className="font-bold">{bookingConfirmedSlip.consultation?.doctor_name || bookingForm.doctorName}</span>
+              </div>
+              <div className="flex justify-between items-center text-xs">
+                <span className="text-slate-500">Specialty:</span>
+                <span className="font-bold">{bookingConfirmedSlip.consultation?.specialty || bookingForm.specialty}</span>
+              </div>
+              <div className="flex justify-between items-center text-xs">
+                <span className="text-slate-500">Scheduled Date &amp; Slot:</span>
+                <span className="font-bold font-mono">{bookingConfirmedSlip.consultation?.date || bookingForm.date} &bull; {bookingConfirmedSlip.consultation?.time_slot || bookingForm.timeSlot}</span>
+              </div>
+            </div>
+
+            <div className="text-[11px] text-slate-500 mb-4 bg-emerald-50 dark:bg-emerald-950/20 p-2.5 rounded-lg border border-emerald-200 dark:border-emerald-800">
+              🔒 Teleconsultation note has been automatically sealed and persisted to your Health Wallet.
+            </div>
+
+            <div className="flex justify-center gap-2">
+              <button
+                onClick={() => {
+                  setBookingConfirmedSlip(null);
+                  setActiveTab('wallet');
+                }}
+                className="bg-emerald-800 hover:bg-emerald-900 text-white font-bold text-xs px-4 py-2 rounded-xl transition shadow-xs"
+              >
+                View in Health Wallet
+              </button>
+              <button
+                onClick={() => setBookingConfirmedSlip(null)}
+                className="px-4 py-2 rounded-xl text-xs font-bold border border-slate-300 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 transition"
+              >
+                Close
               </button>
             </div>
           </div>

@@ -27,6 +27,117 @@ SECRET_KEY = b"kavach_defence_health_aes256_key32b!"
 # Default password hash for 'kavach123'
 DEFAULT_PW_HASH = hashlib.sha256("kavach123".encode()).hexdigest()
 
+# =============================================================================
+# GLOBALLY VALIDATED CLINICAL QUESTIONNAIRES (DSM-5 & AFMS PROTOCOL)
+# =============================================================================
+CLINICAL_QUESTIONNAIRES = {
+    "PHQ-9": {
+        "id": "PHQ-9",
+        "title": "PHQ-9 (Patient Health Questionnaire - Depression Screening)",
+        "subtitle": "Globally validated 9-item psychometric screen for depressive symptoms in active personnel.",
+        "instruction": "Over the last 2 weeks, how often have you been bothered by any of the following problems?",
+        "options": [
+            {"score": 0, "label": "Not at all"},
+            {"score": 1, "label": "Several days"},
+            {"score": 2, "label": "More than half the days"},
+            {"score": 3, "label": "Nearly every day"}
+        ],
+        "questions": [
+            {"id": "phq_1", "text": "Little interest or pleasure in doing things"},
+            {"id": "phq_2", "text": "Feeling down, depressed, or hopeless"},
+            {"id": "phq_3", "text": "Trouble falling or staying asleep, or sleeping too much"},
+            {"id": "phq_4", "text": "Feeling tired or having little energy"},
+            {"id": "phq_5", "text": "Poor appetite or overeating"},
+            {"id": "phq_6", "text": "Feeling bad about yourself — or that you are a failure or have let yourself or your family/unit down"},
+            {"id": "phq_7", "text": "Trouble concentrating on tasks, such as reading briefings or operating equipment"},
+            {"id": "phq_8", "text": "Moving or speaking so slowly that other people noticed, or being so fidgety/restless that you moved a lot more than usual"},
+            {"id": "phq_9", "text": "Thoughts that you would be better off dead, or of hurting yourself in some way"}
+        ],
+        "max_score": 27,
+        "nudge_threshold": 10
+    },
+    "GAD-7": {
+        "id": "GAD-7",
+        "title": "GAD-7 (Generalized Anxiety Disorder Screening)",
+        "subtitle": "Validated 7-item clinical tool assessing hyperarousal, tension, and apprehension.",
+        "instruction": "Over the last 2 weeks, how often have you been bothered by the following problems?",
+        "options": [
+            {"score": 0, "label": "Not at all"},
+            {"score": 1, "label": "Several days"},
+            {"score": 2, "label": "More than half the days"},
+            {"score": 3, "label": "Nearly every day"}
+        ],
+        "questions": [
+            {"id": "gad_1", "text": "Feeling nervous, anxious, or on edge"},
+            {"id": "gad_2", "text": "Not being able to stop or control worrying"},
+            {"id": "gad_3", "text": "Worrying too much about different operational and personal issues"},
+            {"id": "gad_4", "text": "Trouble relaxing during off-duty hours"},
+            {"id": "gad_5", "text": "Being so restless that it is hard to sit still"},
+            {"id": "gad_6", "text": "Becoming easily annoyed or irritable with colleagues or family"},
+            {"id": "gad_7", "text": "Feeling afraid, as if something awful might happen"}
+        ],
+        "max_score": 21,
+        "nudge_threshold": 10
+    },
+    "PCL-5": {
+        "id": "PCL-5",
+        "title": "PCL-5 (PTSD Checklist for DSM-5 Military Screening)",
+        "subtitle": "Official 20-item DSM-5 gold-standard symptom checklist for combat and operational trauma.",
+        "instruction": "In the past month, how much have you been bothered by the following problems regarding stressful/combat experiences?",
+        "options": [
+            {"score": 0, "label": "Not at all"},
+            {"score": 1, "label": "A little bit"},
+            {"score": 2, "label": "Moderately"},
+            {"score": 3, "label": "Quite a bit"},
+            {"score": 4, "label": "Extremely"}
+        ],
+        "questions": [
+            {"id": "pcl_1", "text": "Repeated, disturbing, and unwanted memories of the stressful experience?"},
+            {"id": "pcl_2", "text": "Repeated, disturbing dreams of the stressful experience?"},
+            {"id": "pcl_3", "text": "Suddenly feeling or acting as if the stressful experience were happening again (flashbacks)?"},
+            {"id": "pcl_4", "text": "Feeling very upset when something reminded you of the stressful experience?"},
+            {"id": "pcl_5", "text": "Strong physical reactions when reminded of the stressful experience (sweating, heart pounding)?"},
+            {"id": "pcl_6", "text": "Avoiding memories, thoughts, or feelings related to the stressful experience?"},
+            {"id": "pcl_7", "text": "Avoiding external reminders of the stressful experience (people, places, military situations)?"},
+            {"id": "pcl_8", "text": "Trouble remembering important parts of the stressful experience?"},
+            {"id": "pcl_9", "text": "Strong negative beliefs about yourself, other people, or the world?"},
+            {"id": "pcl_10", "text": "Blaming yourself or someone else for the stressful experience or what happened after?"},
+            {"id": "pcl_11", "text": "Strong negative feelings such as fear, horror, anger, guilt, or shame?"},
+            {"id": "pcl_12", "text": "Loss of interest in activities that you used to enjoy?"},
+            {"id": "pcl_13", "text": "Feeling distant or cut off from other people (unit comrades, family)?"},
+            {"id": "pcl_14", "text": "Trouble experiencing positive feelings (being unable to feel happiness or love)?"},
+            {"id": "pcl_15", "text": "Irritable behavior, angry outbursts, or acting aggressively?"},
+            {"id": "pcl_16", "text": "Taking too many risks or doing things that could cause you harm?"},
+            {"id": "pcl_17", "text": "Being 'super-alert', watchful, or on guard (hypervigilance)?"},
+            {"id": "pcl_18", "text": "Feeling jumpy or easily startled?"},
+            {"id": "pcl_19", "text": "Having difficulty concentrating on tasks?"},
+            {"id": "pcl_20", "text": "Trouble falling or staying asleep?"}
+        ],
+        "max_score": 80,
+        "nudge_threshold": 31
+    }
+}
+
+def evaluate_screening_score(q_type, score):
+    """Calculates severity tier, counselor referral trigger, and clinical status badge color"""
+    if q_type == 'PHQ-9':
+        if score < 5: return "Minimal", False, "#10b981", "Normal baseline mood. Regular self-care advised."
+        if score < 10: return "Mild Depression", False, "#eab308", "Mild situational tension. Relaxation and peer support recommended."
+        if score < 15: return "Moderate Depression", True, "#f97316", "Your stress scores indicate moderate tension. A confidential counselor is available for private guidance."
+        if score < 20: return "Moderately Severe Depression", True, "#ef4444", "Elevated depression indicators. Confidential tele-counseling is strongly advised."
+        return "Severe Depression", True, "#dc2626", "Urgent Clinical Alert: Confidential AFMS Mental Health Support officer notified for priority outreach."
+    elif q_type == 'GAD-7':
+        if score < 5: return "Minimal Anxiety", False, "#10b981", "Calm autonomic state. No acute anxiety indicators."
+        if score < 10: return "Mild Anxiety", False, "#eab308", "Mild situational worry. Breathing regulation protocols suggested."
+        if score < 15: return "Moderate Anxiety", True, "#f97316", "Anxiety levels have climbed over past check-ins. Confidential counseling recommended."
+        return "Severe Anxiety", True, "#dc2626", "Severe anxiety hyperarousal. Confidential counselor consultation one tap away."
+    elif q_type == 'PCL-5':
+        if score < 21: return "Subthreshold / Normal", False, "#10b981", "No acute post-traumatic stress symptomatology detected."
+        if score < 31: return "Mild Combat Stress", False, "#eab308", "Mild stress response to deployment. Monitored through routine check-ins."
+        if score < 51: return "Probable PTSD (Elevated)", True, "#f97316", "Scores indicate elevated post-traumatic stress. Confidential trauma counseling is available without command notification."
+        return "Severe PTSD Symptomatology", True, "#dc2626", "High-intensity trauma reactivity. Confidential specialist counselor intervention recommended immediately."
+    return "Normal Baseline", False, "#10b981", "Scores within standard operational limits."
+
 # Database store with full Demo Data for Arjun Verma and military care team
 DB = {
     "users": [
@@ -117,9 +228,11 @@ DB = {
             "title": "Battle Shrapnel Injury - Right Shoulder",
             "date": "2024-03-12",
             "posting": "Rajasthan (Desert Sector)",
+            "department": "Casualty & Trauma Surgery",
             "doctor_name": "Maj. S. Chakravorty",
             "hospital": "Military Hospital, Jodhpur",
             "diagnosis": "Splinter wound right deltoid sustained during desert tactical firing exercise. Clean surgical debridement performed. No neurovascular deficit.",
+            "prescription": "Tab Diclofenac 50mg (1-0-1) after meals x 5 days; Tab Pantoprazole 40mg (1-0-0 AC) x 5 days; Inj Tetanus Toxoid 0.5ml IM stat; Daily sterile dressing.",
             "file_url": "records/shrapnel_wound_report.pdf",
             "is_mental_health": False,
             "encrypted_data": None,
@@ -135,9 +248,11 @@ DB = {
             "title": "Left Knee Arthroscopic Meniscus Repair",
             "date": "2023-08-19",
             "posting": "North East (Tawang Sector)",
+            "department": "Orthopedics & Joint Reconstruction",
             "doctor_name": "Lt. Col. A. Bhattacharya",
             "hospital": "151 Base Hospital, Guwahati",
             "diagnosis": "Grade III Medial Meniscus Tear sustained during high-altitude patrol on snow-covered scree. Partial meniscectomy and stabilization performed under spinal anesthesia.",
+            "prescription": "Tab Aceclofenac + Paracetamol (1-0-1) x 7 days; Cap Tramadol 50mg (SOS for acute flare-up); Tab Calcium Citrate 500mg OD x 30 days; Hinged knee brace for 4 weeks.",
             "file_url": "records/knee_arthroscopy_summary.pdf",
             "is_mental_health": False,
             "encrypted_data": None,
@@ -153,9 +268,11 @@ DB = {
             "title": "Digital Radiograph - Left Knee & Lumbar Spine",
             "date": "2023-08-15",
             "posting": "North East (Tawang Sector)",
+            "department": "Radiology & Diagnostic Imaging",
             "doctor_name": "Capt. Dr. Priya Nair",
             "hospital": "Military Hospital, Tezpur",
             "diagnosis": "Joint effusion present at left tibiofemoral joint space with early patellar tracking deviation. No acute bony fracture seen.",
+            "prescription": "Diagnostic imaging report; continue compression bandage and non-weight-bearing crutch ambulation.",
             "file_url": "records/knee_xray_radiology.png",
             "is_mental_health": False,
             "encrypted_data": None,
@@ -702,14 +819,55 @@ class KavachRequestHandler(http.server.SimpleHTTPRequestHandler):
 
             # RULE: Doctor / Physiotherapist
             elif role in ('DOCTOR', 'PHYSIOTHERAPIST'):
-                if requested_type == 'MENTAL_HEALTH':
-                    log_audit(user['id'], role, soldier_id, 'ACCESS_DENIED_MENTAL_HEALTH', 'BLOCKED', f'{role} attempted to query confidential counseling notes')
-                    return self.send_json(403, {
-                        "error": "ACCESS DENIED",
-                        "message": "Private counseling records are restricted strictly to authorized mental health counselors."
-                    })
                 log_audit(user['id'], role, soldier_id, 'VIEW_CLINICAL_RECORDS', 'ALLOWED', f'{role} accessed clinical record history under active patient grant')
-                res = [r for r in DB['records'] if r['soldier_id'] == soldier_id and not r['is_mental_health']]
+                res = []
+                for r in DB['records']:
+                    if r['soldier_id'] != soldier_id:
+                        continue
+                    item = dict(r)
+                    if not item.get('department'):
+                        item['department'] = 'Orthopedics & Joint Surgery' if 'Knee' in item.get('title', '') else ('Casualty & Trauma Surgery' if 'Injury' in item.get('title', '') else 'General Medicine')
+                    if not item.get('prescription'):
+                        item['prescription'] = 'Routine clinical care and observation directives.'
+
+                    if item.get('is_mental_health'):
+                        # Check if psychologist approved access for this doctor
+                        mh_req = next((req for req in DB.get('mental_health_requests', []) if req['soldier_id'] == soldier_id and req.get('doctor_id') == user.get('id')), None)
+                        if mh_req and mh_req.get('status') == 'APPROVED':
+                            item['access_status'] = 'APPROVED'
+                            res.append(item)
+                        elif mh_req and mh_req.get('status') == 'PENDING_PSYCHOLOGIST_APPROVAL':
+                            res.append({
+                                "id": item['id'],
+                                "soldier_id": soldier_id,
+                                "type": "MENTAL_HEALTH",
+                                "is_mental_health": True,
+                                "access_status": "WAITING_PSYCHOLOGIST_APPROVAL",
+                                "title": "🔒 Confidential Psychological Assessment (Sealed)",
+                                "department": "Defence Psychological Support Cell",
+                                "doctor_name": item.get('doctor_name', 'Dr. Sunita Rao (AFMS Senior Counselor)'),
+                                "hospital": item.get('hospital', 'Command Hospital (Central), AFMS'),
+                                "date": item.get('date'),
+                                "diagnosis": "ACCESS PENDING: Authorization request has been dispatched to Dr. Sunita Rao (Senior Counselor). Waiting for clinical sign-off.",
+                                "prescription": "Sealed until psychologist authorization granted."
+                            })
+                        else:
+                            res.append({
+                                "id": item['id'],
+                                "soldier_id": soldier_id,
+                                "type": "MENTAL_HEALTH",
+                                "is_mental_health": True,
+                                "access_status": "NOT_REQUESTED",
+                                "title": "🔒 Confidential Psychological Assessment (Sealed)",
+                                "department": "Defence Psychological Support Cell",
+                                "doctor_name": item.get('doctor_name', 'Dr. Sunita Rao (AFMS Senior Counselor)'),
+                                "hospital": item.get('hospital', 'Command Hospital (Central), AFMS'),
+                                "date": item.get('date'),
+                                "diagnosis": "RESTRICTED DOSSIER: Requires authorization from treating Psychologist / Counselor under AFMS Privacy Directives.",
+                                "prescription": "Requires psychologist approval."
+                            })
+                    else:
+                        res.append(item)
                 return self.send_json(200, res)
 
             return self.send_json(403, {"error": "Unauthorized role"})
@@ -720,6 +878,47 @@ class KavachRequestHandler(http.server.SimpleHTTPRequestHandler):
             soldier_id = user['id'] if user.get('role') == 'SOLDIER' else params.get('soldier_id', ['usr-soldier-1'])[0]
             res = [s for s in DB['screenings'] if s['soldier_id'] == soldier_id]
             return self.send_json(200, res)
+
+        # 3.1 API: Questionnaires Definition (PHQ-9, GAD-7, PCL-5)
+        elif path == '/api/screenings/questionnaires':
+            return self.send_json(200, CLINICAL_QUESTIONNAIRES)
+
+        # 3.2 API: Doctor Active Patient Wallet (Single Patient Health Wallet View)
+        elif path == '/api/doctor/active-patient':
+            user = self.get_auth_user()
+            target_id = params.get('soldier_id', [DB.get('last_active_soldier_id', 'usr-soldier-1')])[0]
+            soldier = next((u for u in DB['users'] if u['id'] == target_id and u['role'] == 'SOLDIER'), None)
+            if not soldier:
+                soldier = next((u for u in DB['users'] if u['role'] == 'SOLDIER'), DB['users'][0])
+            grant = next((g for g in DB.get('access_grants', []) if g['soldier_id'] == soldier['id'] and g.get('granted_to_role') == 'DOCTOR'), None)
+            return self.send_json(200, {
+                "soldier": soldier,
+                "grant": grant,
+                "wallet_id": f"KAVACH-WLT-{soldier['service_no']}",
+                "wallet_status": "SINGLE_SOLDIER_WALLET_ACTIVE"
+            })
+
+        # 3.3 API: Doctor Credentials Status
+        elif path == '/api/doctor/credentials':
+            user = self.get_auth_user()
+            return self.send_json(200, {
+                "verified": bool(user.get('credentials_verified', False)),
+                "doctor": user
+            })
+
+        # 3.4 API: Doctor Mental Health Access Status
+        elif path == '/api/doctor/mh-access-status':
+            user = self.get_auth_user()
+            soldier_id = params.get('soldier_id', ['usr-soldier-1'])[0]
+            req = next((r for r in DB.get('mental_health_requests', []) if r['soldier_id'] == soldier_id and r.get('doctor_id') == user.get('id')), None)
+            return self.send_json(200, {
+                "status": req.get('status') if req else "NOT_REQUESTED",
+                "request": req
+            })
+
+        # 3.5 API: Counselor Mental Health Access Requests
+        elif path == '/api/counselor/mh-requests':
+            return self.send_json(200, DB.get('mental_health_requests', []))
 
         # 4. API: Rehab
         elif path == '/api/rehab':
@@ -820,6 +1019,10 @@ class KavachRequestHandler(http.server.SimpleHTTPRequestHandler):
                 "rank": user['rank'],
                 "posting": user.get('posting', '')
             })
+            if user['role'] == 'SOLDIER':
+                DB['last_active_soldier_id'] = user['id']
+                save_db()
+
             log_audit(user['id'], user['role'], user['id'], 'LOGIN_SUCCESS', 'SUCCESS',
                       f"Personnel {user['name']} ({user['service_no']}) authenticated via JWT")
             return self.send_json(200, {"token": token, "user": user})
@@ -868,6 +1071,7 @@ class KavachRequestHandler(http.server.SimpleHTTPRequestHandler):
 
             # If new registered user is a Soldier, initialize their personal wallet
             if role == 'SOLDIER':
+                DB['last_active_soldier_id'] = new_user['id']
                 induction_rec = {
                     "id": f"rec-ind-{int(time.time()*1000)}",
                     "soldier_id": new_user['id'],
@@ -929,6 +1133,10 @@ class KavachRequestHandler(http.server.SimpleHTTPRequestHandler):
             posting = payload.get('posting', user.get('posting', 'Field Posting'))
             is_mh = bool(payload.get('is_mental_health', False))
             doctor_id = payload.get('doctor_id', user.get('id', 'usr-doctor-1'))
+            department = payload.get('department', 'Orthopedics & Joint Surgery')
+            prescription = payload.get('prescription', '')
+            hospital = payload.get('hospital', user.get('hospital_name', 'Base Hospital'))
+            doctor_name = payload.get('doctor_name', user.get('name', 'Medical Officer'))
 
             rec = {
                 "id": f"rec-{int(time.time()*1000)}",
@@ -938,9 +1146,11 @@ class KavachRequestHandler(http.server.SimpleHTTPRequestHandler):
                 "title": title,
                 "date": payload.get('date', datetime.date.today().isoformat()),
                 "posting": posting,
-                "doctor_name": payload.get('doctor_name', user['name']),
-                "hospital": payload.get('hospital', 'Base Hospital'),
+                "department": department,
+                "doctor_name": doctor_name,
+                "hospital": hospital,
                 "diagnosis": diagnosis,
+                "prescription": prescription,
                 "file_url": "records/clinical_document.pdf",
                 "is_mental_health": is_mh,
                 "encrypted_data": f"AES-256-GCM::{int(time.time())}::CIPHERTEXT" if is_mh else None,
@@ -955,24 +1165,21 @@ class KavachRequestHandler(http.server.SimpleHTTPRequestHandler):
                       record_id=rec['id'])
             return self.send_json(201, rec)
 
-        # 4. Stress Screening Check-in
+        # 4. Stress Screening Check-in (PCL-5, PHQ-9, GAD-7)
         elif path == '/api/screenings':
             user = self.get_auth_user()
             soldier_id = user['id'] if user.get('role') == 'SOLDIER' else payload.get('soldier_id', 'usr-soldier-1')
             q_type = payload.get('questionnaire_type', 'PHQ-9')
-            score = int(payload.get('score', 0))
-            max_score = int(payload.get('max_score', 27))
+            answers = payload.get('answers', [])
             
-            nudge = False
-            if q_type == 'PHQ-9':
-                severity = "Minimal" if score < 5 else ("Mild Depression" if score < 10 else ("Moderate Depression" if score < 15 else "Severe Depression"))
-                nudge = (score >= 10)
-            elif q_type == 'PCL-5':
-                severity = "Probable PTSD" if score >= 31 else "Subthreshold Stress"
-                nudge = (score >= 31)
+            if answers and isinstance(answers, list) and len(answers) > 0:
+                score = sum(int(a) for a in answers)
             else:
-                severity = "Moderate Anxiety" if score >= 10 else "Normal/Mild Anxiety"
-                nudge = (score >= 10)
+                score = int(payload.get('score', 0))
+
+            q_info = CLINICAL_QUESTIONNAIRES.get(q_type, CLINICAL_QUESTIONNAIRES['PHQ-9'])
+            max_score = q_info['max_score']
+            severity, nudge, color_code, advice = evaluate_screening_score(q_type, score)
 
             scr = {
                 "id": f"scr-{int(time.time()*1000)}",
@@ -981,14 +1188,33 @@ class KavachRequestHandler(http.server.SimpleHTTPRequestHandler):
                 "score": score,
                 "max_score": max_score,
                 "severity": severity,
+                "color_code": color_code,
+                "clinical_advice": advice,
+                "answers": answers,
                 "date": datetime.date.today().isoformat(),
                 "counselor_nudge_triggered": nudge,
                 "created_at": datetime.datetime.now(datetime.timezone.utc).isoformat()
             }
-            DB['screenings'].append(scr)
+            DB.setdefault('screenings', []).append(scr)
+
+            if nudge:
+                notif = {
+                    "id": f"notif-{int(time.time()*1000)}",
+                    "recipient_id": soldier_id,
+                    "recipient_role": "SOLDIER",
+                    "sender_name": "Dr. Sunita Rao, AFMS",
+                    "sender_role": "COUNSELOR",
+                    "type": "COUNSELOR_NUDGE",
+                    "title": f"Confidential Check-in Follow-up ({q_type})",
+                    "message": f"Your recent {q_type} check-in indicates {severity}. A confidential counselor is available for private guidance without command notification.",
+                    "created_at": datetime.datetime.now(datetime.timezone.utc).isoformat(),
+                    "is_read": False,
+                    "priority": "HIGH"
+                }
+                DB.setdefault('notifications', []).insert(0, notif)
 
             log_audit(user['id'], user['role'], soldier_id, 'SUBMIT_SCREENING', 'SUCCESS',
-                      f"Completed {q_type} check-in (Score: {score}/{max_score}, {severity}). Counselor nudge: {'TRIGGERED' if nudge else 'Normal'}")
+                      f"Completed validated {q_type} check-in (Score: {score}/{max_score}, {severity}). Counselor nudge: {'TRIGGERED' if nudge else 'Normal'}")
             return self.send_json(201, scr)
 
         # 5. Rehab Session Check-off
@@ -1126,8 +1352,9 @@ class KavachRequestHandler(http.server.SimpleHTTPRequestHandler):
 
             consult_id = f"cns-{int(time.time()*1000)}"
             record_id = f"rec-tele-{int(time.time()*1000)}"
+            ref_no = f"AFMS-TC-2026-{int(time.time()*100)%1000000:06d}"
 
-            diag = f"Teleconsultation confirmed with {doctor_name} ({specialty}) at {hospital}. Slot: {date} @ {time_slot}. Clinical reason: {reason}. Directives issued via AFMS Tele-Health Gateway."
+            diag = f"Teleconsultation confirmed with {doctor_name} ({specialty}) at {hospital}. Slot: {date} @ {time_slot}. Clinical reason: {reason}. Reference: {ref_no}. Directives issued via AFMS Tele-Health Gateway."
             rec = {
                 "id": record_id,
                 "soldier_id": soldier_id,
@@ -1139,6 +1366,7 @@ class KavachRequestHandler(http.server.SimpleHTTPRequestHandler):
                 "doctor_name": doctor_name,
                 "hospital": hospital,
                 "diagnosis": diag,
+                "reference_no": ref_no,
                 "file_url": "records/teleconsult_signed_e_prescription.pdf",
                 "is_mental_health": False,
                 "encrypted_data": None,
@@ -1159,17 +1387,35 @@ class KavachRequestHandler(http.server.SimpleHTTPRequestHandler):
                 "date": date,
                 "time_slot": time_slot,
                 "reason": reason,
+                "reference_no": ref_no,
                 "status": "CONFIRMED",
                 "record_id": record_id,
                 "created_at": datetime.datetime.now(datetime.timezone.utc).isoformat()
             }
             DB.setdefault('consultations', []).insert(0, consult)
 
+            # Dispatch high-priority alert to Doctor's Inbox
+            doctor_notif = {
+                "id": f"notif-{int(time.time()*1000)}",
+                "recipient_id": doctor_id,
+                "recipient_role": "DOCTOR",
+                "sender_name": user.get('name', 'Soldier Patient'),
+                "sender_role": "SOLDIER",
+                "type": "APPOINTMENT_BOOKED",
+                "title": f"New Teleconsultation Booked: {specialty}",
+                "message": f"Appointment booked by {user.get('rank', '')} {user.get('name', 'Soldier')} on {date} at {time_slot}. Ref: {ref_no}. Clinical reason: {reason}",
+                "created_at": datetime.datetime.now(datetime.timezone.utc).isoformat(),
+                "is_read": False,
+                "priority": "HIGH",
+                "reference_no": ref_no
+            }
+            DB.setdefault('notifications', []).insert(0, doctor_notif)
+
             log_audit(user['id'], user['role'], soldier_id, 'BOOK_TELECONSULT', 'SUCCESS',
-                      f"Booked teleconsultation with {doctor_name} ({hospital}). Auto-persisted record {record_id} to Health Wallet.",
+                      f"Booked teleconsultation with {doctor_name} ({hospital}) [Ref: {ref_no}]. Auto-persisted record {record_id} to Health Wallet.",
                       record_id=record_id)
 
-            return self.send_json(201, {"consultation": consult, "record": rec})
+            return self.send_json(201, {"consultation": consult, "record": rec, "reference_no": ref_no})
 
         # 12. Update User Profile Details
         elif path == '/api/users/profile':
@@ -1309,11 +1555,154 @@ class KavachRequestHandler(http.server.SimpleHTTPRequestHandler):
 
             new_status = 'REVOKED' if grant['status'] == 'ACTIVE' else 'ACTIVE'
             grant['status'] = new_status
+            if new_status == 'ACTIVE':
+                grant['expiry_date'] = (datetime.date.today() + datetime.timedelta(days=30)).isoformat()
             grant['last_accessed'] = datetime.datetime.now().strftime("%d %b %Y %H:%M")
             grant['visits_count'] = grant.get('visits_count', 0) + 1
             log_audit(user['id'], user['role'], grant['soldier_id'], 'TOGGLE_GRANT', 'SUCCESS',
                       f"Access grant status switched to {new_status} for {grant['granted_to_role']}")
             return self.send_json(200, {"grant": grant, "status": new_status})
+
+        # 18. Doctor Credential Verification
+        elif path == '/api/doctor/credentials':
+            user = self.get_auth_user()
+            u = next((usr for usr in DB['users'] if usr['id'] == user['id']), None)
+            if not u:
+                return self.send_json(404, {"error": "Doctor profile not found"})
+            
+            u['credentials_verified'] = True
+            u['hospital_name'] = payload.get('hospital_name', u.get('hospital_name', 'Base Hospital, Delhi Cantt'))
+            u['id_card_no'] = payload.get('id_card_no', u.get('id_card_no', 'AMC-ID-2026-9824'))
+            u['department'] = payload.get('department', u.get('department', 'Orthopedics & Joint Restoration'))
+            if payload.get('doctor_name'):
+                u['name'] = payload['doctor_name']
+            if payload.get('rank'):
+                u['rank'] = payload['rank']
+                
+            log_audit(user['id'], user['role'], user['id'], 'DOCTOR_CREDENTIALS_VERIFIED', 'SUCCESS',
+                      f"Doctor verified credentials: {u['name']}, {u['rank']}, {u['hospital_name']}, Dept: {u['department']}, ID: {u['id_card_no']}")
+            return self.send_json(200, {"message": "Credentials verified", "doctor": u})
+
+        # 19. Doctor Request Mental Health Access from Counselor
+        elif path == '/api/doctor/request-mh-access':
+            user = self.get_auth_user()
+            soldier_id = payload.get('soldier_id', 'usr-soldier-1')
+            soldier = next((u for u in DB['users'] if u['id'] == soldier_id), None)
+            soldier_name = soldier['name'] if soldier else 'Soldier Patient'
+            
+            req = {
+                "id": f"mhreq-{int(time.time()*1000)}",
+                "doctor_id": user['id'],
+                "doctor_name": user.get('name', 'Medical Officer'),
+                "doctor_rank": user.get('rank', 'Captain'),
+                "hospital": user.get('hospital_name', user.get('posting', 'Base Hospital')),
+                "soldier_id": soldier_id,
+                "soldier_name": soldier_name,
+                "reason": payload.get('reason', 'Clinical coordination for surgical/trauma evaluation'),
+                "status": "PENDING_PSYCHOLOGIST_APPROVAL",
+                "requested_at": datetime.datetime.now(datetime.timezone.utc).isoformat()
+            }
+            DB.setdefault('mental_health_requests', []).insert(0, req)
+            
+            # Send notification to Counselor
+            notif = {
+                "id": f"notif-{int(time.time()*1000)}",
+                "recipient_id": "usr-counselor-1",
+                "recipient_role": "COUNSELOR",
+                "sender_name": user.get('name', 'Medical Officer'),
+                "sender_role": "DOCTOR",
+                "type": "MH_ACCESS_REQUEST",
+                "title": f"Access Request: {soldier_name}",
+                "message": f"Doctor {user.get('name')} requested clinical access to confidential psychological records for {soldier_name}.",
+                "created_at": datetime.datetime.now(datetime.timezone.utc).isoformat(),
+                "is_read": False,
+                "priority": "HIGH",
+                "request_id": req['id']
+            }
+            DB.setdefault('notifications', []).insert(0, notif)
+            
+            log_audit(user['id'], user['role'], soldier_id, 'REQUEST_MH_ACCESS', 'PENDING',
+                      f"Doctor {user.get('name')} submitted request for confidential MH records to Counselor")
+            return self.send_json(201, {"request": req, "message": "Access request forwarded to Counselor for approval."})
+
+        # 20. Counselor Decision on Doctor MH Access Request
+        elif path == '/api/counselor/approve-mh-access':
+            user = self.get_auth_user()
+            req_id = payload.get('request_id')
+            decision = payload.get('decision', 'APPROVED')
+            req = next((r for r in DB.get('mental_health_requests', []) if r['id'] == req_id), None)
+            if not req:
+                return self.send_json(404, {"error": "Request not found"})
+                
+            req['status'] = decision
+            req['adjudicated_by'] = user.get('name', 'Dr. Sunita Rao')
+            req['adjudicated_at'] = datetime.datetime.now(datetime.timezone.utc).isoformat()
+            req['clinical_remarks'] = payload.get('remarks', 'Clinical coordination approved under strict confidentiality protocol.')
+            
+            # Notify Doctor of decision
+            notif = {
+                "id": f"notif-{int(time.time()*1000)}",
+                "recipient_id": req['doctor_id'],
+                "recipient_role": "DOCTOR",
+                "sender_name": user.get('name', 'Dr. Sunita Rao, AFMS'),
+                "sender_role": "COUNSELOR",
+                "type": "MH_ACCESS_DECISION",
+                "title": f"MH Access Request {decision}",
+                "message": f"Psychologist has {decision.lower()} your request to view psychological records for {req.get('soldier_name', 'Patient')}.",
+                "created_at": datetime.datetime.now(datetime.timezone.utc).isoformat(),
+                "is_read": False,
+                "priority": "HIGH"
+            }
+            DB.setdefault('notifications', []).insert(0, notif)
+            
+            log_audit(user['id'], user['role'], req['soldier_id'], f'MH_ACCESS_{decision}', 'SUCCESS',
+                      f"Counselor {user.get('name')} {decision} Doctor {req['doctor_name']} access to mental health records")
+            return self.send_json(200, {"request": req, "decision": decision})
+
+        # 21. File Grievance / Appeal Report on Claim
+        elif path == '/api/claims/dispute':
+            user = self.get_auth_user()
+            claim_id = payload.get('claim_id')
+            claim = next((c for c in DB.get('claims', []) if c['id'] == claim_id), None)
+            if not claim:
+                return self.send_json(404, {"error": "Claim not found"})
+                
+            dispute_id = f"ECHS-DISP-2026-{int(time.time()*100)%100000:05d}"
+            report = {
+                "dispute_id": dispute_id,
+                "claim_id": claim_id,
+                "filed_by_id": user['id'],
+                "filed_by_name": user.get('name', 'Soldier'),
+                "filed_by_role": user.get('role', 'SOLDIER'),
+                "filed_at": datetime.datetime.now(datetime.timezone.utc).isoformat(),
+                "report_title": payload.get('report_title', 'Disability Assessment Discrepancy Grievance'),
+                "dispute_reason": payload.get('dispute_reason', 'Disability percentage calculated lower than AFMS board findings.'),
+                "evidence_summary": payload.get('evidence_summary', 'Knee arthroscopy operative notes and MRI report from 151 Base Hospital attached.'),
+                "status": "UNDER_EXECUTIVE_REVIEW"
+            }
+            claim['dispute_report'] = report
+            claim['has_dispute'] = True
+            
+            # Send notification to Claims Officer
+            notif = {
+                "id": f"notif-{int(time.time()*1000)}",
+                "recipient_id": "usr-claims-1",
+                "recipient_role": "CLAIMS_OFFICER",
+                "sender_name": user.get('name', 'Soldier Applicant'),
+                "sender_role": user.get('role', 'SOLDIER'),
+                "type": "CLAIM_GRIEVANCE_FILED",
+                "title": f"Grievance Filed: Claim #{claim_id}",
+                "message": f"Appeal report {dispute_id} submitted for claim '{claim.get('title')}'. Immediate review requested.",
+                "created_at": datetime.datetime.now(datetime.timezone.utc).isoformat(),
+                "is_read": False,
+                "priority": "HIGH",
+                "dispute_id": dispute_id
+            }
+            DB.setdefault('notifications', []).insert(0, notif)
+            
+            log_audit(user['id'], user['role'], claim.get('soldier_id', user['id']), 'FILE_CLAIM_DISPUTE', 'SUCCESS',
+                      f"Filed grievance report {dispute_id} on claim #{claim_id}")
+            return self.send_json(201, {"dispute": report, "claim": claim})
 
         return self.send_json(404, {"error": "Endpoint not found"})
 

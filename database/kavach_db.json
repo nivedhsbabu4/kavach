@@ -76,20 +76,20 @@
       "branch": "Indian Army"
     },
     {
-      "id": "usr-1795415358949",
-      "service_no": "16009823M",
-      "name": "Naik Subhash Chandra",
-      "rank": "Naik",
+      "id": "usr-1795415480192",
+      "service_no": "12345687k",
+      "name": "liya",
+      "rank": "sep",
       "role": "SOLDIER",
-      "password_hash": "5f72baf43548d09f6d3a61492175087a1061dfc53022f3af0d3f2714bf5fa326",
-      "posting": "Siachen Base Camp",
-      "unit": "9 Para SF",
-      "branch": "SPECIAL_FORCES",
-      "blood_group": "AB+",
+      "password_hash": "154c4c511cbb166a317c247a839e46cac6d9208af5b015e1867a84cd9a56007b",
+      "posting": "rr",
+      "unit": "anc",
+      "branch": "Indian Army",
+      "blood_group": "O+",
       "allergies": "None Reported",
       "phone": "+91-9876540000",
-      "email": "16009823m@kavach.afms.in",
-      "address": "Station HQ, Siachen Base Camp",
+      "email": "12345687k@kavach.afms.in",
+      "address": "Station HQ, rr",
       "emergency_contact": "Next of Kin - Family Contact",
       "lock_enabled": false,
       "pin": "1234",
@@ -98,13 +98,13 @@
   ],
   "records": [
     {
-      "id": "rec-ind-1795415358949",
-      "soldier_id": "usr-1795415358949",
+      "id": "rec-ind-1795415480192",
+      "soldier_id": "usr-1795415480192",
       "doctor_id": "usr-doctor-1",
       "type": "PRESCRIPTION",
       "title": "Service Enlistment Medical Fitness Examination",
       "date": "2026-11-23",
-      "posting": "Siachen Base Camp",
+      "posting": "rr",
       "doctor_name": "Capt. Dr. Priya Nair, AMC",
       "hospital": "Station Health Organization",
       "diagnosis": "Initial military medical fitness examination completed. Classified SHAPE-1. Immunizations current. Enrolled in Kavach Health Tracker.",
@@ -112,8 +112,8 @@
       "is_mental_health": false,
       "encrypted_data": null,
       "version": 1,
-      "created_at": "2026-11-23T06:29:18.949994+00:00",
-      "tamper_hash": "d70cf502a2cca9abf2d1bfa4e519c6a55637a4f1e01451f088ee3e847b8138d8"
+      "created_at": "2026-11-23T06:31:20.192400+00:00",
+      "tamper_hash": "5bf3119e1eef7ddedfb605c5edf653f4177552705ea7c4a92ec5869f9859f068"
     },
     {
       "id": "rec-001",
@@ -226,18 +226,18 @@
   ],
   "access_grants": [
     {
-      "id": "grant-1795415358950",
-      "soldier_id": "usr-1795415358949",
+      "id": "grant-1795415480192",
+      "soldier_id": "usr-1795415480192",
       "record_id": null,
       "granted_to_user": "usr-doctor-1",
       "granted_to_role": "DOCTOR",
-      "granted_by": "usr-1795415358949",
+      "granted_by": "usr-1795415480192",
       "purpose": "Clinical Consultation & General Care",
       "expiry_date": "2027-02-21",
       "status": "ACTIVE",
       "visits_count": 0,
       "last_accessed": "Never",
-      "created_at": "2026-11-23T06:29:18.950016+00:00"
+      "created_at": "2026-11-23T06:31:20.192543+00:00"
     },
     {
       "id": "grant-001",
@@ -438,6 +438,38 @@
           "completed": false
         }
       ]
+    },
+    {
+      "id": "rhb-usr-1795415480192",
+      "soldier_id": "usr-1795415480192",
+      "title": "Musculoskeletal Conditioning & Mobility Protocol",
+      "diagnosed_by": "Capt. Dr. Priya Nair, AMC",
+      "pain_location": "No Active Joint Injury Reported",
+      "pain_type": "Standard Routine Conditioning",
+      "since_when": "Enlistment",
+      "pain_severity": "Mild",
+      "completed_sessions": 0,
+      "total_sessions": 10,
+      "exercises": [
+        {
+          "id": "ex-01",
+          "name": "Core Stability & Lumbar Plank",
+          "reps": "3 sets x 30 sec",
+          "completed": false
+        },
+        {
+          "id": "ex-02",
+          "name": "Quadriceps & Hamstring Conditioning",
+          "reps": "3 sets x 12 reps",
+          "completed": false
+        },
+        {
+          "id": "ex-03",
+          "name": "Shoulder Scapular Retraction",
+          "reps": "3 sets x 15 reps",
+          "completed": false
+        }
+      ]
     }
   ],
   "claims": [
@@ -503,39 +535,147 @@
   ],
   "audit_log": [
     {
-      "id": "aud-1795415358953",
-      "user_id": "usr-1795415358949",
+      "id": "aud-1795416854313",
+      "user_id": "usr-soldier-1",
       "user_role": "SOLDIER",
-      "soldier_id": "usr-1795415358949",
+      "soldier_id": "usr-soldier-1",
       "record_id": null,
       "action": "VIEW_WALLET",
-      "timestamp": "2026-11-23T06:29:18.953120+00:00",
+      "timestamp": "2026-11-23T06:54:14.313108+00:00",
       "status": "ALLOWED",
       "details": "Soldier opened comprehensive health wallet",
       "ip_address": "127.0.0.1"
     },
     {
-      "id": "aud-1795415358952",
-      "user_id": "usr-1795415358949",
+      "id": "aud-1795416852390",
+      "user_id": "usr-soldier-1",
       "user_role": "SOLDIER",
-      "soldier_id": "usr-1795415358949",
+      "soldier_id": "usr-soldier-1",
       "record_id": null,
       "action": "LOGIN_SUCCESS",
-      "timestamp": "2026-11-23T06:29:18.952195+00:00",
+      "timestamp": "2026-11-23T06:54:12.390241+00:00",
       "status": "SUCCESS",
-      "details": "Personnel Naik Subhash Chandra (16009823M) authenticated via JWT",
+      "details": "Personnel Rifleman Arjun Verma (15489201A) authenticated via JWT",
       "ip_address": "127.0.0.1"
     },
     {
-      "id": "aud-1795415358950",
-      "user_id": "usr-1795415358949",
+      "id": "aud-1795415853828",
+      "user_id": "usr-doctor-1",
+      "user_role": "DOCTOR",
+      "soldier_id": "usr-soldier-1",
+      "record_id": null,
+      "action": "VIEW_CLINICAL_RECORDS",
+      "timestamp": "2026-11-23T06:37:33.828077+00:00",
+      "status": "ALLOWED",
+      "details": "DOCTOR accessed clinical record history under active patient grant",
+      "ip_address": "127.0.0.1"
+    },
+    {
+      "id": "aud-1795415853049",
+      "user_id": "usr-doctor-1",
+      "user_role": "DOCTOR",
+      "soldier_id": "usr-doctor-1",
+      "record_id": null,
+      "action": "LOGIN_SUCCESS",
+      "timestamp": "2026-11-23T06:37:33.049470+00:00",
+      "status": "SUCCESS",
+      "details": "Personnel Capt. Dr. Priya Nair (MR-09824X) authenticated via JWT",
+      "ip_address": "127.0.0.1"
+    },
+    {
+      "id": "aud-1795415839003",
+      "user_id": "usr-soldier-1",
       "user_role": "SOLDIER",
-      "soldier_id": "usr-1795415358949",
+      "soldier_id": "usr-soldier-1",
+      "record_id": null,
+      "action": "VIEW_WALLET",
+      "timestamp": "2026-11-23T06:37:19.003527+00:00",
+      "status": "ALLOWED",
+      "details": "Soldier opened comprehensive health wallet",
+      "ip_address": "127.0.0.1"
+    },
+    {
+      "id": "aud-1795415835649",
+      "user_id": "usr-soldier-1",
+      "user_role": "SOLDIER",
+      "soldier_id": "usr-soldier-1",
+      "record_id": null,
+      "action": "LOGIN_SUCCESS",
+      "timestamp": "2026-11-23T06:37:15.649373+00:00",
+      "status": "SUCCESS",
+      "details": "Personnel Rifleman Arjun Verma (15489201A) authenticated via JWT",
+      "ip_address": "127.0.0.1"
+    },
+    {
+      "id": "aud-1795415824275",
+      "user_id": "usr-doctor-1",
+      "user_role": "DOCTOR",
+      "soldier_id": "usr-soldier-1",
+      "record_id": null,
+      "action": "DISPATCH_NOTIFICATION",
+      "timestamp": "2026-11-23T06:37:04.275520+00:00",
+      "status": "SUCCESS",
+      "details": "Dispatched HIGH notification 'Clinical Adherence Nudge: Knee Rehab #14' to SOLDIER",
+      "ip_address": "127.0.0.1"
+    },
+    {
+      "id": "aud-1795415814106",
+      "user_id": "usr-doctor-1",
+      "user_role": "DOCTOR",
+      "soldier_id": "usr-soldier-1",
+      "record_id": null,
+      "action": "VIEW_CLINICAL_RECORDS",
+      "timestamp": "2026-11-23T06:36:54.106441+00:00",
+      "status": "ALLOWED",
+      "details": "DOCTOR accessed clinical record history under active patient grant",
+      "ip_address": "127.0.0.1"
+    },
+    {
+      "id": "aud-1795415813314",
+      "user_id": "usr-doctor-1",
+      "user_role": "DOCTOR",
+      "soldier_id": "usr-doctor-1",
+      "record_id": null,
+      "action": "LOGIN_SUCCESS",
+      "timestamp": "2026-11-23T06:36:53.314053+00:00",
+      "status": "SUCCESS",
+      "details": "Personnel Capt. Dr. Priya Nair (MR-09824X) authenticated via JWT",
+      "ip_address": "127.0.0.1"
+    },
+    {
+      "id": "aud-1795415491488",
+      "user_id": "usr-1795415480192",
+      "user_role": "SOLDIER",
+      "soldier_id": "usr-1795415480192",
+      "record_id": null,
+      "action": "VIEW_WALLET",
+      "timestamp": "2026-11-23T06:31:31.488892+00:00",
+      "status": "ALLOWED",
+      "details": "Soldier opened comprehensive health wallet",
+      "ip_address": "127.0.0.1"
+    },
+    {
+      "id": "aud-1795415490197",
+      "user_id": "usr-1795415480192",
+      "user_role": "SOLDIER",
+      "soldier_id": "usr-1795415480192",
+      "record_id": null,
+      "action": "LOGIN_SUCCESS",
+      "timestamp": "2026-11-23T06:31:30.197156+00:00",
+      "status": "SUCCESS",
+      "details": "Personnel liya (12345687k) authenticated via JWT",
+      "ip_address": "127.0.0.1"
+    },
+    {
+      "id": "aud-1795415480192",
+      "user_id": "usr-1795415480192",
+      "user_role": "SOLDIER",
+      "soldier_id": "usr-1795415480192",
       "record_id": null,
       "action": "USER_REGISTERED",
-      "timestamp": "2026-11-23T06:29:18.950042+00:00",
+      "timestamp": "2026-11-23T06:31:20.192676+00:00",
       "status": "SUCCESS",
-      "details": "Enrolled new SOLDIER: Naik Subhash Chandra (16009823M) into Kavach Network",
+      "details": "Enrolled new SOLDIER: liya (12345687k) into Kavach Network",
       "ip_address": "127.0.0.1"
     },
     {
@@ -576,6 +716,19 @@
     }
   ],
   "notifications": [
+    {
+      "id": "notif-1795415824275",
+      "recipient_id": "usr-soldier-1",
+      "recipient_role": "SOLDIER",
+      "sender_name": "Capt. Dr. Priya Nair",
+      "sender_role": "DOCTOR",
+      "type": "REHAB_MISSED",
+      "title": "Clinical Adherence Nudge: Knee Rehab #14",
+      "message": "Capt. Dr. Priya Nair, AMC: You missed Session #14 yesterday. Please complete your knee exercises to maintain joint flexion and prevent joint stiffness relapse.",
+      "created_at": "2026-11-23T06:37:04.275486+00:00",
+      "is_read": false,
+      "priority": "HIGH"
+    },
     {
       "id": "notif-001",
       "recipient_id": "usr-soldier-1",

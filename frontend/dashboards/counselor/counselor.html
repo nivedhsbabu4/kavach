@@ -54,6 +54,31 @@
 
   <div class="dashboard-layout">
     <main class="main-content" style="padding: 24px;">
+      
+      <!-- Doctor Clinical Consultation Access Requests Section -->
+      <div class="card" style="border: 2px solid #a21caf; margin-bottom: 24px; background: #fdf4ff;">
+        <div class="card-header" style="border-bottom: 1px solid #f5d0fe; padding-bottom: 12px;">
+          <div>
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <span style="font-size: 1.2rem;">🛡️</span>
+              <h2 class="card-title" style="color: #701a75;">Doctor Consultation Access Requests</h2>
+            </div>
+            <div style="font-size: 0.78rem; color: #86198f; margin-top: 2px;">
+              Military Medical Officers requesting authorized access to view confidential mental health notes for physical rehab coordination
+            </div>
+          </div>
+          <span class="badge-tag" style="background: #fae8ff; color: #701a75; border-color: #e879f9; font-weight: 800;" id="requestCountBadge">
+            AUTHORIZATION QUEUE
+          </span>
+        </div>
+
+        <div id="mhRequestsContainer" style="padding: 18px 20px;">
+          <div style="font-size: 0.8rem; color: #6b7280; text-align: center; padding: 20px;">
+            Checking pending clinical requests...
+          </div>
+        </div>
+      </div>
+
       <!-- 3-Week Rising Stress Escalation Alert -->
       <div style="background: #fffbeb; border: 2px solid #f59e0b; border-radius: 10px; padding: 18px 22px; margin-bottom: 24px; display: flex; align-items: center; justify-content: space-between;">
         <div style="display: flex; align-items: center; gap: 14px;">
@@ -154,6 +179,103 @@
         toast.style.transition = 'opacity 0.4s ease';
         setTimeout(() => toast.remove(), 400);
       }, 3500);
+    }
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      await loadMhRequests();
+    });
+
+    async function loadMhRequests() {
+      try {
+        const headers = getAuthHeaders();
+        const res = await fetch('/api/counselor/mh-requests', { headers });
+        if (res.ok) {
+          const list = await res.json();
+          renderMhRequests(list);
+        }
+      } catch (e) {
+        console.warn('Could not load MH requests:', e);
+      }
+    }
+
+    function renderMhRequests(list) {
+      const container = document.getElementById('mhRequestsContainer');
+      const badge = document.getElementById('requestCountBadge');
+      if (!container) return;
+
+      if (!list || list.length === 0) {
+        container.innerHTML = `
+          <div style="text-align: center; padding: 24px; color: #86198f;">
+            <span>🛡️</span> <strong>No active doctor access requests.</strong>
+            <div style="font-size: 0.76rem; color: #6b7280; margin-top: 2px;">All confidential psychological records are securely isolated.</div>
+          </div>
+        `;
+        if (badge) badge.textContent = '0 PENDING';
+        return;
+      }
+
+      const pending = list.filter(r => r.status === 'PENDING_PSYCHOLOGIST_APPROVAL');
+      if (badge) badge.textContent = `${pending.length} PENDING DECISION`;
+
+      container.innerHTML = `
+        <div style="display: flex; flex-direction: column; gap: 12px;">
+          ${list.map(r => `
+            <div style="background: white; border: 1.5px solid ${r.status === 'APPROVED' ? '#86efac' : (r.status === 'DENIED' ? '#fca5a5' : '#f0abfc')}; border-radius: 10px; padding: 14px 18px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
+              <div>
+                <div style="display: flex; align-items: center; gap: 8px;">
+                  <strong style="font-size: 0.95rem; color: #1e293b;">
+                    ${r.doctor_rank || 'Doctor'} ${r.doctor_name}
+                  </strong>
+                  <span style="font-size: 0.72rem; color: #64748b;">(${r.hospital || 'Military Hospital'})</span>
+                  <span class="badge-tag" style="font-size: 0.7rem; font-weight: 800; background: ${r.status === 'APPROVED' ? '#dcfce7' : (r.status === 'DENIED' ? '#fee2e2' : '#fef3c7')}; color: ${r.status === 'APPROVED' ? '#15803d' : (r.status === 'DENIED' ? '#991b1b' : '#92400e')}; border-color: transparent;">
+                    ${r.status}
+                  </span>
+                </div>
+                <div style="font-size: 0.8rem; color: #475569; margin-top: 4px;">
+                  <strong>Patient:</strong> ${r.soldier_name} &bull; <strong>Reason:</strong> "${r.reason}"
+                </div>
+                <div style="font-size: 0.72rem; color: #94a3b8; margin-top: 2px;">
+                  Requested: ${r.requested_at ? r.requested_at.slice(0, 16).replace('T', ' ') : 'Recent'}
+                </div>
+              </div>
+
+              <div>
+                ${r.status === 'PENDING_PSYCHOLOGIST_APPROVAL' ? `
+                  <div style="display: flex; gap: 8px;">
+                    <button class="btn-primary" style="background: #15803d; border-color: #166534; font-size: 0.75rem; padding: 6px 14px;" onclick="adjudicateRequest('${r.id}', 'APPROVED')">
+                      ✓ Approve Access
+                    </button>
+                    <button class="btn-outline" style="color: #991b1b; border-color: #ef4444; font-size: 0.75rem; padding: 6px 12px;" onclick="adjudicateRequest('${r.id}', 'DENIED')">
+                      ✕ Deny
+                    </button>
+                  </div>
+                ` : `
+                  <div style="font-size: 0.75rem; color: #64748b; font-weight: 700;">
+                    Adjudicated by Dr. Sunita Rao
+                  </div>
+                `}
+              </div>
+            </div>
+          `).join('')}
+        </div>
+      `;
+    }
+
+    async function adjudicateRequest(requestId, decision) {
+      try {
+        const headers = getAuthHeaders();
+        const res = await fetch('/api/counselor/approve-mh-access', {
+          method: 'POST',
+          headers,
+          body: JSON.stringify({ request_id: requestId, decision })
+        });
+        if (res.ok) {
+          showToast(`✓ Request successfully ${decision.toLowerCase()}! Notification dispatched to Doctor console.`, 'success');
+          await loadMhRequests();
+        }
+      } catch (e) {
+        showToast('Error recording decision.', 'warn');
+      }
     }
 
     function openConfidentialSessionModal(soldierId) {

@@ -8,6 +8,51 @@
   <link rel="icon" href="../../assets/logo.svg" />
   <script src="../../shared/auth_guard.js"></script>
   <script>enforceRoleGuard('DOCTOR');</script>
+  <style>
+    .disappear-anim {
+      animation: slideUpFade 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+    @keyframes slideUpFade {
+      0% { opacity: 1; transform: translateY(0); max-height: 200px; }
+      100% { opacity: 0; transform: translateY(-24px); max-height: 0; padding: 0; margin: 0; overflow: hidden; border: none; }
+    }
+    .preview-first-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.76rem;
+      font-weight: 800;
+      padding: 3px 10px;
+      border-radius: 6px;
+      letter-spacing: 0.02em;
+    }
+    .expandable-record {
+      border: 1.5px solid var(--border-color);
+      border-radius: 12px;
+      background: var(--bg-card);
+      transition: all 0.2s ease;
+      cursor: pointer;
+      margin-bottom: 12px;
+    }
+    .expandable-record:hover {
+      border-color: #0284c7;
+      box-shadow: 0 4px 14px rgba(2, 132, 199, 0.12);
+    }
+    .record-header-strip {
+      padding: 14px 18px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 10px;
+      border-bottom: 1px solid transparent;
+    }
+    .record-expanded-body {
+      padding: 16px 18px;
+      border-top: 1px solid var(--border-subtle);
+      background: rgba(248, 250, 252, 0.5);
+    }
+  </style>
 </head>
 <body data-theme="light">
 
@@ -15,7 +60,7 @@
   <aside class="crisis-topbar">
     <div style="display: flex; align-items: center; gap: 12px;">
       <span style="font-weight: 800;">🩺 ARMY MEDICAL CORPS (AMC) &bull; CLINICAL OFFICER CONSOLE</span>
-      <span style="font-size: 0.75rem; color: var(--gold-light);">BASE HOSPITAL DELHI CANTT</span>
+      <span style="font-size: 0.75rem; color: var(--gold-light);" id="docHospitalTopbar">BASE HOSPITAL DELHI CANTT</span>
     </div>
   </aside>
 
@@ -39,49 +84,50 @@
     </div>
 
     <div class="header-profile-cluster">
-      <div class="user-identity-card">
-        <div class="user-avatar-badge" style="background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);">PN</div>
+      <div class="user-identity-card" id="doctorProfileHeaderCard">
+        <div class="user-avatar-badge" style="background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);" id="docAvatar">PN</div>
         <div class="user-details-text">
-          <div class="user-name-title">Capt. Dr. Priya Nair, AMC</div>
+          <div class="user-name-title" id="docHeaderName">Capt. Dr. Priya Nair, AMC</div>
           <div class="user-meta-sub">
-            <span>Orthopedic Specialist &bull; MR-09824X</span>
+            <span id="docHeaderDept">Orthopedic Specialist</span>
             <span>&bull;</span>
-            <span class="sync-badge synced"><span class="sync-pulse-dot"></span> <span>BASE HOSPITAL DELHI</span></span>
+            <span class="sync-badge synced"><span class="sync-pulse-dot"></span> <span id="docHeaderHospital">BASE HOSPITAL DELHI</span></span>
           </div>
         </div>
       </div>
+
       <!-- Notification Bell with Alert Badge -->
       <div style="position: relative;">
-        <button class="header-action-btn" id="docNotifBellBtn" onclick="toggleDoctorNotifDrawer()" title="Clinical Notifications (1 Alert)" style="position: relative; width: 40px; height: 40px; border-radius: 8px; border: 1.5px solid var(--border-color); background: var(--bg-card); cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 1.15rem;">
+        <button class="header-action-btn" id="docNotifBellBtn" onclick="toggleDoctorNotifDrawer()" title="Clinical Notifications" style="position: relative; width: 40px; height: 40px; border-radius: 8px; border: 1.5px solid var(--border-color); background: var(--bg-card); cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 1.15rem;">
           🔔
-          <span style="position: absolute; top: -4px; right: -4px; background: #e11d48; color: white; font-size: 0.65rem; font-weight: 900; width: 18px; height: 18px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 2px solid var(--bg-card);">1</span>
+          <span id="docNotifBadge" style="position: absolute; top: -4px; right: -4px; background: #e11d48; color: white; font-size: 0.65rem; font-weight: 900; width: 18px; height: 18px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 2px solid var(--bg-card);">1</span>
         </button>
 
         <!-- Dropdown Notifications Menu -->
         <div id="doctorNotifDrawer" style="display: none; position: absolute; right: 0; top: 48px; width: 360px; background: var(--bg-card); border: 1.5px solid var(--border-color); border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.25); z-index: 100; padding: 16px;">
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; border-bottom: 1px solid var(--border-subtle); padding-bottom: 8px;">
             <strong style="font-size: 0.88rem;">🚨 Clinical Notifications</strong>
-            <span style="font-size: 0.7rem; background: #fee2e2; color: #991b1b; padding: 2px 6px; border-radius: 4px; font-weight: 800;">1 HIGH PRIORITY</span>
+            <span style="font-size: 0.7rem; background: #fee2e2; color: #991b1b; padding: 2px 6px; border-radius: 4px; font-weight: 800;" id="notifBadgeSub">ACTIVE ALERT</span>
           </div>
 
-          <div style="background: #fff1f2; border: 1px solid #fecdd3; border-radius: 8px; padding: 12px; margin-bottom: 8px;">
+          <div id="doctorNotifItem" style="background: #fff1f2; border: 1px solid #fecdd3; border-radius: 8px; padding: 12px; margin-bottom: 8px; transition: all 0.4s ease;">
             <div style="display: flex; justify-content: space-between; font-size: 0.72rem; color: #9f1239; font-weight: 800; margin-bottom: 4px;">
               <span>🏃 MISSED REHAB SESSION</span>
               <span>YESTERDAY</span>
             </div>
-            <div style="font-size: 0.82rem; font-weight: 700; color: #881337;">
+            <div style="font-size: 0.82rem; font-weight: 700; color: #881337;" id="notifItemPatient">
               Rifleman Arjun Verma (15489201A) missed Session #14
             </div>
             <div style="font-size: 0.74rem; color: #475569; margin: 4px 0;">
               Left Knee Arthroscopy Recovery &bull; VAS Pain Level: 4/10. Adherence reminder needed.
             </div>
-            <button class="btn-primary" style="background: #e11d48; border-color: #be123c; font-size: 0.75rem; padding: 6px 10px; width: 100%; margin-top: 6px; font-weight: 800;" onclick="sendDoctorNudge('usr-soldier-1')">
+            <button class="btn-primary" style="background: #e11d48; border-color: #be123c; font-size: 0.75rem; padding: 6px 10px; width: 100%; margin-top: 6px; font-weight: 800;" onclick="sendDoctorNudge()">
               🔔 Send Direct Adherence Nudge
             </button>
           </div>
 
           <div style="font-size: 0.72rem; color: var(--text-muted); text-align: center; margin-top: 8px;">
-            All other patients adhering to treatment protocols.
+            Clinical telemetry automatically logged to AFMS.
           </div>
         </div>
       </div>
@@ -95,8 +141,9 @@
 
   <div class="dashboard-layout">
     <main class="main-content" style="padding: 24px;">
+      
       <!-- Prominent Missed Rehab Session Alert Banner -->
-      <div style="background: #fff1f2; border: 2px solid #e11d48; border-radius: 12px; padding: 18px 22px; margin-bottom: 24px; display: flex; align-items: center; justify-content: space-between; gap: 16px; box-shadow: 0 4px 15px rgba(225, 29, 72, 0.12);">
+      <div id="doctorRehabAlertBanner" style="background: #fff1f2; border: 2px solid #e11d48; border-radius: 12px; padding: 18px 22px; margin-bottom: 24px; display: flex; align-items: center; justify-content: space-between; gap: 16px; box-shadow: 0 4px 15px rgba(225, 29, 72, 0.12); transition: all 0.5s ease;">
         <div style="display: flex; align-items: center; gap: 14px;">
           <div style="width: 48px; height: 48px; border-radius: 50%; background: #fee2e2; display: flex; align-items: center; justify-content: center; font-size: 1.6rem; flex-shrink: 0;">
             🚨
@@ -106,77 +153,175 @@
               <strong style="color: #9f1239; font-size: 1.05rem; font-weight: 900;">HIGH-PRIORITY CLINICAL REHAB ALERT: MISSED SESSION #14</strong>
               <span style="background: #e11d48; color: #fff; font-size: 0.7rem; font-weight: 800; padding: 2px 7px; border-radius: 4px; letter-spacing: 0.5px;">ACTION REQUIRED</span>
             </div>
-            <div style="font-size: 0.85rem; color: #881337; margin-top: 4px; line-height: 1.45;">
-              Patient <strong>Rifleman Arjun Verma</strong> (15489201A &bull; Rajasthan Desert Sector) missed scheduled <strong>Knee Mobility Session #14</strong> yesterday. Current VAS Pain Index: <strong>4/10</strong>. Intervention required to prevent joint stiffness relapse.
+            <div style="font-size: 0.85rem; color: #881337; margin-top: 4px; line-height: 1.45;" id="rehabBannerText">
+              Active Patient <strong>Rifleman Arjun Verma</strong> (15489201A &bull; Rajasthan Desert Sector) missed scheduled <strong>Knee Mobility Session #14</strong> yesterday. Current VAS Pain Index: <strong>4/10</strong>. Intervention required to prevent joint stiffness relapse.
             </div>
           </div>
         </div>
         <div style="display: flex; gap: 8px; flex-shrink: 0;">
-          <button class="btn-primary" style="background: #e11d48; border-color: #be123c; white-space: nowrap; font-weight: 800;" onclick="sendDoctorNudge('usr-soldier-1')">
+          <button class="btn-primary" style="background: #e11d48; border-color: #be123c; white-space: nowrap; font-weight: 800;" onclick="sendDoctorNudge()">
             🔔 Send Clinical Nudge &amp; Reminder
           </button>
         </div>
       </div>
 
-      <!-- Active Patients with Time-Stamped Access -->
-      <div class="card">
-        <div class="card-header">
+      <!-- Single Patient Health Wallet Concept Container -->
+      <div class="card" style="border: 2px solid #0284c7; background: linear-gradient(180deg, #f0f9ff 0%, #ffffff 100px); margin-bottom: 24px;">
+        <div class="card-header" style="border-bottom: 1px solid #bae6fd; padding-bottom: 14px;">
           <div>
-            <h2 class="card-title">🪖 Active Patients Under Your Authorized Care</h2>
-            <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 2px;">
-              Only patients with time-stamped sovereign consent grants appear here &bull; Private counseling notes excluded
+            <div style="display: flex; align-items: center; gap: 10px;">
+              <span style="background: #0284c7; color: white; font-size: 0.72rem; font-weight: 900; padding: 3px 8px; border-radius: 5px; letter-spacing: 0.5px;">
+                💼 ACTIVE SOLDIER HEALTH WALLET
+              </span>
+              <span id="walletIdBadge" style="font-family: monospace; font-size: 0.8rem; font-weight: 800; color: #0369a1;">
+                KAVACH-WLT-15489201A
+              </span>
+            </div>
+            <h2 class="card-title" style="margin-top: 6px; font-size: 1.35rem;" id="activeSoldierTitle">
+              Rifleman Arjun Verma (15489201A)
+            </h2>
+            <div style="font-size: 0.82rem; color: #475569; margin-top: 4px;" id="activeSoldierMeta">
+              14 Rajputana Rifles &bull; Field Posting: Rajasthan (Desert Sector) &bull; Blood Group: O+ &bull; Allergies: Penicillin
+            </div>
+          </div>
+          
+          <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 6px;">
+            <div id="grantStatusBadge" class="badge-tag badge-vaccine" style="background: #dcfce7; color: #15803d; border-color: #86efac; font-size: 0.78rem;">
+              ⏱️ TIME-STAMPED ACCESS ACTIVE (30 DAYS)
+            </div>
+            <div style="font-size: 0.72rem; color: var(--text-muted);">
+              Sovereign permission granted by soldier
             </div>
           </div>
         </div>
 
-        <div style="display: flex; flex-direction: column; gap: 12px;" id="doctorPatientsList">
-          <div style="padding: 16px; border: 1.5px solid var(--border-color); border-radius: 8px; display: flex; justify-content: space-between; align-items: center; background: var(--bg-card);">
-            <div>
-              <div style="display: flex; align-items: center; gap: 10px;">
-                <strong style="font-size: 1.05rem;">Rifleman Arjun Verma</strong>
-                <span class="badge-tag badge-vaccine">ACTIVE GRANT</span>
-                <span style="font-size: 0.75rem; color: var(--text-muted);">Service No: 15489201A &bull; 14 Rajputana Rifles</span>
-              </div>
-              <div style="font-size: 0.82rem; color: var(--text-muted); margin-top: 4px;">
-                Diagnosis: Left Knee Arthroscopic Meniscus Repair &bull; Shrapnel Wound Deltoid
-              </div>
-              <div style="font-size: 0.75rem; color: var(--olive-700); margin-top: 4px; font-weight: 700;">
-                ⏱️ Time-Stamped Consent Active until Dec 31, 2026 (General Medical Only)
-              </div>
-            </div>
-            <div style="display: flex; gap: 8px; flex-wrap: wrap;">
-              <button class="btn-outline" onclick="viewPatientRecords('usr-soldier-1')">View Wallet History</button>
-              <button class="btn-primary" style="background: #2563eb; border-color: #1d4ed8;" onclick="openPainDiagnosisModal('usr-soldier-1')">🩺 Update Pain Diagnosis</button>
-              <button class="btn-primary" onclick="openCreateRecordModal('usr-soldier-1')">✚ Create Field Record</button>
-            </div>
+        <div style="padding: 16px 20px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; background: white; border-radius: 0 0 12px 12px;">
+          <div style="font-size: 0.82rem; color: #334155;">
+            <strong>Clinical Scope:</strong> General Medical, Surgical &amp; Rehabilitation Records Only &bull; <span style="color: #991b1b; font-weight: 700;">Confidential mental health notes sealed until psychologist approval.</span>
+          </div>
+          <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+            <button class="btn-primary" style="background: #2563eb; border-color: #1d4ed8;" onclick="openPainDiagnosisModal()">
+              🩺 Update Pain Diagnosis
+            </button>
+            <button class="btn-primary" style="background: #0284c7; border-color: #0369a1;" onclick="openCreateRecordModal()">
+              ✚ Create Field Record &amp; Prescription
+            </button>
           </div>
         </div>
       </div>
 
-      <!-- Patient Medical History (Tamper-Proof) -->
+      <!-- Confidential Mental Health Records Access Panel (Psychologist Authorization Required) -->
+      <div class="card" id="mhAccessCard" style="border: 2px solid #a21caf; margin-bottom: 24px; background: #faf5ff;">
+        <div class="card-header" style="border-bottom: 1px solid #f0abfc; padding-bottom: 12px;">
+          <div>
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <span style="font-size: 1.1rem;">🧠</span>
+              <h3 class="card-title" style="color: #701a75;">Confidential Psychological Dossier (AFMS Seclusion Protocol)</h3>
+            </div>
+            <div style="font-size: 0.78rem; color: #86198f; margin-top: 2px;">
+              Under military medical privacy regulations, mental health records cannot be opened by general Medical Officers without explicit Clinical Psychologist authorization.
+            </div>
+          </div>
+          <div id="mhStatusBadge">
+            <!-- Rendered by doctor.js -->
+          </div>
+        </div>
+
+        <div style="padding: 18px 20px;" id="mhCardBody">
+          <!-- Rendered by doctor.js (either request button, waiting status, or unlocked notes) -->
+        </div>
+      </div>
+
+      <!-- Verified Medical History (Preview Cards: Department, Doctor Name, Hospital, Date First) -->
       <div class="card" id="patientHistorySection">
         <div class="card-header">
           <div>
-            <h3 class="card-title">📁 Verified Patient Medical History (Rifleman Arjun Verma)</h3>
+            <h3 class="card-title" id="historyCardTitle">📁 Verified Clinical Records (<span id="historyPatientName">Rifleman Arjun Verma</span>)</h3>
             <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 2px;">
-              Tamper-proof records &bull; Once entered, records CANNOT be deleted &bull; Only the original authoring doctor can edit
+              Department, Doctor Name, Hospital and Date displayed first &bull; Click any record to expand clinical notes, prescriptions, and cryptographic seals.
             </div>
           </div>
           <div style="display: flex; align-items: center; gap: 8px;">
             <button class="btn-outline" onclick="window.print()" style="font-size: 0.78rem; padding: 6px 12px;">
               🖨️ Print Clinical Dossier
             </button>
-            <div class="role-tag-badge" style="background: #fef2f2; color: #991b1b; border-color: #fca5a5;">
-              🔒 Mental Health Notes Barred
-            </div>
           </div>
         </div>
 
-        <div class="records-grid" id="doctorRecordsGrid">
-          <!-- Populated by doctor.js -->
+        <div id="doctorRecordsList" style="margin-top: 14px;">
+          <!-- Populated by doctor.js with expandable cards -->
         </div>
       </div>
     </main>
+  </div>
+
+  <!-- Mandatory Doctor Credential Verification Modal -->
+  <div id="doctorCredentialModal" class="privacy-curtain" style="display: none; background: rgba(15, 23, 42, 0.85); backdrop-filter: blur(4px); z-index: 10000; position: fixed; inset: 0; align-items: center; justify-content: center;">
+    <div style="background: var(--bg-card); border-radius: 16px; max-width: 520px; width: 92%; padding: 28px; color: var(--text-main); border: 2px solid #0284c7; box-shadow: 0 20px 50px rgba(0,0,0,0.5); text-align: left;" onclick="event.stopPropagation()">
+      <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px;">
+        <div style="width: 44px; height: 44px; border-radius: 12px; background: #e0f2fe; color: #0284c7; display: flex; align-items: center; justify-content: center; font-size: 1.4rem;">
+          🩺
+        </div>
+        <div>
+          <h3 style="font-size: 1.2rem; font-weight: 900; color: #0369a1;">Mandatory Clinical Facility Verification</h3>
+          <div style="font-size: 0.76rem; color: var(--text-muted);">Army Medical Corps (AMC) Secure Terminal Protocol</div>
+        </div>
+      </div>
+
+      <p style="font-size: 0.82rem; color: #475569; margin-bottom: 18px; line-height: 1.45;">
+        Before inspecting patient health wallets or issuing prescriptions, military directives require verifying your active military medical facility credentials.
+      </p>
+
+      <div style="margin-bottom: 12px;">
+        <label style="display: block; font-size: 0.8rem; font-weight: 700; margin-bottom: 4px;">Base / Military Hospital Name:</label>
+        <select id="credHospital" style="width: 100%; padding: 10px; border-radius: 8px; border: 1.5px solid var(--border-color); font-weight: 600;">
+          <option value="Base Hospital, Delhi Cantt">Base Hospital, Delhi Cantt</option>
+          <option value="Command Hospital (Central), Lucknow">Command Hospital (Central), Lucknow</option>
+          <option value="Command Hospital (Southern), Pune">Command Hospital (Southern), Pune</option>
+          <option value="Military Hospital, Jaipur">Military Hospital, Jaipur</option>
+          <option value="Command Hospital (Western), Chandimandir">Command Hospital (Western), Chandimandir</option>
+          <option value="151 Base Hospital, Guwahati">151 Base Hospital, Guwahati</option>
+        </select>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px;">
+        <div>
+          <label style="display: block; font-size: 0.8rem; font-weight: 700; margin-bottom: 4px;">Doctor Name:</label>
+          <input type="text" id="credDocName" value="Capt. Dr. Priya Nair" style="width: 100%; padding: 10px; border-radius: 8px; border: 1.5px solid var(--border-color); font-weight: 600;" />
+        </div>
+        <div>
+          <label style="display: block; font-size: 0.8rem; font-weight: 700; margin-bottom: 4px;">Military Rank:</label>
+          <select id="credRank" style="width: 100%; padding: 10px; border-radius: 8px; border: 1.5px solid var(--border-color); font-weight: 600;">
+            <option value="Captain" selected>Captain (AMC)</option>
+            <option value="Major">Major (AMC)</option>
+            <option value="Lt. Colonel">Lt. Colonel (AMC)</option>
+            <option value="Colonel">Colonel (AMC)</option>
+          </select>
+        </div>
+      </div>
+
+      <div style="margin-bottom: 12px;">
+        <label style="display: block; font-size: 0.8rem; font-weight: 700; margin-bottom: 4px;">Employee / Military ID Card Number:</label>
+        <input type="text" id="credIdCard" value="AMC-MR-09824X" placeholder="e.g. AMC-MR-09824X" style="width: 100%; padding: 10px; border-radius: 8px; border: 1.5px solid var(--border-color); font-weight: 600; font-family: monospace;" />
+      </div>
+
+      <div style="margin-bottom: 18px;">
+        <label style="display: block; font-size: 0.8rem; font-weight: 700; margin-bottom: 4px;">Medical Department:</label>
+        <select id="credDept" style="width: 100%; padding: 10px; border-radius: 8px; border: 1.5px solid var(--border-color); font-weight: 600;">
+          <option value="Orthopedics & Joint Restoration" selected>Orthopedics &amp; Joint Restoration</option>
+          <option value="General & Combat Surgery">General &amp; Combat Surgery</option>
+          <option value="Combat Medicine & Emergency Care">Combat Medicine &amp; Emergency Care</option>
+          <option value="Cardiology">Cardiology</option>
+          <option value="Radiology & Imaging">Radiology &amp; Imaging</option>
+        </select>
+      </div>
+
+      <div style="display: flex; justify-content: flex-end;">
+        <button class="btn-primary" style="background: #0284c7; border-color: #0369a1; padding: 10px 20px; font-size: 0.85rem; font-weight: 800;" onclick="submitDoctorCredentials()">
+          ✓ Authenticate &amp; Access Clinical Console
+        </button>
+      </div>
+    </div>
   </div>
 
   <script src="doctor.js"></script>
