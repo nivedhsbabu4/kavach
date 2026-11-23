@@ -1,0 +1,711 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>KAVACH — Final Defense Presentation Deck (15-Min Executive Pitch)</title>
+  <link rel="stylesheet" href="presentation.css" />
+  <link rel="icon" href="../assets/logo.svg" />
+</head>
+<body>
+
+  <div class="deck-container">
+    
+    <!-- Top Status Bar & 15-Minute Session Guide -->
+    <header class="deck-topbar">
+      <div class="topbar-left">
+        <img src="../assets/logo.svg" alt="Kavach Shield Crest" class="topbar-logo" />
+        <div>
+          <div class="topbar-title">KAVACH // DEFENSE HEALTH PITCH DECK</div>
+          <div class="topbar-sub">MINISTRY OF DEFENCE &bull; ARMED FORCES MEDICAL SERVICES (AFMS)</div>
+        </div>
+      </div>
+
+      <!-- Live 15-Min Guideline Timer -->
+      <div class="topbar-timer">
+        <span class="timer-pill active">
+          <span>⏱️</span> <span id="timerDisplay">00:00</span>
+        </span>
+        <span style="color: var(--mil-border);">&bull;</span>
+        <span id="phaseDisplay" style="font-weight: 800; color: var(--mil-gold);">
+          PHASE 1: SLIDE PITCH (0-3 MIN)
+        </span>
+      </div>
+
+      <div class="topbar-actions">
+        <button class="deck-btn" onclick="toggleNotes()" title="Toggle Speaker Notes (N key)">
+          <span>📝</span> <span>Notes</span>
+        </button>
+        <button class="deck-btn" onclick="window.print()" title="Print / Export Slides to PDF">
+          <span>🖨️</span> <span>PDF Export</span>
+        </button>
+        <button class="deck-btn" onclick="toggleFullscreen()" title="Toggle Fullscreen (F key)">
+          <span>⛶</span> <span>Fullscreen</span>
+        </button>
+        <button class="deck-btn primary" onclick="launchLivePlatform()" title="Open KAVACH Live System">
+          <span>🚀</span> <span>Launch Demo →</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- Slide Viewport -->
+    <main class="deck-viewport">
+
+      <!-- ====================================================================
+           SLIDE 1: TITLE
+           ==================================================================== -->
+      <section class="slide active" id="slide-1">
+        <div class="slide-header">
+          <div>
+            <div class="slide-category">ARMED FORCES MEDICAL INFORMATICS &bull; SOVEREIGN DEFENSE TECH</div>
+            <h1 class="slide-title">KAVACH (कवच)</h1>
+            <div class="slide-tagline">"Health That Follows The Soldier."</div>
+          </div>
+          <div class="slide-number-badge">01 / 09</div>
+        </div>
+
+        <div class="slide-body">
+          <div class="grid-2" style="align-items: center;">
+            <div>
+              <div style="font-size: 1.35rem; font-weight: 800; color: #fff; line-height: 1.45; margin-bottom: 20px;">
+                Sovereign Soldier-Centric Health Wallet, Combat Tele-Rehabilitation, and Tamper-Proof ECHS Disability Pension Adjudication.
+              </div>
+              <p style="font-size: 0.95rem; color: var(--text-muted); line-height: 1.6; margin-bottom: 24px;">
+                Designed for high-altitude pickets, desert deployments, and rotational transfers across the Indian Armed Forces (Army, Navy, Air Force) and Central Armed Police Forces.
+              </p>
+              <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+                <span class="deck-btn" style="background: rgba(34, 197, 94, 0.15); border-color: var(--mil-accent); color: #86efac;">
+                  🛡️ Sovereign Record Ownership
+                </span>
+                <span class="deck-btn" style="background: rgba(234, 179, 8, 0.15); border-color: var(--mil-gold); color: #fef08a;">
+                  🔒 AES-256-GCM Cryptographic Vault
+                </span>
+                <span class="deck-btn" style="background: rgba(56, 189, 248, 0.15); border-color: var(--mil-blue); color: #bae6fd;">
+                  ⚡ PCDA Auto-Sanction Pipeline
+                </span>
+              </div>
+            </div>
+
+            <div style="text-align: center; background: rgba(7, 14, 9, 0.6); border: 1.5px solid var(--mil-border); border-radius: 18px; padding: 36px 24px;">
+              <div style="width: 110px; height: 110px; margin: 0 auto 18px auto; border-radius: 50%; background: radial-gradient(circle, rgba(34, 197, 94, 0.2) 0%, rgba(15, 28, 18, 0) 70%); display: flex; align-items: center; justify-content: center; border: 2px solid var(--mil-accent); box-shadow: 0 0 30px rgba(34, 197, 94, 0.25);">
+                <img src="../assets/logo.svg" alt="Kavach Shield" style="width: 64px; height: 64px;" />
+              </div>
+              <div style="font-size: 1.1rem; font-weight: 900; color: #fff;">15-MINUTE EXECUTIVE PITCH</div>
+              <div style="font-size: 0.8rem; font-family: var(--font-mono); color: var(--mil-gold); margin-top: 6px;">
+                3 MIN SLIDES &bull; 7 MIN LIVE DEMO &bull; 5 MIN DEFENSE Q&amp;A
+              </div>
+              <div style="font-size: 0.74rem; color: var(--text-muted); margin-top: 14px;">
+                Indian Armed Forces / AFMS / ECHS Deployment Ready
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div style="font-size: 0.75rem; color: var(--text-muted); font-family: var(--font-mono); display: flex; justify-content: space-between; border-top: 1px solid var(--mil-border); padding-top: 14px;">
+          <span>CONFIDENTIAL &bull; FOR SELECTION COMMITTEE &amp; EVALUATION BOARD ONLY</span>
+          <span>PRESENTATION TEMPLATE SPEC 15-MIN</span>
+        </div>
+      </section>
+
+
+      <!-- ====================================================================
+           SLIDE 2: PROBLEM
+           ==================================================================== -->
+      <section class="slide" id="slide-2">
+        <div class="slide-header">
+          <div>
+            <div class="slide-category">OPERATIONAL FRICTION &amp; DEFENSE HEALTHCARE VULNERABILITIES</div>
+            <h2 class="slide-title">The Problem</h2>
+            <div class="slide-tagline">Why Traditional Military Healthcare Fails Moving Soldiers</div>
+          </div>
+          <div class="slide-number-badge">02 / 09</div>
+        </div>
+
+        <div class="slide-body">
+          <div class="grid-4">
+            <div class="deck-card">
+              <span class="card-icon">📂</span>
+              <h3 class="card-title">1. Record Fragmentation</h3>
+              <div class="card-stat" style="color: var(--mil-red);">65%</div>
+              <p class="card-desc">
+                Frequent rotational transfers (Siachen &rarr; Thar &rarr; Peace stations) cause medical records, surgeries, and vaccine history to scatter across base hospitals or get lost in physical transit.
+              </p>
+            </div>
+
+            <div class="deck-card">
+              <span class="card-icon">🏃</span>
+              <h3 class="card-title">2. Rehab Dropouts</h3>
+              <div class="card-stat" style="color: var(--mil-gold);">58%</div>
+              <p class="card-desc">
+                Physiotherapy protocols for joint tears and blast shock are abandoned during unit field deployments. Doctors have zero live telemetry on missed sessions, causing irreversible joint relapse.
+              </p>
+            </div>
+
+            <div class="deck-card">
+              <span class="card-icon">🧠</span>
+              <h3 class="card-title">3. Mental Health Stigma</h3>
+              <div class="card-stat" style="color: var(--mil-red);">73%</div>
+              <p class="card-desc">
+                Soldiers conceal combat trauma, PTSD, and depression because traditional mental health evaluations leak into regimental promotion sheets and command reviews, ruining service careers.
+              </p>
+            </div>
+
+            <div class="deck-card">
+              <span class="card-icon">⚖️</span>
+              <h3 class="card-title">4. Pension Disputes</h3>
+              <div class="card-stat" style="color: var(--mil-gold);">18 Mo</div>
+              <p class="card-desc">
+                ECHS and PCDA disability pension claims drag on for 12 to 24 months. Over 40% of claims are contested due to unverified paper injury trails and lack of cryptographic proof.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div style="font-size: 0.75rem; color: var(--mil-red); font-family: var(--font-mono); border-top: 1px solid var(--mil-border); padding-top: 12px;">
+          CRITICAL IMPACT: REDUCED OPERATIONAL COMBAT READINESS &amp; POST-SERVICE VETERAN DISTRESS.
+        </div>
+      </section>
+
+
+      <!-- ====================================================================
+           SLIDE 3: SOLUTION
+           ==================================================================== -->
+      <section class="slide" id="slide-3">
+        <div class="slide-header">
+          <div>
+            <div class="slide-category">SOVEREIGN ARCHITECTURAL PILLARS</div>
+            <h2 class="slide-title">The KAVACH Solution</h2>
+            <div class="slide-tagline">Integrated Sovereign Health System for Modern Defense Forces</div>
+          </div>
+          <div class="slide-number-badge">03 / 09</div>
+        </div>
+
+        <div class="slide-body">
+          <div class="grid-4">
+            <div class="deck-card highlight">
+              <span class="card-icon">💼</span>
+              <h3 class="card-title">1. Sovereign Health Wallet</h3>
+              <p class="card-desc">
+                Records belong strictly to the soldier. Offline combat QR cards provide instant access to blood group, allergies, and emergency medical history even in electronic warfare blackouts.
+              </p>
+            </div>
+
+            <div class="deck-card highlight">
+              <span class="card-icon">🏃</span>
+              <h3 class="card-title">2. Active Rehab Telemetry</h3>
+              <p class="card-desc">
+                Doctor-prescribed daily physiotherapy routines with built-in timers and VAS pain scale logging. Automatic high-priority telemetry triggers alert the Medical Officer when sessions are missed.
+              </p>
+            </div>
+
+            <div class="deck-card highlight">
+              <span class="card-icon">🔒</span>
+              <h3 class="card-title">3. Confidential Psychological Sanctuary</h3>
+              <p class="card-desc">
+                Separated AES-256-GCM vault for PCL-5, PHQ-9, and GAD-7 screenings. Accessible exclusively to AFMS licensed psychologists — strictly shielded from Commanding Officers and Claims Officers.
+              </p>
+            </div>
+
+            <div class="deck-card highlight">
+              <span class="card-icon">⚖️</span>
+              <h3 class="card-title">4. 5-Stage PCDA Auto-Sanction</h3>
+              <p class="card-desc">
+                Every physical medical record is sealed with an immutable SHA-256 HMAC checksum. Streamlines ECHS adjudication into a transparent 5-stage moving line directly linked to PCDA Allahabad PPO disbursement.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div style="font-size: 0.75rem; color: var(--mil-accent); font-family: var(--font-mono); border-top: 1px solid var(--mil-border); padding-top: 12px;">
+          PROVEN PARADIGM: PORTABLE &bull; TAMPER-PROOF &bull; COMMAND-SEPARATED &bull; PCDA-CONNECTED.
+        </div>
+      </section>
+
+
+      <!-- ====================================================================
+           SLIDE 4: MARKET OPPORTUNITY + CUSTOMER SEGMENTS
+           ==================================================================== -->
+      <section class="slide" id="slide-4">
+        <div class="slide-header">
+          <div>
+            <div class="slide-category">DEFENSE SCALE &amp; USER SEGMENTATION</div>
+            <h2 class="slide-title">Market Opportunity &amp; Customer Segments</h2>
+            <div class="slide-tagline">Institutional Scale Across Indian Defense and Global Allied Forces</div>
+          </div>
+          <div class="slide-number-badge">04 / 09</div>
+        </div>
+
+        <div class="slide-body">
+          <div class="grid-2">
+            <!-- Market Opportunity Breakdown -->
+            <div>
+              <div style="font-size: 0.95rem; font-weight: 800; color: var(--mil-gold); margin-bottom: 12px; font-family: var(--font-mono);">
+                TOTAL ADDRESSABLE POPULATION (INDIA):
+              </div>
+              
+              <div style="display: flex; flex-direction: column; gap: 12px;">
+                <div style="background: var(--mil-card); border: 1px solid var(--mil-border); padding: 14px 18px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center;">
+                  <div>
+                    <strong style="color: #fff; font-size: 1rem;">Active Duty Military Personnel</strong>
+                    <div style="font-size: 0.78rem; color: var(--text-muted);">Indian Army, Indian Navy, Indian Air Force</div>
+                  </div>
+                  <div style="font-size: 1.5rem; font-weight: 900; font-family: var(--font-mono); color: var(--mil-accent);">1.4 Million</div>
+                </div>
+
+                <div style="background: var(--mil-card); border: 1px solid var(--mil-border); padding: 14px 18px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center;">
+                  <div>
+                    <strong style="color: #fff; font-size: 1rem;">Central Armed Police Forces (CAPF)</strong>
+                    <div style="font-size: 0.78rem; color: var(--text-muted);">CRPF, BSF, ITBP, CISF, Assam Rifles</div>
+                  </div>
+                  <div style="font-size: 1.5rem; font-weight: 900; font-family: var(--font-mono); color: var(--mil-gold);">1.0 Million</div>
+                </div>
+
+                <div style="background: var(--mil-card); border: 1px solid var(--mil-border); padding: 14px 18px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center;">
+                  <div>
+                    <strong style="color: #fff; font-size: 1rem;">ECHS Pensioners &amp; Military Dependents</strong>
+                    <div style="font-size: 0.78rem; color: var(--text-muted);">Veterans and dependents drawing defense healthcare</div>
+                  </div>
+                  <div style="font-size: 1.5rem; font-weight: 900; font-family: var(--font-mono); color: var(--mil-blue);">3.2 Million</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- 4 Precise Customer Segments -->
+            <div>
+              <div style="font-size: 0.95rem; font-weight: 800; color: var(--mil-gold); margin-bottom: 12px; font-family: var(--font-mono);">
+                4 DISTINCT DEFENSE STAKEHOLDERS:
+              </div>
+
+              <div class="grid-2" style="gap: 12px;">
+                <div class="deck-card" style="padding: 16px;">
+                  <strong style="color: #fff; font-size: 0.9rem; display: flex; align-items: center; gap: 6px;">
+                    <span>🪖</span> <span>1. Active Soldiers</span>
+                  </strong>
+                  <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px; line-height: 1.4;">
+                    Lifetime sovereign control of records, offline ICE QR cards, zero-stigma confidential counseling.
+                  </div>
+                </div>
+
+                <div class="deck-card" style="padding: 16px;">
+                  <strong style="color: #fff; font-size: 0.9rem; display: flex; align-items: center; gap: 6px;">
+                    <span>🩺</span> <span>2. AFMS Medical Officers</span>
+                  </strong>
+                  <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px; line-height: 1.4;">
+                    Single-patient health wallet view, SHA-256 e-prescriptions, real-time missed rehab alerts.
+                  </div>
+                </div>
+
+                <div class="deck-card" style="padding: 16px;">
+                  <strong style="color: #fff; font-size: 0.9rem; display: flex; align-items: center; gap: 6px;">
+                    <span>⚖️</span> <span>3. ECHS / PCDA Officers</span>
+                  </strong>
+                  <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px; line-height: 1.4;">
+                    Tamper-proof physical disability proofs, fraud elimination, 1-click PCDA PPO sanction.
+                  </div>
+                </div>
+
+                <div class="deck-card" style="padding: 16px;">
+                  <strong style="color: #fff; font-size: 0.9rem; display: flex; align-items: center; gap: 6px;">
+                    <span>🎖️</span> <span>4. Commanding Officers</span>
+                  </strong>
+                  <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px; line-height: 1.4;">
+                    Aggregated unit SHAPE-1 readiness index without violating personal soldier medical privacy.
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div style="font-size: 0.75rem; color: var(--text-muted); font-family: var(--font-mono); border-top: 1px solid var(--mil-border); padding-top: 12px;">
+          INTERNATIONAL EXTENSION: NATO / ALLIED EXPEDITIONARY ARMED FORCES FACING MULTI-BASE DEPLOYMENT GAPS.
+        </div>
+      </section>
+
+
+      <!-- ====================================================================
+           SLIDE 5: PRODUCT ARCHITECTURE
+           ==================================================================== -->
+      <section class="slide" id="slide-5">
+        <div class="slide-header">
+          <div>
+            <div class="slide-category">DEFENSE-GRADE SYSTEM DESIGN &amp; CRYPTOGRAPHY</div>
+            <h2 class="slide-title">Product Architecture</h2>
+            <div class="slide-tagline">Multi-Tier Sovereign Security and High-Availability Tactical Infrastructure</div>
+          </div>
+          <div class="slide-number-badge">05 / 09</div>
+        </div>
+
+        <div class="slide-body">
+          <div class="grid-3">
+            <div class="deck-card">
+              <span class="card-icon">🛡️</span>
+              <h3 class="card-title">Sovereign RBAC &amp; Consent</h3>
+              <p class="card-desc">
+                Granular access barriers separating Clinical, Mental Health, and Claims domains. Soldiers issue time-stamped access grants (24h to 30d) with <strong>instant one-tap revocation</strong>.
+              </p>
+              <div style="margin-top: 14px; font-size: 0.74rem; font-family: var(--font-mono); color: var(--mil-accent);">
+                &bull; JWT Session Authorization<br />
+                &bull; Zero Command Exposure on PTSD
+              </div>
+            </div>
+
+            <div class="deck-card">
+              <span class="card-icon">🔐</span>
+              <h3 class="card-title">Cryptographic Integrity</h3>
+              <p class="card-desc">
+                Dual cryptographic protections: <strong>AES-256-GCM</strong> payload encryption at rest for psychological consultations, combined with tamper-evident <strong>SHA-256 HMAC checksums</strong> on all physical proofs.
+              </p>
+              <div style="margin-top: 14px; font-size: 0.74rem; font-family: var(--font-mono); color: var(--mil-gold);">
+                &bull; Append-Only Immutable Audit Log<br />
+                &bull; Zero Undetected Tampering
+              </div>
+            </div>
+
+            <div class="deck-card">
+              <span class="card-icon">📡</span>
+              <h3 class="card-title">Tactical Offline &amp; Tele-Health</h3>
+              <p class="card-desc">
+                Engineered for edge deployment in low-bandwidth forward bases. Offline QR card verification, localized caching, and WebRTC-ready AFMS teleconsultation pipeline with digital e-prescriptions.
+              </p>
+              <div style="margin-top: 14px; font-size: 0.74rem; font-family: var(--font-mono); color: var(--mil-blue);">
+                &bull; Offline Emergency ICE Cards<br />
+                &bull; Sub-100ms Microservices Backend
+              </div>
+            </div>
+          </div>
+
+          <!-- Architectural Pipeline Strip -->
+          <div style="margin-top: 20px; background: rgba(7, 14, 9, 0.7); border: 1.5px solid var(--mil-border); border-radius: 12px; padding: 14px 20px; display: flex; justify-content: space-between; align-items: center; font-size: 0.8rem; font-family: var(--font-mono);">
+            <div><span style="color: var(--mil-accent);">STEP 1:</span> Combat Picket Telemetry</div>
+            <div style="color: var(--text-muted);">&rarr;</div>
+            <div><span style="color: var(--mil-blue);">STEP 2:</span> Base Hospital Diagnosis &amp; Rehab</div>
+            <div style="color: var(--text-muted);">&rarr;</div>
+            <div><span style="color: var(--mil-gold);">STEP 3:</span> SHA-256 Sealed Wallet Dossier</div>
+            <div style="color: var(--text-muted);">&rarr;</div>
+            <div><span style="color: var(--mil-accent);">STEP 4:</span> AG Branch &amp; PCDA PPO Sanction</div>
+          </div>
+        </div>
+
+        <div style="font-size: 0.75rem; color: var(--text-muted); font-family: var(--font-mono); border-top: 1px solid var(--mil-border); padding-top: 12px;">
+          NATIVE PYTHON MICROSERVICES BACKEND &bull; ZERO HEAVY DEPENDENCIES &bull; REST API WITH JSON LEDGER
+        </div>
+      </section>
+
+
+      <!-- ====================================================================
+           SLIDE 6: BUSINESS MODEL
+           ==================================================================== -->
+      <section class="slide" id="slide-6">
+        <div class="slide-header">
+          <div>
+            <div class="slide-category">COMMERCIALIZATION &amp; FISCAL IMPACT</div>
+            <h2 class="slide-title">Business Model &amp; Defense ROI</h2>
+            <div class="slide-tagline">Institutional MoD Procurement and Massive Treasury Dispute Reductions</div>
+          </div>
+          <div class="slide-number-badge">06 / 09</div>
+        </div>
+
+        <div class="slide-body">
+          <div class="grid-3">
+            <div class="deck-card">
+              <span class="card-icon">🏛️</span>
+              <h3 class="card-title">1. MoD Enterprise Licensing</h3>
+              <p class="card-desc">
+                Institutional procurement contract under Defense Acquisition Procedure (DAP) Make-in-India Category. Deployed as a secure sovereign intranet node across AFMS, Army, Navy, and Air Force.
+              </p>
+              <div class="card-stat" style="font-size: 1.5rem; color: var(--mil-gold);">Annual License</div>
+              <div style="font-size: 0.76rem; color: var(--text-muted);">Includes node upgrades, cryptographic maintenance &amp; 24x7 support.</div>
+            </div>
+
+            <div class="deck-card">
+              <span class="card-icon">💰</span>
+              <h3 class="card-title">2. ECHS Litigation Savings</h3>
+              <p class="card-desc">
+                Eliminates over <strong>80% of Armed Forces Tribunal (AFT) pension dispute litigation</strong> by producing certified SHA-256 attestation records proving service attributability.
+              </p>
+              <div class="card-stat" style="font-size: 1.5rem; color: var(--mil-accent);">₹180+ Crore</div>
+              <div style="font-size: 0.76rem; color: var(--text-muted);">Estimated annual defense treasury savings in legal &amp; board appeals.</div>
+            </div>
+
+            <div class="deck-card">
+              <span class="card-icon">🌐</span>
+              <h3 class="card-title">3. Multi-Force Expansion</h3>
+              <p class="card-desc">
+                Tiered expansion path:
+                <br /><strong style="color: #fff;">Phase 1:</strong> Armed Forces Medical Services (AFMS).
+                <br /><strong style="color: #fff;">Phase 2:</strong> CAPF Paramilitary Forces (MHA).
+                <br /><strong style="color: #fff;">Phase 3:</strong> Allied Defense export (Govt-to-Govt).
+              </p>
+              <div class="card-stat" style="font-size: 1.5rem; color: var(--mil-blue);">3-Phase Rollout</div>
+              <div style="font-size: 0.76rem; color: var(--text-muted);">Interoperable with ABHA / ABDM national digital health grid.</div>
+            </div>
+          </div>
+        </div>
+
+        <div style="font-size: 0.75rem; color: var(--mil-gold); font-family: var(--font-mono); border-top: 1px solid var(--mil-border); padding-top: 12px;">
+          ROI THESIS: ONE PREVENTED COMBAT DISABILITY RELAPSE SAVES ₹50+ LAKHS IN LIFETIME PENSION OVERHEAD.
+        </div>
+      </section>
+
+
+      <!-- ====================================================================
+           SLIDE 7: COMPETITIVE MATRIX
+           ==================================================================== -->
+      <section class="slide" id="slide-7">
+        <div class="slide-header">
+          <div>
+            <div class="slide-category">BENCHMARKING DEFENSE INFORMATICS</div>
+            <h2 class="slide-title">Competitive Matrix</h2>
+            <div class="slide-tagline">Why Civilian and Generic Solutions Fail Defense Operational Standards</div>
+          </div>
+          <div class="slide-number-badge">07 / 09</div>
+        </div>
+
+        <div class="slide-body">
+          <table class="matrix-table">
+            <thead>
+              <tr>
+                <th>Critical Defense Capabilities</th>
+                <th class="kavach-col">🛡️ KAVACH System</th>
+                <th>Civilian EHR (Epic / Cerner)</th>
+                <th>ABDM / ABHA Digital Grid</th>
+                <th>Traditional Military Paper Dossiers</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Cross-Posting Sovereign Wallet</strong></td>
+                <td class="kavach-col check">✓ Sovereign Soldier Wallet</td>
+                <td class="cross">✗ Hospital Siloed</td>
+                <td>~ Patient Portal (Civilian)</td>
+                <td class="cross">✗ Lost in Transfer</td>
+              </tr>
+              <tr>
+                <td><strong>Strict PTSD / Command Separation</strong></td>
+                <td class="kavach-col check">✓ AES-256 Vault Barrier</td>
+                <td class="cross">✗ Mixed Clinical Chart</td>
+                <td class="cross">✗ No Military Hierarchy</td>
+                <td class="cross">✗ Leaks in Paper Sheet</td>
+              </tr>
+              <tr>
+                <td><strong>Live Rehab Telemetry &amp; Missed Alerts</strong></td>
+                <td class="kavach-col check">✓ Real-time Doctor Push</td>
+                <td class="cross">✗ Passive Appointment Log</td>
+                <td class="cross">✗ No Physiotherapy Telemetry</td>
+                <td class="cross">✗ Zero Tracking</td>
+              </tr>
+              <tr>
+                <td><strong>5-Stage PCDA Auto-Sanction Pipeline</strong></td>
+                <td class="kavach-col check">✓ Built-in PPO Issuance</td>
+                <td class="cross">✗ No Defense Pension Flow</td>
+                <td class="cross">✗ No ECHS Integration</td>
+                <td class="cross">✗ 12-24 Month Delay</td>
+              </tr>
+              <tr>
+                <td><strong>SHA-256 Cryptographic Checksum Seals</strong></td>
+                <td class="kavach-col check">✓ Tamper-Evident Ledger</td>
+                <td>~ Database Hash Only</td>
+                <td>~ Standard HTTPS</td>
+                <td class="cross">✗ Easy Paper Forgery</td>
+              </tr>
+              <tr>
+                <td><strong>Offline Emergency QR Verification</strong></td>
+                <td class="kavach-col check">✓ Instant Combat Triage</td>
+                <td class="cross">✗ Online Portal Only</td>
+                <td>~ Requires Internet</td>
+                <td>✓ Physical Tag (Static)</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div style="font-size: 0.75rem; color: var(--mil-accent); font-family: var(--font-mono); border-top: 1px solid var(--mil-border); padding-top: 12px;">
+          UNFAIR ADVANTAGE: PURPOSE-BUILT FOR ARMED FORCES COMMAND HIERARCHY, COMBAT DOCTORS &amp; PCDA TREASURY.
+        </div>
+      </section>
+
+
+      <!-- ====================================================================
+           SLIDE 8: TEAM
+           ==================================================================== -->
+      <section class="slide" id="slide-8">
+        <div class="slide-header">
+          <div>
+            <div class="slide-category">MULTIDISCIPLINARY EXECUTION TEAM</div>
+            <h2 class="slide-title">Our Team</h2>
+            <div class="slide-tagline">Deep Expertise in Defense Technology, Clinical Medicine &amp; Sovereign Systems</div>
+          </div>
+          <div class="slide-number-badge">08 / 09</div>
+        </div>
+
+        <div class="slide-body">
+          <div class="grid-4">
+            <div class="deck-card">
+              <div style="width: 56px; height: 56px; border-radius: 50%; background: linear-gradient(135deg, #15803d 0%, #166534 100%); display: flex; align-items: center; justify-content: center; font-size: 1.5rem; margin-bottom: 14px; border: 2px solid var(--mil-accent);">
+                💻
+              </div>
+              <h3 class="card-title">Lead Systems Architect</h3>
+              <div style="font-size: 0.8rem; color: var(--mil-gold); font-family: var(--font-mono); margin-bottom: 8px;">Product &amp; Systems Engineering</div>
+              <p class="card-desc">
+                Architected KAVACH's sovereign microservices, role-based security layers, and client-side progressive web consoles.
+              </p>
+            </div>
+
+            <div class="deck-card">
+              <div style="width: 56px; height: 56px; border-radius: 50%; background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%); display: flex; align-items: center; justify-content: center; font-size: 1.5rem; margin-bottom: 14px; border: 2px solid var(--mil-blue);">
+                🩺
+              </div>
+              <h3 class="card-title">Defense Health Specialist</h3>
+              <div style="font-size: 0.8rem; color: var(--mil-gold); font-family: var(--font-mono); margin-bottom: 8px;">Clinical Workflows &amp; AFMS Protocols</div>
+              <p class="card-desc">
+                Formulated military orthopedic protocols, PCL-5/PHQ-9 mental health separation, and ECHS Medical Board criteria.
+              </p>
+            </div>
+
+            <div class="deck-card">
+              <div style="width: 56px; height: 56px; border-radius: 50%; background: linear-gradient(135deg, #a21caf 0%, #701a75 100%); display: flex; align-items: center; justify-content: center; font-size: 1.5rem; margin-bottom: 14px; border: 2px solid #e879f9;">
+                🔒
+              </div>
+              <h3 class="card-title">Security &amp; Cryptography Lead</h3>
+              <div style="font-size: 0.8rem; color: var(--mil-gold); font-family: var(--font-mono); margin-bottom: 8px;">Applied Cryptography &amp; RBAC</div>
+              <p class="card-desc">
+                Implemented AES-256-GCM encryption at rest, SHA-256 HMAC digital seals, and append-only tamper-evident security audit trails.
+              </p>
+            </div>
+
+            <div class="deck-card">
+              <div style="width: 56px; height: 56px; border-radius: 50%; background: linear-gradient(135deg, #b45309 0%, #78350f 100%); display: flex; align-items: center; justify-content: center; font-size: 1.5rem; margin-bottom: 14px; border: 2px solid var(--mil-gold);">
+                🎨
+              </div>
+              <h3 class="card-title">Tactical UI/UX Designer</h3>
+              <div style="font-size: 0.8rem; color: var(--mil-gold); font-family: var(--font-mono); margin-bottom: 8px;">Human Factors &amp; Tactical Usability</div>
+              <p class="card-desc">
+                Engineered high-contrast, military-standard responsive interfaces operable in forward pickets, touch consoles, and mobile devices.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div style="font-size: 0.75rem; color: var(--text-muted); font-family: var(--font-mono); border-top: 1px solid var(--mil-border); padding-top: 12px;">
+          MISSION: DELIVERING SOVEREIGN DEFENSE RESILIENCE THROUGH CUTTING-EDGE HEALTH INFORMATICS.
+        </div>
+      </section>
+
+
+      <!-- ====================================================================
+           SLIDE 9: CLOSING SLIDE + LIVE DEMO
+           ==================================================================== -->
+      <section class="slide" id="slide-9">
+        <div class="slide-header">
+          <div>
+            <div class="slide-category">EXECUTIVE CONCLUSION &bull; 7-MINUTE LIVE DEMONSTRATION</div>
+            <h2 class="slide-title">Conclusion &amp; Live Demo</h2>
+            <div class="slide-tagline">Transitioning from Slides to Interactive Combat Health System</div>
+          </div>
+          <div class="slide-number-badge">09 / 09</div>
+        </div>
+
+        <div class="slide-body">
+          <div class="grid-2" style="align-items: center;">
+            <div>
+              <div style="font-size: 1.3rem; font-weight: 900; color: #fff; margin-bottom: 16px;">
+                "Four Zeroes" of Sovereign Defense Impact:
+              </div>
+
+              <div style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 24px;">
+                <div style="display: flex; align-items: center; gap: 10px;">
+                  <span style="font-size: 1.2rem; color: var(--mil-accent); font-weight: 900;">✓</span>
+                  <span style="font-size: 0.95rem;"><strong>Zero Lost Medical Records:</strong> Sovereign wallet follows across postings.</span>
+                </div>
+                <div style="display: flex; align-items: center; gap: 10px;">
+                  <span style="font-size: 1.2rem; color: var(--mil-accent); font-weight: 900;">✓</span>
+                  <span style="font-size: 0.95rem;"><strong>Zero Forgotten Rehab:</strong> Live telemetry &amp; proactive doctor nudges.</span>
+                </div>
+                <div style="display: flex; align-items: center; gap: 10px;">
+                  <span style="font-size: 1.2rem; color: var(--mil-accent); font-weight: 900;">✓</span>
+                  <span style="font-size: 0.95rem;"><strong>Zero Stigmatized Minds:</strong> Strict AES-256 PTSD privacy wall.</span>
+                </div>
+                <div style="display: flex; align-items: center; gap: 10px;">
+                  <span style="font-size: 1.2rem; color: var(--mil-accent); font-weight: 900;">✓</span>
+                  <span style="font-size: 0.95rem;"><strong>Zero Delayed Pensions:</strong> SHA-256 sealed ECHS &amp; PCDA pipeline.</span>
+                </div>
+              </div>
+
+              <div style="display: flex; gap: 12px;">
+                <button class="deck-btn primary" onclick="launchLivePlatform()" style="padding: 14px 28px; font-size: 1rem; border-radius: 12px;">
+                  <span>🚀</span> <span>START LIVE 7-MINUTE DEMO NOW</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- Demo Script Sequence Card -->
+            <div style="background: rgba(7, 14, 9, 0.7); border: 2px solid var(--mil-accent); border-radius: 16px; padding: 24px; box-shadow: 0 0 30px rgba(34, 197, 94, 0.15);">
+              <div style="font-size: 0.8rem; font-weight: 900; color: var(--mil-accent); font-family: var(--font-mono); margin-bottom: 12px; letter-spacing: 0.05em;">
+                LIVE DEMO SEQUENCE FOR JURY (7 MINUTES):
+              </div>
+
+              <div style="display: flex; flex-direction: column; gap: 10px; font-size: 0.85rem;">
+                <div style="background: var(--mil-card); padding: 10px 14px; border-radius: 8px; border: 1px solid var(--mil-border);">
+                  <strong>1. Soldier Console:</strong> Emergency QR card, active pain logger, validated PHQ-9/PCL-5 check-in &amp; teleconsult booking.
+                </div>
+                <div style="background: var(--mil-card); padding: 10px 14px; border-radius: 8px; border: 1px solid var(--mil-border);">
+                  <strong>2. Doctor Console:</strong> Single-patient wallet view, missed rehab telemetry alert, and e-prescription with SHA-256 seal.
+                </div>
+                <div style="background: var(--mil-card); padding: 10px 14px; border-radius: 8px; border: 1px solid var(--mil-border);">
+                  <strong>3. Claims Officer:</strong> Tamper-proof physical records review, Stage 4 PCDA advance, and Stage 5 PPO sanction.
+                </div>
+                <div style="background: var(--mil-card); padding: 10px 14px; border-radius: 8px; border: 1px solid var(--mil-border);">
+                  <strong>4. Full Circle:</strong> Soldier receives instant PPO notification &amp; generates certified printable claim dossier.
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div style="font-size: 0.75rem; color: var(--mil-gold); font-family: var(--font-mono); border-top: 1px solid var(--mil-border); padding-top: 12px;">
+          READY FOR QUESTIONS &bull; THANK YOU ESTEEMED EVALUATORS &amp; JURY MEMBERS.
+        </div>
+      </section>
+
+    </main>
+
+    <!-- Speaker Notes Drawer (Toggled with N key) -->
+    <div class="notes-drawer" id="notesDrawer">
+      <div class="notes-title">🎙️ VERBAL PITCH SCRIPT &bull; SPEAKER NOTES (ACTIVE SLIDE)</div>
+      <div class="notes-text" id="notesText">
+        Good morning esteemed evaluators. We are proud to present KAVACH (कवच) — the Sovereign Military Health &amp; Rehabilitation Operating System.
+      </div>
+    </div>
+
+    <!-- Bottom Navigation Footer -->
+    <footer class="deck-footer">
+      <div class="footer-nav">
+        <button class="deck-btn" onclick="prevSlide()" title="Previous Slide (Left Arrow)">
+          <span>←</span> <span>Prev</span>
+        </button>
+        <button class="deck-btn" onclick="nextSlide()" title="Next Slide (Right Arrow or Space)">
+          <span>Next</span> <span>→</span>
+        </button>
+        <span style="font-size: 0.8rem; font-family: var(--font-mono); color: var(--text-muted); margin-left: 8px;">
+          Slide <strong id="currentSlideNum" style="color: #fff;">1</strong> of 9
+        </span>
+      </div>
+
+      <!-- Slide Jump Dots -->
+      <div class="footer-progress" id="footerDots">
+        <!-- Injected dynamically by presentation.js -->
+      </div>
+
+      <div style="display: flex; align-items: center; gap: 8px;">
+        <span style="font-size: 0.72rem; color: var(--text-muted); font-family: var(--font-mono);">
+          Keys: [← / →] Navigate &bull; [N] Notes &bull; [F] Fullscreen
+        </span>
+      </div>
+    </footer>
+
+  </div>
+
+  <script src="presentation.js"></script>
+</body>
+</html>

@@ -6,77 +6,71 @@
   <title>KAVACH — Military Physiotherapy &amp; Rehab Portal</title>
   <link rel="stylesheet" href="../../shared/shared.css" />
   <link rel="icon" href="../../assets/logo.svg" />
+  <style>
+    :root {
+      --role-accent: #059669;
+      --role-accent-dark: #047857;
+      --role-accent-light: #ecfdf5;
+    }
+    .physio-badge {
+      background: #ecfdf5;
+      color: #047857;
+      border: 1px solid #a7f3d0;
+      font-weight: 800;
+      padding: 3px 8px;
+      border-radius: 4px;
+      font-size: 0.72rem;
+    }
+  </style>
   <script src="../../shared/auth_guard.js"></script>
   <script>enforceRoleGuard('PHYSIOTHERAPIST');</script>
 </head>
 <body data-theme="light">
 
-  <aside class="crisis-topbar">
+  <aside class="crisis-topbar" style="background: #064e3b;">
     <div style="display: flex; align-items: center; gap: 12px;">
       <span style="font-weight: 800;">🏃 MILITARY REHABILITATION WING &bull; PHYSIOTHERAPY PORTAL</span>
-      <span style="font-size: 0.75rem; color: var(--gold-light);">MILITARY HOSPITAL JAIPUR</span>
+      <span style="font-size: 0.75rem; color: #a7f3d0;">CENTRAL COMMAND REHABILITATION CELL</span>
     </div>
   </aside>
 
-  <header class="app-header">
+  <header class="app-header" style="border-bottom: 2.5px solid var(--role-accent);">
     <div class="brand-wrapper">
       <div class="brand-logo-fixed">
         <img src="../../assets/logo.svg" alt="Kavach Shield Logo" />
       </div>
       <div class="brand-text">
-        <h1>KAVACH <span class="brand-classification-pill" style="background: #fef3c7; color: #92400e; border-color: #fde68a;">AMC PHYSIOTHERAPY</span></h1>
-        <div class="brand-tagline-sub">"Rehab that never silently dies."</div>
+        <h1>KAVACH <span class="brand-classification-pill" style="background: #ecfdf5; color: #047857; border-color: #a7f3d0;">AMC PHYSIOTHERAPY</span></h1>
+        <div class="brand-tagline-sub">"Musculoskeletal Restoration &bull; Operational Mobility"</div>
       </div>
     </div>
 
     <div class="header-center-info">
-      <div class="security-seal-chip">
+      <div class="security-seal-chip" style="border-color: #a7f3d0; background: #ecfdf5; color: #047857;">
         <span>🏃</span>
-        <span>REHABILITATION &bull; MOBILITY CALIBRATION</span>
+        <span>REHABILITATION &bull; MOBILITY CALIBRATION &bull; ACTIVE RBAC</span>
       </div>
     </div>
 
     <div class="header-profile-cluster">
       <div class="user-identity-card">
-        <div class="user-avatar-badge" style="background: linear-gradient(135deg, #059669 0%, #065f46 100%);">RK</div>
+        <div class="user-avatar-badge" id="physioAvatarBadge" style="background: linear-gradient(135deg, #059669 0%, #065f46 100%);">RK</div>
         <div class="user-details-text">
-          <div class="user-name-title">Lt. Rajesh Kumar</div>
-          <div class="user-meta-sub">
+          <div class="user-name-title" id="physioNameTitle">Lt. Rajesh Kumar</div>
+          <div class="user-meta-sub" id="physioMetaSub">
             <span>Rehab Officer &bull; MR-11204K</span>
             <span>&bull;</span>
             <span class="sync-badge synced"><span class="sync-pulse-dot"></span> <span>MH JAIPUR</span></span>
           </div>
         </div>
-      <!-- Notification Bell with Alert Badge -->
+      </div>
+
+      <!-- Notification Bell -->
       <div style="position: relative;">
-        <button class="header-action-btn" id="physioNotifBellBtn" onclick="togglePhysioNotifDrawer()" title="Rehab Notifications (1 Alert)" style="position: relative; width: 40px; height: 40px; border-radius: 8px; border: 1.5px solid var(--border-color); background: var(--bg-card); cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 1.15rem;">
+        <button class="header-action-btn" id="physioNotifBellBtn" title="Rehab Notifications" style="position: relative; width: 40px; height: 40px; border-radius: 8px; border: 1.5px solid var(--border-color); background: var(--bg-card); cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 1.15rem;">
           🔔
-          <span style="position: absolute; top: -4px; right: -4px; background: #e11d48; color: white; font-size: 0.65rem; font-weight: 900; width: 18px; height: 18px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 2px solid var(--bg-card);">1</span>
+          <span id="physioNotifBadge" style="position: absolute; top: -4px; right: -4px; background: #e11d48; color: white; font-size: 0.65rem; font-weight: 900; width: 18px; height: 18px; border-radius: 50%; display: none; align-items: center; justify-content: center; border: 2px solid var(--bg-card);">0</span>
         </button>
-
-        <!-- Dropdown Notifications Menu -->
-        <div id="physioNotifDrawer" style="display: none; position: absolute; right: 0; top: 48px; width: 360px; background: var(--bg-card); border: 1.5px solid var(--border-color); border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.25); z-index: 100; padding: 16px;">
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; border-bottom: 1px solid var(--border-subtle); padding-bottom: 8px;">
-            <strong style="font-size: 0.88rem;">🏃 Rehab Adherence Notifications</strong>
-            <span style="font-size: 0.7rem; background: #fee2e2; color: #991b1b; padding: 2px 6px; border-radius: 4px; font-weight: 800;">1 MISSED</span>
-          </div>
-
-          <div style="background: #fff1f2; border: 1px solid #fecdd3; border-radius: 8px; padding: 12px; margin-bottom: 8px;">
-            <div style="display: flex; justify-content: space-between; font-size: 0.72rem; color: #9f1239; font-weight: 800; margin-bottom: 4px;">
-              <span>⚠️ MISSED SESSION #14</span>
-              <span>YESTERDAY</span>
-            </div>
-            <div style="font-size: 0.82rem; font-weight: 700; color: #881337;">
-              Rfn. Arjun Verma (15489201A) &bull; 14 Rajputana Rifles
-            </div>
-            <div style="font-size: 0.74rem; color: #475569; margin: 4px 0;">
-              Left Knee Flexion Wall Squat &bull; VAS Pain: 4/10. Adherence reminder recommended.
-            </div>
-            <button class="btn-primary" style="background: #e11d48; border-color: #be123c; font-size: 0.75rem; padding: 6px 10px; width: 100%; margin-top: 6px; font-weight: 800;" onclick="sendPhysioNudge('usr-soldier-1')">
-              📱 Send Mobile Adherence Push
-            </button>
-          </div>
-        </div>
       </div>
 
       <button class="btn-logout" onclick="logoutUser()">LOGOUT</button>
@@ -84,223 +78,67 @@
   </header>
 
   <div class="dashboard-layout">
-    <main class="main-content" style="padding: 24px;">
-      <!-- Real-Time Rehab Alert for Missed Session -->
-      <div style="background: #fff1f2; border: 2px solid #e11d48; border-radius: 10px; padding: 18px 22px; margin-bottom: 24px; display: flex; align-items: center; justify-content: space-between;">
-        <div style="display: flex; align-items: center; gap: 14px;">
-          <span style="font-size: 2.4rem;">🚨</span>
-          <div>
-            <strong style="color: #9f1239; font-size: 1.05rem; display: block;">HIGH-PRIORITY PHYSIOTHERAPY ALERT: MISSED SESSION</strong>
-            <span style="font-size: 0.85rem; color: #881337;">
-              Rifleman Arjun Verma (15489201A &bull; Rajasthan Desert Sector) missed Session 14 yesterday. Knee pain VAS: 4/10. Automated notification dispatched to ensure rehab never silently stops.
-            </span>
-          </div>
-        </div>
-        <button class="btn-primary" style="background: #e11d48; white-space: nowrap;" onclick="sendPhysioNudge('usr-soldier-1')">
-          📱 Send Adherence Push &amp; Call
-        </button>
-      </div>
+    <main class="main-content" style="padding: 24px; max-width: 1400px; margin: 0 auto;">
 
-      <!-- Active Patient Rehab Plan -->
-      <div class="card">
-        <div class="card-header">
-          <div>
-            <h2 class="card-title">🏃 Active Musculoskeletal Protocol: Post-Arthroscopy Left Knee</h2>
-            <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 2px;">
-              Patient: Rifleman Arjun Verma &bull; Meniscus tear repair sustained in North East snow patrol
-            </div>
-          </div>
-          <div style="font-size: 1.25rem; font-weight: 900; color: var(--olive-700);">
-            Session 14 / 20 Completed (70%)
-          </div>
+      <!-- Summary Stat Metric Cards -->
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; margin-bottom: 24px;">
+        <div class="card" style="margin-bottom: 0; border-left: 4px solid #059669;">
+          <div style="font-size: 0.74rem; font-weight: 800; color: var(--text-muted); text-transform: uppercase;">Assigned Rehab Patients</div>
+          <div style="font-size: 1.8rem; font-weight: 900; color: #047857; margin: 4px 0;" id="statTotalRehabPatients">0</div>
+          <div style="font-size: 0.74rem; color: #15803d; font-weight: 700;">Active Musculoskeletal Protocols</div>
         </div>
 
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; margin-bottom: 20px;">
-          <div style="padding: 16px; border: 1.5px solid var(--border-color); border-radius: 8px; background: var(--bg-card);">
-            <div style="font-size: 0.75rem; color: var(--text-muted); font-weight: 800; text-transform: uppercase;">Joint Mobility Arc</div>
-            <div style="font-size: 1.8rem; font-weight: 900; color: var(--olive-700); margin: 4px 0;">115&deg; Flexion</div>
-            <div style="font-size: 0.75rem; color: #15803d; font-weight: 700;">+15&deg; improvement over post-op baseline</div>
-          </div>
-
-          <div style="padding: 16px; border: 1.5px solid var(--border-color); border-radius: 8px; background: var(--bg-card);">
-            <div style="font-size: 0.75rem; color: var(--text-muted); font-weight: 800; text-transform: uppercase;">Current Pain Index (VAS)</div>
-            <div style="font-size: 1.8rem; font-weight: 900; color: #dc2626; margin: 4px 0;">4 / 10</div>
-            <div style="font-size: 0.75rem; color: var(--text-muted);">Mild-to-moderate post-weight-bearing</div>
-          </div>
-
-          <div style="padding: 16px; border: 1.5px solid var(--border-color); border-radius: 8px; background: var(--bg-card);">
-            <div style="font-size: 0.75rem; color: var(--text-muted); font-weight: 800; text-transform: uppercase;">Recovery Verification</div>
-            <div style="font-size: 1.1rem; font-weight: 800; margin: 4px 0;">On Track for SHAPE-1</div>
-            <div style="font-size: 0.75rem; color: var(--text-muted);">6 sessions remaining until re-evaluation</div>
-          </div>
+        <div class="card" style="margin-bottom: 0; border-left: 4px solid #16a34a;">
+          <div style="font-size: 0.74rem; font-weight: 800; color: var(--text-muted); text-transform: uppercase;">Regimen Adherence Rate</div>
+          <div style="font-size: 1.8rem; font-weight: 900; color: #15803d; margin: 4px 0;" id="statOverallAdherence">--%</div>
+          <div style="font-size: 0.74rem; color: var(--text-muted);">Verified Session Completion</div>
         </div>
 
-        <!-- Exercise Regimen Assigner -->
-        <h3 style="font-size: 0.95rem; font-weight: 800; margin-bottom: 12px;">Assigned Exercise Regimen &amp; Adherence Status</h3>
-        <div style="display: flex; flex-direction: column; gap: 10px;" id="physioExercisesList">
-          <div style="padding: 12px 16px; border: 1px solid var(--border-color); border-radius: 6px; display: flex; justify-content: space-between; align-items: center;">
-            <div>
-              <strong>1. Straight Leg Raises (Vastus Medialis Strengthening)</strong>
-              <div style="font-size: 0.75rem; color: var(--text-muted);">3 sets x 15 reps &bull; Completed yesterday</div>
-            </div>
-            <span style="color: #15803d; font-weight: 800; font-size: 0.8rem;">✓ Adhering</span>
-          </div>
-
-          <div style="padding: 12px 16px; border: 1px solid var(--border-color); border-radius: 6px; display: flex; justify-content: space-between; align-items: center;">
-            <div>
-              <strong>2. Terminal Knee Extension with Theraband (Patellar Tracking)</strong>
-              <div style="font-size: 0.75rem; color: var(--text-muted);">3 sets x 12 reps &bull; Completed yesterday</div>
-            </div>
-            <span style="color: #15803d; font-weight: 800; font-size: 0.8rem;">✓ Adhering</span>
-          </div>
-
-          <div style="padding: 12px 16px; border: 1px solid var(--border-color); border-radius: 6px; display: flex; justify-content: space-between; align-items: center; background: #fff1f2;">
-            <div>
-              <strong>3. Wall Squats with Swiss Ball (30 deg Flexion)</strong>
-              <div style="font-size: 0.75rem; color: #9f1239;">Missed in previous session</div>
-            </div>
-            <span style="color: #e11d48; font-weight: 800; font-size: 0.8rem;">⚠️ Missed</span>
-          </div>
-        </div>
-
-        <div style="display: flex; justify-content: flex-end; margin-top: 18px; gap: 10px;">
-          <button class="btn-outline" onclick="showToast('Loading verified progress photos: Left knee scar healing and extension angle photos.', 'success')">
-            📷 Inspect Patient Progress Photos
-          </button>
-          <button class="btn-primary" onclick="openAddExerciseModal('usr-soldier-1')">
-            ✚ Add / Update Exercise Regimen
-          </button>
+        <div class="card" style="margin-bottom: 0; border-left: 4px solid #e11d48;">
+          <div style="font-size: 0.74rem; font-weight: 800; color: var(--text-muted); text-transform: uppercase;">Missed Session Alerts</div>
+          <div style="font-size: 1.8rem; font-weight: 900; color: #e11d48; margin: 4px 0;" id="statMissedSessionsCount">0</div>
+          <div style="font-size: 0.74rem; color: #9f1239; font-weight: 700;">Actionable Adherence Nudges</div>
         </div>
       </div>
+
+      <!-- Main Two-Column Workflow Layout -->
+      <div style="display: grid; grid-template-columns: 340px 1fr; gap: 20px; align-items: start;">
+        
+        <!-- Left Column: Patient Directory & Search -->
+        <div class="card" style="padding: 16px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+            <strong style="font-size: 0.95rem; color: #065f46;">🏃 Assigned Patients</strong>
+            <span class="physio-badge">ACTIVE REHAB</span>
+          </div>
+
+          <div style="margin-bottom: 12px;">
+            <input type="text" id="physioSearchInput" placeholder="🔍 Search soldier, army no, unit..." 
+                   oninput="filterPatients(this.value)"
+                   style="width: 100%; padding: 8px 12px; border-radius: 6px; border: 1.5px solid var(--border-color); font-size: 0.82rem;" />
+          </div>
+
+          <div id="physioPatientsList" style="max-height: 600px; overflow-y: auto;">
+            <div style="padding: 20px; text-align: center; color: var(--text-muted); font-size: 0.85rem;">
+              Loading assigned rehab patients...
+            </div>
+          </div>
+        </div>
+
+        <!-- Right Column: Patient Detail & Calibration -->
+        <div id="patientDetailView">
+          <div style="padding: 60px 20px; text-align: center; color: var(--text-muted); background: var(--bg-card); border-radius: 12px; border: 1.5px dashed var(--border-color);">
+            <span>🏃</span> Select a soldier from the assigned directory to inspect musculoskeletal recovery metrics.
+          </div>
+        </div>
+
+      </div>
+
     </main>
   </div>
 
   <!-- Inline Toast Container -->
   <div id="toastContainer" style="position: fixed; top: 20px; right: 20px; z-index: 9999; display: flex; flex-direction: column; gap: 10px;"></div>
 
-  <script>
-    function showToast(message, type = 'success') {
-      const container = document.getElementById('toastContainer');
-      if (!container) return;
-      const toast = document.createElement('div');
-      toast.style.background = type === 'success' ? '#065f46' : (type === 'warn' ? '#92400e' : '#991b1b');
-      toast.style.color = '#ffffff';
-      toast.style.padding = '12px 18px';
-      toast.style.borderRadius = '10px';
-      toast.style.fontSize = '0.84rem';
-      toast.style.fontWeight = '700';
-      toast.style.boxShadow = '0 6px 20px rgba(0,0,0,0.3)';
-      toast.style.display = 'flex';
-      toast.style.alignItems = 'center';
-      toast.style.gap = '10px';
-      toast.style.animation = 'fadeIn 0.25s ease';
-      toast.innerHTML = `<span>${type === 'success' ? '✓' : '⚠️'}</span> <span>${message}</span>`;
-      container.appendChild(toast);
-      setTimeout(() => {
-        toast.style.opacity = '0';
-        toast.style.transition = 'opacity 0.4s ease';
-        setTimeout(() => toast.remove(), 400);
-      }, 3500);
-    }
-
-    function togglePhysioNotifDrawer() {
-      const drawer = document.getElementById('physioNotifDrawer');
-      if (drawer) {
-        drawer.style.display = drawer.style.display === 'none' || drawer.style.display === '' ? 'block' : 'none';
-      }
-    }
-
-    async function sendPhysioNudge(soldierId) {
-      try {
-        const headers = getAuthHeaders();
-        await fetch('/api/notifications', {
-          method: 'POST',
-          headers,
-          body: JSON.stringify({
-            recipient_id: soldierId,
-            recipient_role: 'SOLDIER',
-            type: 'REHAB_MISSED',
-            title: 'Physiotherapy Adherence Alert',
-            message: 'Lt. Rajesh Kumar (MH Jaipur): Please complete Session #14 knee exercises or report joint swelling. Your recovery is vital.',
-            priority: 'HIGH'
-          })
-        });
-        showToast('✓ Physiotherapy Adherence Push Dispatched & Synced to Soldier Mobile App!', 'success');
-        const drawer = document.getElementById('physioNotifDrawer');
-        if (drawer) drawer.style.display = 'none';
-      } catch (e) {
-        showToast('Nudge sent to soldier via local gateway.', 'success');
-      }
-    }
-
-    function openAddExerciseModal(soldierId) {
-      const modal = document.createElement('div');
-      modal.className = 'privacy-curtain active';
-      modal.id = 'addExerciseModal';
-      modal.style.background = 'rgba(0,0,0,0.75)';
-      modal.innerHTML = `
-        <div style="background: var(--bg-card); border-radius: 12px; max-width: 500px; width: 92%; padding: 24px; color: var(--text-main); border: 2px solid #059669; text-align: left;" onclick="event.stopPropagation()">
-          <h3 style="font-size: 1.15rem; font-weight: 800; color: #047857; margin-bottom: 12px;">🏃 Prescribe New Exercise to Regimen</h3>
-          <div style="font-size: 0.78rem; color: var(--text-muted); margin-bottom: 16px;">
-            This exercise will be immediately appended to Rifleman Arjun Verma's daily rehab tracker queue.
-          </div>
-
-          <div style="margin-bottom: 12px;">
-            <label style="display: block; font-size: 0.8rem; font-weight: 700; margin-bottom: 4px;">Exercise Name &amp; Target Muscle:</label>
-            <input type="text" id="exName" placeholder="e.g. Seated Leg Extension with 2kg Ankle Weight" style="width: 100%; padding: 8px; border-radius: 6px; border: 1.5px solid var(--border-color); font-weight: 600;" />
-          </div>
-
-          <div style="margin-bottom: 16px;">
-            <label style="display: block; font-size: 0.8rem; font-weight: 700; margin-bottom: 4px;">Repetitions &amp; Sets Schedule:</label>
-            <input type="text" id="exReps" value="3 sets x 15 reps (Daily morning & evening)" style="width: 100%; padding: 8px; border-radius: 6px; border: 1.5px solid var(--border-color); font-weight: 600;" />
-          </div>
-
-          <div style="display: flex; justify-content: flex-end; gap: 10px;">
-            <button class="btn-outline" onclick="document.getElementById('addExerciseModal').remove()">Cancel</button>
-            <button class="btn-primary" style="background: #059669;" onclick="submitNewExercise('${soldierId}')">Save to Regimen →</button>
-          </div>
-        </div>
-      `;
-      document.body.appendChild(modal);
-    }
-
-    async function submitNewExercise(soldierId) {
-      const name = document.getElementById('exName').value.trim();
-      const reps = document.getElementById('exReps').value.trim();
-      if (!name) {
-        showToast('Please enter exercise name.', 'warn');
-        return;
-      }
-
-      try {
-        const headers = getAuthHeaders();
-        const res = await fetch('/api/rehab/exercise', {
-          method: 'POST',
-          headers,
-          body: JSON.stringify({ soldier_id: soldierId, name, reps })
-        });
-        if (res.ok) {
-          document.getElementById('addExerciseModal').remove();
-          showToast(`✓ Prescribed '${name}' added to soldier's active regimen!`, 'success');
-          // Add dynamically to UI
-          const list = document.getElementById('physioExercisesList');
-          if (list) {
-            const div = document.createElement('div');
-            div.style.cssText = 'padding: 12px 16px; border: 1px solid var(--border-color); border-radius: 6px; display: flex; justify-content: space-between; align-items: center; background: #f0fdf4;';
-            div.innerHTML = `
-              <div>
-                <strong>${name}</strong>
-                <div style="font-size: 0.75rem; color: var(--text-muted);">${reps} &bull; Newly Prescribed</div>
-              </div>
-              <span style="color: #15803d; font-weight: 800; font-size: 0.8rem;">✓ Added</span>
-            `;
-            list.appendChild(div);
-          }
-        }
-      } catch (e) {
-        showToast('Failed to save exercise.', 'warn');
-      }
-    }
-  </script>
+  <script src="physio.js"></script>
 </body>
 </html>

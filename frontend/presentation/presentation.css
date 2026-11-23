@@ -1,0 +1,475 @@
+/* ==========================================================================
+   KAVACH MILITARY PITCH DECK STYLES (16:9 Widescreen Presentation)
+   ========================================================================== */
+:root {
+  --mil-dark: #070e09;
+  --mil-surface: #0f1c12;
+  --mil-card: #15271b;
+  --mil-border: #23432e;
+  --mil-olive: #3b754d;
+  --mil-accent: #22c55e;
+  --mil-gold: #eab308;
+  --mil-gold-light: #fef08a;
+  --mil-red: #f43f5e;
+  --mil-blue: #38bdf8;
+  --text-main: #f8fafc;
+  --text-muted: #94a3b8;
+  --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background: var(--mil-dark);
+  color: var(--text-main);
+  font-family: var(--font-sans);
+  overflow: hidden;
+  height: 100vh;
+  width: 100vw;
+  user-select: none;
+}
+
+/* Master Presentation Container */
+.deck-container {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Presentation Top Status Bar */
+.deck-topbar {
+  height: 52px;
+  background: rgba(15, 28, 18, 0.95);
+  border-bottom: 1.5px solid var(--mil-border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 24px;
+  z-index: 100;
+  backdrop-filter: blur(10px);
+}
+
+.topbar-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.topbar-logo {
+  height: 28px;
+  width: 28px;
+}
+
+.topbar-title {
+  font-size: 0.9rem;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  color: var(--mil-gold);
+}
+
+.topbar-sub {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+}
+
+/* Timer Cluster */
+.topbar-timer {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: rgba(7, 14, 9, 0.8);
+  border: 1px solid var(--mil-border);
+  padding: 4px 14px;
+  border-radius: 999px;
+  font-size: 0.76rem;
+  font-family: var(--font-mono);
+}
+
+.timer-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 800;
+}
+
+.timer-pill.active {
+  color: var(--mil-accent);
+}
+
+.topbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.deck-btn {
+  background: var(--mil-card);
+  color: var(--text-main);
+  border: 1px solid var(--mil-border);
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.2s ease;
+}
+
+.deck-btn:hover {
+  background: var(--mil-olive);
+  border-color: var(--mil-accent);
+  color: #fff;
+}
+
+.deck-btn.primary {
+  background: linear-gradient(135deg, #15803d 0%, #166534 100%);
+  border-color: #22c55e;
+  color: #fff;
+  box-shadow: 0 2px 8px rgba(34, 197, 94, 0.3);
+}
+
+.deck-btn.primary:hover {
+  filter: brightness(1.15);
+  transform: translateY(-1px);
+}
+
+/* Slide Viewport */
+.deck-viewport {
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+
+.slide {
+  position: absolute;
+  width: 92vw;
+  max-width: 1400px;
+  height: 82vh;
+  max-height: 820px;
+  background: var(--mil-surface);
+  border: 1.5px solid var(--mil-border);
+  border-radius: 20px;
+  padding: 44px 56px;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateX(40px) scale(0.98);
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  overflow-y: auto;
+}
+
+.slide.active {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateX(0) scale(1);
+  z-index: 10;
+}
+
+.slide.prev {
+  transform: translateX(-40px) scale(0.98);
+}
+
+/* Slide Header */
+.slide-header {
+  border-bottom: 1.5px solid var(--mil-border);
+  padding-bottom: 18px;
+  margin-bottom: 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+}
+
+.slide-category {
+  font-size: 0.75rem;
+  font-family: var(--font-mono);
+  font-weight: 900;
+  color: var(--mil-accent);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  margin-bottom: 4px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.slide-title {
+  font-size: 2.1rem;
+  font-weight: 900;
+  letter-spacing: -0.02em;
+  color: #fff;
+  line-height: 1.15;
+}
+
+.slide-tagline {
+  font-size: 0.95rem;
+  color: var(--text-muted);
+  margin-top: 4px;
+}
+
+.slide-number-badge {
+  font-family: var(--font-mono);
+  font-size: 1.1rem;
+  font-weight: 900;
+  color: var(--mil-gold);
+  background: rgba(234, 179, 8, 0.12);
+  border: 1px solid rgba(234, 179, 8, 0.3);
+  padding: 4px 12px;
+  border-radius: 8px;
+}
+
+/* Slide Body Layouts */
+.slide-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+/* Grid Layouts */
+.grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 28px;
+}
+
+.grid-3 {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+}
+
+.grid-4 {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+}
+
+/* Feature & Metric Cards */
+.deck-card {
+  background: var(--mil-card);
+  border: 1px solid var(--mil-border);
+  border-radius: 14px;
+  padding: 24px;
+  transition: all 0.25s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.deck-card:hover {
+  border-color: var(--mil-accent);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+}
+
+.deck-card.highlight {
+  border: 2px solid var(--mil-gold);
+  background: linear-gradient(145deg, var(--mil-card) 0%, rgba(234, 179, 8, 0.08) 100%);
+}
+
+.card-icon {
+  font-size: 2rem;
+  margin-bottom: 12px;
+  display: inline-block;
+}
+
+.card-title {
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: #fff;
+  margin-bottom: 8px;
+}
+
+.card-desc {
+  font-size: 0.88rem;
+  color: var(--text-muted);
+  line-height: 1.5;
+}
+
+.card-stat {
+  font-size: 2.2rem;
+  font-weight: 900;
+  font-family: var(--font-mono);
+  color: var(--mil-accent);
+  margin: 8px 0;
+}
+
+/* Competitive Table */
+.matrix-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+  font-size: 0.88rem;
+}
+
+.matrix-table th {
+  background: var(--mil-card);
+  color: #fff;
+  font-weight: 800;
+  text-align: left;
+  padding: 14px 18px;
+  border-bottom: 2px solid var(--mil-border);
+}
+
+.matrix-table th.kavach-col {
+  background: rgba(34, 197, 94, 0.15);
+  color: var(--mil-accent);
+  border-bottom: 2px solid var(--mil-accent);
+}
+
+.matrix-table td {
+  padding: 12px 18px;
+  border-bottom: 1px solid var(--mil-border);
+  color: var(--text-muted);
+}
+
+.matrix-table td.kavach-col {
+  background: rgba(34, 197, 94, 0.05);
+  color: #fff;
+  font-weight: 700;
+}
+
+.check {
+  color: var(--mil-accent);
+  font-weight: 900;
+}
+
+.cross {
+  color: var(--mil-red);
+  font-weight: 900;
+}
+
+/* Slide Footer & Navigation Controls */
+.deck-footer {
+  height: 58px;
+  background: rgba(15, 28, 18, 0.95);
+  border-top: 1.5px solid var(--mil-border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 24px;
+  z-index: 100;
+}
+
+.footer-nav {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.footer-progress {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.progress-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--mil-border);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.progress-dot.active {
+  background: var(--mil-accent);
+  width: 28px;
+  border-radius: 999px;
+  box-shadow: 0 0 10px rgba(34, 197, 94, 0.5);
+}
+
+.progress-dot:hover {
+  background: var(--mil-gold);
+}
+
+/* Speaker Notes Drawer */
+.notes-drawer {
+  position: fixed;
+  bottom: 58px;
+  left: 0;
+  width: 100vw;
+  background: rgba(7, 14, 9, 0.95);
+  border-top: 2px solid var(--mil-gold);
+  padding: 16px 28px;
+  z-index: 95;
+  display: none;
+  backdrop-filter: blur(12px);
+  box-shadow: 0 -10px 30px rgba(0,0,0,0.5);
+}
+
+.notes-drawer.open {
+  display: block;
+}
+
+.notes-title {
+  font-size: 0.78rem;
+  font-weight: 900;
+  color: var(--mil-gold);
+  text-transform: uppercase;
+  font-family: var(--font-mono);
+  margin-bottom: 6px;
+}
+
+.notes-text {
+  font-size: 0.92rem;
+  color: #e2e8f0;
+  line-height: 1.6;
+}
+
+/* Print Styles */
+@media print {
+  body {
+    overflow: visible !important;
+    background: #fff !important;
+    color: #000 !important;
+  }
+  .deck-topbar, .deck-footer, .notes-drawer, .deck-btn {
+    display: none !important;
+  }
+  .deck-viewport {
+    padding: 0 !important;
+    display: block !important;
+  }
+  .slide {
+    position: relative !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    height: 100vh !important;
+    opacity: 1 !important;
+    transform: none !important;
+    page-break-after: always !important;
+    background: #fff !important;
+    color: #000 !important;
+    border: none !important;
+    box-shadow: none !important;
+    padding: 40px !important;
+  }
+  .deck-card {
+    background: #f8fafc !important;
+    border: 1px solid #cbd5e1 !important;
+    color: #000 !important;
+  }
+  .card-title, .slide-title {
+    color: #000 !important;
+  }
+  .card-desc, .slide-tagline {
+    color: #334155 !important;
+  }
+}

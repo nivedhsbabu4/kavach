@@ -43,9 +43,55 @@ function switchAuthTab(tab) {
   }
 }
 
+function autoDetectRoleFromServiceNo() {
+  const serviceNo = (document.getElementById('loginServiceNo')?.value || '').trim().toLowerCase();
+  const statusEl = document.getElementById('roleDetectStatus');
+  const roleSelect = document.getElementById('loginRole');
+  if (!serviceNo || !roleSelect) {
+    if (statusEl) statusEl.style.display = 'none';
+    return;
+  }
+
+  // 1. Check in allDatabaseUsers from persistent database
+  const matched = allDatabaseUsers.find(u => 
+    (u.service_no && u.service_no.toLowerCase() === serviceNo) || 
+    (u.id && u.id.toLowerCase() === serviceNo)
+  );
+
+  if (matched) {
+    roleSelect.value = matched.role;
+    if (statusEl) {
+      statusEl.style.display = 'block';
+      statusEl.style.color = '#15803d';
+      statusEl.innerHTML = `✓ Verified Registered Account: <strong>${matched.rank || ''} ${matched.name}</strong> &bull; Role: <strong>${matched.role}</strong>`;
+    }
+    return;
+  }
+
+  // 2. Check demo credentials
+  for (const [r, s] of Object.entries(DEMO_CREDENTIALS)) {
+    if (s.toLowerCase() === serviceNo) {
+      roleSelect.value = r;
+      if (statusEl) {
+        statusEl.style.display = 'block';
+        statusEl.style.color = '#15803d';
+        statusEl.innerHTML = `✓ Demo Account: <strong>${r}</strong> (${s})`;
+      }
+      return;
+    }
+  }
+
+  if (statusEl) {
+    statusEl.style.display = 'block';
+    statusEl.style.color = '#64748b';
+    statusEl.innerHTML = `Target Terminal: <strong>${roleSelect.value}</strong>`;
+  }
+}
+
 function handleLoginRoleChange() {
   const selectedRole = document.getElementById('loginRole').value;
   const serviceNoInput = document.getElementById('loginServiceNo');
+  const statusEl = document.getElementById('roleDetectStatus');
   
   // If user just registered with this role, retain their registered credentials
   if (window._justRegisteredServiceNo && selectedRole === window._justRegisteredRole) {
@@ -58,6 +104,11 @@ function handleLoginRoleChange() {
   if (DEMO_CREDENTIALS[selectedRole]) {
     serviceNoInput.value = DEMO_CREDENTIALS[selectedRole];
   }
+  if (statusEl) {
+    statusEl.style.display = 'block';
+    statusEl.style.color = '#64748b';
+    statusEl.innerHTML = `Selected Terminal: <strong>${selectedRole}</strong>`;
+  }
 }
 
 function quickFillLogin(role, serviceNo) {
@@ -68,7 +119,8 @@ function quickFillLogin(role, serviceNo) {
   document.getElementById('loginRole').value = role;
   document.getElementById('loginServiceNo').value = serviceNo;
   document.getElementById('loginPassword').value = 'kavach123';
-  showAlert(`Selected ${role} profile: ${serviceNo}. Click "AUTHENTICATE VIA JWT" to enter.`, 'success');
+  autoDetectRoleFromServiceNo();
+  showAlert(`Selected <strong>${role}</strong> profile (<code>${serviceNo}</code>). Click "AUTHENTICATE VIA JWT" to enter.`, 'success');
 }
 
 function clearRegisteredHighlights() {
@@ -113,32 +165,27 @@ async function handleLoginSubmit(event) {
       return;
     }
 
-    // Role Enforcement Check
-    if (data.user.role !== role) {
-      showAlert(`⛔ RBAC ACCESS REJECTED: Your account is registered as ${data.user.role}. You are not authorized to login to the ${role} terminal!`, 'error');
-      btn.disabled = false;
-      btn.textContent = 'AUTHENTICATE VIA JWT →';
-      return;
-    }
-
-    // Store verified JWT and user profile
+    // Store verified JWT and user profile from backend (true registered role)
+    const userRole = data.user.role;
     localStorage.setItem('kavach_jwt_token', data.token);
-    localStorage.setItem('kavach_user_role', data.user.role);
+    localStorage.setItem('kavach_user_role', userRole);
     localStorage.setItem('kavach_user_name', data.user.name);
     localStorage.setItem('kavach_user_service_no', data.user.service_no);
     localStorage.setItem('kavach_user_id', data.user.id);
-    localStorage.setItem('kavach_user_posting', data.user.posting || 'Field Station');
+    localStorage.setItem('kavach_user_posting', data.user.posting || data.user.unit || 'Field Station');
 
     // Clean up temporary registration markers
     clearRegisteredHighlights();
     window._justRegisteredServiceNo = null;
     window._justRegisteredRole = null;
 
-    showAlert(`✓ Access Granted! Welcome <strong>${data.user.name}</strong> (${data.user.service_no}). Opening your ${data.user.role} console...`, 'success');
+    const targetRoute = DASHBOARD_ROUTES[userRole] || '../dashboards/soldier/soldier.html';
+
+    showAlert(`✓ Access Granted! Welcome <strong>${data.user.name}</strong> (${data.user.service_no}). Opening your <strong>${userRole}</strong> console...`, 'success');
 
     setTimeout(() => {
-      window.location.href = DASHBOARD_ROUTES[data.user.role] || '../dashboards/soldier/soldier.html';
-    }, 700);
+      window.location.href = targetRoute;
+    }, 600);
 
   } catch (err) {
     console.error('Login error:', err);
@@ -149,7 +196,7 @@ async function handleLoginSubmit(event) {
 }
 
 // 2. Handle Registration Submit
-// Flow: Submits registration -> Redirects to Login Form -> Pre-fills registered details -> Ready to authenticate
+// Flow: Submits registration -> Authenticates immediately as the registered role -> Opens that exact role's dashboard
 async function handleRegisterSubmit(event) {
   event.preventDefault();
   const role = document.getElementById('regRole').value;
@@ -201,46 +248,36 @@ async function handleRegisterSubmit(event) {
       return;
     }
 
-    if (btn) {
-      btn.disabled = false;
-      btn.textContent = 'REGISTER & INITIALIZE WALLET →';
-    }
+    // Direct Login on Registration: Store verified JWT and user profile
+    const userRole = data.user.role;
+    localStorage.setItem('kavach_jwt_token', data.token);
+    localStorage.setItem('kavach_user_role', userRole);
+    localStorage.setItem('kavach_user_name', data.user.name);
+    localStorage.setItem('kavach_user_service_no', data.user.service_no);
+    localStorage.setItem('kavach_user_id', data.user.id);
+    localStorage.setItem('kavach_user_posting', data.user.posting || data.user.unit || 'Field Station');
 
-    // Clear previous sessions
-    localStorage.removeItem('kavach_jwt_token');
-    localStorage.removeItem('kavach_user_role');
-    localStorage.removeItem('kavach_user_name');
-    localStorage.removeItem('kavach_user_service_no');
-    localStorage.removeItem('kavach_user_id');
-
-    // Switch to Login Tab
-    switchAuthTab('login');
-
-    // Populate the Login form with the newly registered details
+    // Also populate login form with newly registered details in case user re-logs
     const loginRole = document.getElementById('loginRole');
     const loginServiceNo = document.getElementById('loginServiceNo');
     const loginPassword = document.getElementById('loginPassword');
+    if (loginRole) loginRole.value = userRole;
+    if (loginServiceNo) loginServiceNo.value = data.user.service_no;
+    if (loginPassword) loginPassword.value = password;
 
-    loginRole.value = data.user.role;
-    loginServiceNo.value = data.user.service_no;
-    loginPassword.value = password;
+    const targetRoute = DASHBOARD_ROUTES[userRole] || '../dashboards/soldier/soldier.html';
 
-    // Apply visual glow
-    loginServiceNo.classList.add('input-registered-highlight');
-    loginPassword.classList.add('input-registered-highlight');
-
-    // Store marker so changing roles doesn't wipe this
-    window._justRegisteredServiceNo = data.user.service_no;
-    window._justRegisteredRole = data.user.role;
-
-    // Show prominent instructions on login screen
     showAlert(
-      `✅ <strong>Registration Successful!</strong> Account enrolled for <strong>${data.user.rank} ${data.user.name}</strong> (Service No: <code>${data.user.service_no}</code>).<br />Your registered credentials have been pre-filled below. Click <strong>"AUTHENTICATE VIA JWT"</strong> to log in with your newly registered account.`,
+      `🎉 <strong>Registration Successful!</strong> Enrolled as <strong>${userRole}</strong> &bull; ${data.user.rank} ${data.user.name} (Service No: <code>${data.user.service_no}</code>).<br />Opening your dedicated <strong>${userRole}</strong> console now...`,
       'success'
     );
 
     // Refresh database summary count
     fetchDatabaseRegistry();
+
+    setTimeout(() => {
+      window.location.href = targetRoute;
+    }, 700);
 
   } catch (err) {
     console.error('Registration error:', err);

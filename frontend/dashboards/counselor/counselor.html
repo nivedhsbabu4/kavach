@@ -6,31 +6,38 @@
   <title>KAVACH — AFMS Psychological Support Cell</title>
   <link rel="stylesheet" href="../../shared/shared.css" />
   <link rel="icon" href="../../assets/logo.svg" />
+  <style>
+    :root {
+      --role-accent: #7c3aed;
+      --role-accent-dark: #6d28d9;
+      --role-accent-light: #f5f3ff;
+    }
+  </style>
   <script src="../../shared/auth_guard.js"></script>
   <script>enforceRoleGuard('COUNSELOR');</script>
 </head>
 <body data-theme="light">
 
-  <aside class="crisis-topbar">
+  <aside class="crisis-topbar" style="background: #4c1d95;">
     <div style="display: flex; align-items: center; gap: 12px;">
       <span style="font-weight: 800;">🧠 DEFENCE PSYCHOLOGICAL SUPPORT CELL &bull; AFMS COUNSELOR CONSOLE</span>
-      <span style="font-size: 0.75rem; color: var(--gold-light);">COMMAND HOSPITAL (CENTRAL)</span>
+      <span style="font-size: 0.75rem; color: #ddd6fe;">COMMAND HOSPITAL (CENTRAL) &bull; TELE-MANAS DIRECTORY</span>
     </div>
   </aside>
 
-  <header class="app-header">
+  <header class="app-header" style="border-bottom: 2.5px solid var(--role-accent);">
     <div class="brand-wrapper">
       <div class="brand-logo-fixed">
         <img src="../../assets/logo.svg" alt="Kavach Shield Logo" />
       </div>
       <div class="brand-text">
-        <h1>KAVACH <span class="brand-classification-pill" style="background: #fae8ff; color: #86198f; border-color: #f5d0fe;">AFMS PSYCHOLOGY</span></h1>
+        <h1>KAVACH <span class="brand-classification-pill" style="background: #f5f3ff; color: #6d28d9; border-color: #ddd6fe;">AFMS PSYCHOLOGY</span></h1>
         <div class="brand-tagline-sub">"Confidential sanctuary for the soldier's mind."</div>
       </div>
     </div>
 
     <div class="header-center-info">
-      <div class="security-seal-chip">
+      <div class="security-seal-chip" style="background: #f5f3ff; border-color: #ddd6fe; color: #6d28d9;">
         <span>🧠</span>
         <span>DEFENCE PSYCHOLOGICAL SUPPORT CELL &bull; AES-256 VAULT</span>
       </div>
@@ -38,10 +45,10 @@
 
     <div class="header-profile-cluster">
       <div class="user-identity-card">
-        <div class="user-avatar-badge" style="background: linear-gradient(135deg, #a21caf 0%, #701a75 100%);">SR</div>
+        <div class="user-avatar-badge" id="counselorAvatarBadge" style="background: linear-gradient(135deg, #7c3aed 0%, #4c1d95 100%);">SR</div>
         <div class="user-details-text">
-          <div class="user-name-title">Dr. Sunita Rao</div>
-          <div class="user-meta-sub">
+          <div class="user-name-title" id="counselorNameTitle">Dr. Sunita Rao</div>
+          <div class="user-meta-sub" id="counselorMetaSub">
             <span>Senior Psychologist &bull; CIV-PSY-042</span>
             <span>&bull;</span>
             <span class="sync-badge synced"><span class="sync-pulse-dot"></span> <span>TELE-MANAS CELL</span></span>
@@ -53,21 +60,48 @@
   </header>
 
   <div class="dashboard-layout">
-    <main class="main-content" style="padding: 24px;">
+    <main class="main-content" style="padding: 24px; max-width: 1400px; margin: 0 auto;">
+
+      <!-- Top Summary Metrics -->
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; margin-bottom: 24px;">
+        <div class="card" style="margin-bottom: 0; border-left: 4px solid #7c3aed;">
+          <div style="font-size: 0.74rem; font-weight: 800; color: var(--text-muted); text-transform: uppercase;">Total Screenings Logged</div>
+          <div style="font-size: 1.8rem; font-weight: 900; color: #6d28d9; margin: 4px 0;" id="statTotalScreenings">0</div>
+          <div style="font-size: 0.74rem; color: #15803d; font-weight: 700;">AFMS Psychometric Baseline</div>
+        </div>
+
+        <div class="card" style="margin-bottom: 0; border-left: 4px solid #d97706;">
+          <div style="font-size: 0.74rem; font-weight: 800; color: var(--text-muted); text-transform: uppercase;">Nudge Queue Flags</div>
+          <div style="font-size: 1.8rem; font-weight: 900; color: #d97706; margin: 4px 0;" id="statNudgeCount">0</div>
+          <div style="font-size: 0.74rem; color: #b45309; font-weight: 700;">Personnel Escalating in Stress</div>
+        </div>
+
+        <div class="card" style="margin-bottom: 0; border-left: 4px solid #dc2626;">
+          <div style="font-size: 0.74rem; font-weight: 800; color: var(--text-muted); text-transform: uppercase;">PHQ-9 Depression (Latest)</div>
+          <div style="font-size: 1.8rem; font-weight: 900; color: #dc2626; margin: 4px 0;" id="statPhqScore">-- / 27</div>
+          <div style="font-size: 0.74rem; color: var(--text-muted);">Validated Clinical Depression Metric</div>
+        </div>
+
+        <div class="card" style="margin-bottom: 0; border-left: 4px solid #2563eb;">
+          <div style="font-size: 0.74rem; font-weight: 800; color: var(--text-muted); text-transform: uppercase;">PCL-5 Combat PTSD (Latest)</div>
+          <div style="font-size: 1.8rem; font-weight: 900; color: #2563eb; margin: 4px 0;" id="statPclScore">-- / 80</div>
+          <div style="font-size: 0.74rem; color: var(--text-muted);">High-Altitude &amp; Combat Exposure</div>
+        </div>
+      </div>
       
       <!-- Doctor Clinical Consultation Access Requests Section -->
-      <div class="card" style="border: 2px solid #a21caf; margin-bottom: 24px; background: #fdf4ff;">
-        <div class="card-header" style="border-bottom: 1px solid #f5d0fe; padding-bottom: 12px;">
+      <div class="card" style="border: 2px solid #7c3aed; margin-bottom: 24px; background: #faf5ff;">
+        <div class="card-header" style="border-bottom: 1px solid #e9d5ff; padding-bottom: 12px;">
           <div>
             <div style="display: flex; align-items: center; gap: 8px;">
               <span style="font-size: 1.2rem;">🛡️</span>
-              <h2 class="card-title" style="color: #701a75;">Doctor Consultation Access Requests</h2>
+              <h2 class="card-title" style="color: #581c87;">Doctor Consultation Access Requests</h2>
             </div>
-            <div style="font-size: 0.78rem; color: #86198f; margin-top: 2px;">
-              Military Medical Officers requesting authorized access to view confidential mental health notes for physical rehab coordination
+            <div style="font-size: 0.78rem; color: #6d28d9; margin-top: 2px;">
+              Medical Officers requesting authorization to inspect psychological summaries for physical surgery coordination
             </div>
           </div>
-          <span class="badge-tag" style="background: #fae8ff; color: #701a75; border-color: #e879f9; font-weight: 800;" id="requestCountBadge">
+          <span class="badge-tag" style="background: #f3e8ff; color: #6d28d9; border-color: #d8b4fe; font-weight: 800;" id="requestCountBadge">
             AUTHORIZATION QUEUE
           </span>
         </div>
@@ -79,280 +113,60 @@
         </div>
       </div>
 
-      <!-- 3-Week Rising Stress Escalation Alert -->
-      <div style="background: #fffbeb; border: 2px solid #f59e0b; border-radius: 10px; padding: 18px 22px; margin-bottom: 24px; display: flex; align-items: center; justify-content: space-between;">
-        <div style="display: flex; align-items: center; gap: 14px;">
-          <span style="font-size: 2.4rem;">⚠️</span>
+      <!-- Proactive Counselor Nudge Queue Section -->
+      <div class="card" style="border: 1.5px solid #f59e0b; margin-bottom: 24px;">
+        <div class="card-header" style="border-bottom: 1px solid var(--border-subtle); padding-bottom: 12px;">
           <div>
-            <strong style="color: #92400e; font-size: 1.05rem; display: block;">PROACTIVE COUNSELOR NUDGE: 3 WEEKS ESCALATING STRESS</strong>
-            <span style="font-size: 0.85rem; color: #78350f;">
-              Rifleman Arjun Verma (14 Rajputana Rifles): PHQ-9 depression score climbed 3 weeks consecutively (Oct 24: 8 &rarr; Oct 31: 10 &rarr; Nov 14: 13/27).
-              Gentle supportive nudge delivered to soldier app. Confidential session scheduled.
-            </span>
-          </div>
-        </div>
-        <button class="btn-primary" style="background: #d97706; white-space: nowrap;" onclick="openConfidentialSessionModal('usr-soldier-1')">
-          🔒 Initiate CBT Intervention
-        </button>
-      </div>
-
-      <!-- Confidential Mental Health Dossier -->
-      <div class="card">
-        <div class="card-header">
-          <div>
-            <h2 class="card-title">🔐 Confidential Psychological Dossier: Rifleman Arjun Verma</h2>
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <span style="font-size: 1.2rem;">📱</span>
+              <h2 class="card-title" style="color: #92400e;">Proactive Counselor Nudge Queue</h2>
+            </div>
             <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 2px;">
-              Protected by is_mental_health separation &bull; AES-256-GCM encrypted &bull; Strictly invisible to COs and Claims Officers
+              Personnel with rising depressive or combat trauma scores flagged for gentle, non-judgmental wellness nudges
             </div>
           </div>
-          <span class="badge-tag badge-vaccine">ACTIVE PATIENT CONSENT GRANT</span>
+          <span class="badge-tag" style="background: #fef3c7; color: #92400e; border-color: #fde68a;">
+            TACTICAL MENTAL RESILIENCE
+          </span>
         </div>
 
-        <!-- Screening Breakdown Metrics -->
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; margin-bottom: 20px;">
-          <div style="padding: 16px; border: 1.5px solid var(--border-color); border-radius: 8px; background: var(--bg-card);">
-            <div style="font-size: 0.75rem; color: var(--text-muted); font-weight: 800;">PHQ-9 DEPRESSION (LATEST)</div>
-            <div style="font-size: 1.8rem; font-weight: 900; color: #dc2626; margin: 4px 0;">13 / 27</div>
-            <div style="font-size: 0.75rem; color: #dc2626; font-weight: 700;">Moderate Severity &bull; Sleep Disturbance</div>
-          </div>
-
-          <div style="padding: 16px; border: 1.5px solid var(--border-color); border-radius: 8px; background: var(--bg-card);">
-            <div style="font-size: 0.75rem; color: var(--text-muted); font-weight: 800;">PCL-5 COMBAT PTSD</div>
-            <div style="font-size: 1.8rem; font-weight: 900; color: #d97706; margin: 4px 0;">32 / 80</div>
-            <div style="font-size: 0.75rem; color: var(--text-muted);">High Altitude Snow Patrol Recall Symptoms</div>
-          </div>
-
-          <div style="padding: 16px; border: 1.5px solid var(--border-color); border-radius: 8px; background: var(--bg-card);">
-            <div style="font-size: 0.75rem; color: var(--text-muted); font-weight: 800;">GAD-7 ANXIETY</div>
-            <div style="font-size: 1.8rem; font-weight: 900; color: #15803d; margin: 4px 0;">9 / 21</div>
-            <div style="font-size: 0.75rem; color: var(--text-muted);">Mild-to-Moderate Somatic Tension</div>
+        <div id="nudgeQueueContainer" style="padding: 16px 20px;">
+          <div style="padding: 20px; text-align: center; color: var(--text-muted); font-size: 0.85rem;">
+            Loading proactive nudge queue...
           </div>
         </div>
+      </div>
 
-        <!-- Clinical Psychological Case Assessment -->
-        <div style="border: 1.5px solid var(--border-color); border-radius: 8px; padding: 18px; background: var(--bg-card); margin-bottom: 18px;">
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-            <strong style="font-size: 1.05rem;">Confidential Combat Stress &amp; Sleep Disturbance Assessment</strong>
-            <span style="font-size: 0.75rem; color: var(--text-muted);">Evaluated: Nov 18, 2024 &bull; Dr. Sunita Rao</span>
+      <!-- Screening Trends & Vault Dossier -->
+      <div class="card">
+        <div class="card-header" style="border-bottom: 1px solid var(--border-subtle); padding-bottom: 12px;">
+          <div>
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <span style="font-size: 1.2rem;">🔐</span>
+              <h2 class="card-title" style="color: #581c87;">Confidential Screening Assessments &amp; Psychometric History</h2>
+            </div>
+            <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 2px;">
+              Protected by is_mental_health cryptographic barrier &bull; Strictly barred from COs and Claims Officers
+            </div>
           </div>
-          <p style="font-size: 0.85rem; line-height: 1.5; color: var(--text-main); margin-bottom: 12px;">
-            Soldier reports recurrent nightmares following high-altitude patrol crevasse incident and hypervigilance. Screening indicates escalating PHQ-9 (moderate depressive symptoms, score 13). Initiated cognitive behavioral support, sleep hygiene protocols, and relaxation training.
-          </p>
-          <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.74rem; color: #86198f; font-weight: 700; border-top: 1px solid var(--border-subtle); padding-top: 8px;">
-            <span>🔐 AES-256-GCM Encrypted at Rest &bull; IV: d98a01f928e371b2</span>
-            <span>Tamper Hash Verified: 891023948102...</span>
-          </div>
-        </div>
-
-        <div style="display: flex; justify-content: flex-end;">
-          <button class="btn-primary" onclick="openConfidentialSessionModal('usr-soldier-1')">
+          <button class="btn-primary" style="background: #7c3aed; border-color: #6d28d9; font-size: 0.78rem;" onclick="openConfidentialSessionModal('', 'Active Personnel')">
             ✚ Add Confidential Therapy Note
           </button>
         </div>
+
+        <div id="screeningsContainer" style="padding: 16px 20px;">
+          <div style="padding: 24px; text-align: center; color: var(--text-muted); font-size: 0.85rem;">
+            Loading confidential screening trends...
+          </div>
+        </div>
       </div>
+
     </main>
   </div>
 
   <!-- Inline Toast Container -->
   <div id="toastContainer" style="position: fixed; top: 20px; right: 20px; z-index: 9999; display: flex; flex-direction: column; gap: 10px;"></div>
 
-  <script>
-    function showToast(message, type = 'success') {
-      const container = document.getElementById('toastContainer');
-      if (!container) return;
-      const toast = document.createElement('div');
-      toast.style.background = type === 'success' ? '#701a75' : (type === 'warn' ? '#92400e' : '#991b1b');
-      toast.style.color = '#ffffff';
-      toast.style.padding = '12px 18px';
-      toast.style.borderRadius = '10px';
-      toast.style.fontSize = '0.84rem';
-      toast.style.fontWeight = '700';
-      toast.style.boxShadow = '0 6px 20px rgba(0,0,0,0.3)';
-      toast.style.display = 'flex';
-      toast.style.alignItems = 'center';
-      toast.style.gap = '10px';
-      toast.style.animation = 'fadeIn 0.25s ease';
-      toast.innerHTML = `<span>${type === 'success' ? '✓' : '⚠️'}</span> <span>${message}</span>`;
-      container.appendChild(toast);
-      setTimeout(() => {
-        toast.style.opacity = '0';
-        toast.style.transition = 'opacity 0.4s ease';
-        setTimeout(() => toast.remove(), 400);
-      }, 3500);
-    }
-
-    document.addEventListener('DOMContentLoaded', async () => {
-      await loadMhRequests();
-    });
-
-    async function loadMhRequests() {
-      try {
-        const headers = getAuthHeaders();
-        const res = await fetch('/api/counselor/mh-requests', { headers });
-        if (res.ok) {
-          const list = await res.json();
-          renderMhRequests(list);
-        }
-      } catch (e) {
-        console.warn('Could not load MH requests:', e);
-      }
-    }
-
-    function renderMhRequests(list) {
-      const container = document.getElementById('mhRequestsContainer');
-      const badge = document.getElementById('requestCountBadge');
-      if (!container) return;
-
-      if (!list || list.length === 0) {
-        container.innerHTML = `
-          <div style="text-align: center; padding: 24px; color: #86198f;">
-            <span>🛡️</span> <strong>No active doctor access requests.</strong>
-            <div style="font-size: 0.76rem; color: #6b7280; margin-top: 2px;">All confidential psychological records are securely isolated.</div>
-          </div>
-        `;
-        if (badge) badge.textContent = '0 PENDING';
-        return;
-      }
-
-      const pending = list.filter(r => r.status === 'PENDING_PSYCHOLOGIST_APPROVAL');
-      if (badge) badge.textContent = `${pending.length} PENDING DECISION`;
-
-      container.innerHTML = `
-        <div style="display: flex; flex-direction: column; gap: 12px;">
-          ${list.map(r => `
-            <div style="background: white; border: 1.5px solid ${r.status === 'APPROVED' ? '#86efac' : (r.status === 'DENIED' ? '#fca5a5' : '#f0abfc')}; border-radius: 10px; padding: 14px 18px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
-              <div>
-                <div style="display: flex; align-items: center; gap: 8px;">
-                  <strong style="font-size: 0.95rem; color: #1e293b;">
-                    ${r.doctor_rank || 'Doctor'} ${r.doctor_name}
-                  </strong>
-                  <span style="font-size: 0.72rem; color: #64748b;">(${r.hospital || 'Military Hospital'})</span>
-                  <span class="badge-tag" style="font-size: 0.7rem; font-weight: 800; background: ${r.status === 'APPROVED' ? '#dcfce7' : (r.status === 'DENIED' ? '#fee2e2' : '#fef3c7')}; color: ${r.status === 'APPROVED' ? '#15803d' : (r.status === 'DENIED' ? '#991b1b' : '#92400e')}; border-color: transparent;">
-                    ${r.status}
-                  </span>
-                </div>
-                <div style="font-size: 0.8rem; color: #475569; margin-top: 4px;">
-                  <strong>Patient:</strong> ${r.soldier_name} &bull; <strong>Reason:</strong> "${r.reason}"
-                </div>
-                <div style="font-size: 0.72rem; color: #94a3b8; margin-top: 2px;">
-                  Requested: ${r.requested_at ? r.requested_at.slice(0, 16).replace('T', ' ') : 'Recent'}
-                </div>
-              </div>
-
-              <div>
-                ${r.status === 'PENDING_PSYCHOLOGIST_APPROVAL' ? `
-                  <div style="display: flex; gap: 8px;">
-                    <button class="btn-primary" style="background: #15803d; border-color: #166534; font-size: 0.75rem; padding: 6px 14px;" onclick="adjudicateRequest('${r.id}', 'APPROVED')">
-                      ✓ Approve Access
-                    </button>
-                    <button class="btn-outline" style="color: #991b1b; border-color: #ef4444; font-size: 0.75rem; padding: 6px 12px;" onclick="adjudicateRequest('${r.id}', 'DENIED')">
-                      ✕ Deny
-                    </button>
-                  </div>
-                ` : `
-                  <div style="font-size: 0.75rem; color: #64748b; font-weight: 700;">
-                    Adjudicated by Dr. Sunita Rao
-                  </div>
-                `}
-              </div>
-            </div>
-          `).join('')}
-        </div>
-      `;
-    }
-
-    async function adjudicateRequest(requestId, decision) {
-      try {
-        const headers = getAuthHeaders();
-        const res = await fetch('/api/counselor/approve-mh-access', {
-          method: 'POST',
-          headers,
-          body: JSON.stringify({ request_id: requestId, decision })
-        });
-        if (res.ok) {
-          showToast(`✓ Request successfully ${decision.toLowerCase()}! Notification dispatched to Doctor console.`, 'success');
-          await loadMhRequests();
-        }
-      } catch (e) {
-        showToast('Error recording decision.', 'warn');
-      }
-    }
-
-    function openConfidentialSessionModal(soldierId) {
-      const modal = document.createElement('div');
-      modal.className = 'privacy-curtain active';
-      modal.id = 'cbtModal';
-      modal.style.background = 'rgba(0,0,0,0.75)';
-      modal.innerHTML = `
-        <div style="background: var(--bg-card); border-radius: 12px; max-width: 520px; width: 92%; padding: 24px; color: var(--text-main); border: 2px solid #a21caf; text-align: left;" onclick="event.stopPropagation()">
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-            <h3 style="font-size: 1.15rem; font-weight: 800; color: #86198f;">🔒 Record Confidential CBT Intervention</h3>
-            <span style="font-size: 0.72rem; background: #fdf4ff; color: #86198f; border: 1px solid #f5d0fe; padding: 2px 8px; border-radius: 4px; font-weight: 800;">AES-256 VAULT</span>
-          </div>
-          <div style="font-size: 0.78rem; color: var(--text-muted); margin-bottom: 14px;">
-            This clinical entry is encrypted with AES-256-GCM. <strong>Strictly invisible</strong> to Unit Commanders and Claims Officers.
-          </div>
-
-          <div style="margin-bottom: 12px;">
-            <label style="display: block; font-size: 0.8rem; font-weight: 700; margin-bottom: 4px;">Session Title:</label>
-            <input type="text" id="cbtTitle" value="CBT Session #3: High-Altitude Snow Patrol Flashbacks" style="width: 100%; padding: 8px; border-radius: 6px; border: 1px solid var(--border-color); font-weight: 600;" />
-          </div>
-
-          <div style="margin-bottom: 12px;">
-            <label style="display: block; font-size: 0.8rem; font-weight: 700; margin-bottom: 4px;">Therapeutic Technique:</label>
-            <select id="cbtTech" style="width: 100%; padding: 8px; border-radius: 6px; border: 1px solid var(--border-color); font-weight: 600;">
-              <option value="Cognitive Restructuring & Trauma Grounding">Cognitive Restructuring & Trauma Grounding</option>
-              <option value="Prolonged Exposure (PE) Desensitization">Prolonged Exposure (PE) Desensitization</option>
-              <option value="Somatic Grounding & Controlled Breathing (4-7-8)">Somatic Grounding & Controlled Breathing (4-7-8)</option>
-              <option value="Behavioral Activation & Sleep Hygiene Protocol">Behavioral Activation & Sleep Hygiene Protocol</option>
-            </select>
-          </div>
-
-          <div style="margin-bottom: 12px;">
-            <label style="display: block; font-size: 0.8rem; font-weight: 700; margin-bottom: 4px;">Clinical Notes &amp; Patient Directives:</label>
-            <textarea id="cbtNotes" rows="3" style="width: 100%; padding: 8px; border-radius: 6px; border: 1px solid var(--border-color);" placeholder="Patient reports decreased intrusive memories of snow scree incident...">Patient responded positively to grounding cues. Night awakenings reduced from 4/night to 2/night. Prescribed audio relaxation drills via Kavach app.</textarea>
-          </div>
-
-          <div style="margin-bottom: 16px;">
-            <label style="display: block; font-size: 0.8rem; font-weight: 700; margin-bottom: 4px;">Assessed Risk Level:</label>
-            <select id="cbtRisk" style="width: 100%; padding: 8px; border-radius: 6px; border: 1px solid var(--border-color); font-weight: 600;">
-              <option value="Low">Low - Well stabilized with protective factors</option>
-              <option value="Moderate" selected>Moderate - Elevating PHQ-9, no self-harm ideation</option>
-              <option value="High">High - Requires scheduled bi-weekly check-ins</option>
-            </select>
-          </div>
-
-          <div style="display: flex; justify-content: flex-end; gap: 10px;">
-            <button class="btn-outline" onclick="document.getElementById('cbtModal').remove()">Cancel</button>
-            <button class="btn-primary" style="background: #a21caf;" onclick="submitConfidentialNote('${soldierId}')">Sign &amp; Encrypt Note →</button>
-          </div>
-        </div>
-      `;
-      document.body.appendChild(modal);
-    }
-
-    async function submitConfidentialNote(soldierId) {
-      const title = document.getElementById('cbtTitle').value.trim();
-      const cbt_technique = document.getElementById('cbtTech').value;
-      const notes = document.getElementById('cbtNotes').value.trim();
-      const risk_level = document.getElementById('cbtRisk').value;
-
-      try {
-        const headers = getAuthHeaders();
-        const res = await fetch('/api/counselor/notes', {
-          method: 'POST',
-          headers,
-          body: JSON.stringify({ soldier_id: soldierId, title, cbt_technique, notes, risk_level })
-        });
-
-        if (res.ok) {
-          document.getElementById('cbtModal').remove();
-          showToast('✓ Confidential Note cryptographically sealed with AES-256 and appended to psychological vault!', 'success');
-        }
-      } catch (e) {
-        showToast('Error recording note.', 'warn');
-      }
-    }
-  </script>
+  <script src="counselor.js"></script>
 </body>
 </html>

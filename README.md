@@ -11,24 +11,25 @@
 * **Rejected Disability Claims:** Thousands of veterans face rejected or stalled disability pension claims at ECHS/MoD due to missing chain-of-custody proofs of injuries sustained decades prior in remote border sectors.
 * **Interrupted Rehabilitation:** Musculoskeletal rehabilitation (e.g. knee surgeries, meniscus tears) halts or resets when soldiers transfer between units or retire.
 * **Undetected PTSD & Stigma:** Operational stress, combat trauma, and rising depressive symptoms go unaddressed due to military peer stigma.
-* **ECHS Hospital-Centric Limitation:** Current systems store records inside hospitals, covering only veterans, with zero mental health or active rehabilitation tracking.
+* **Hospital-Centric Limitation:** Traditional systems store records inside individual military hospitals, lacking soldier sovereignty, confidential psychological isolation, or continuous rehab tracking.
 
 ### The Kavach Solution
 **Kavach shifts the paradigm from hospital-centric to soldier-centric.** The health wallet belongs directly to the soldier, following them through 15–20 years of active service and throughout their veteran retirement.
 
 ---
 
-## 🎯 Customers & Target Users
+## 🏛️ Six Role-Based Specialized Portals (RBAC)
 
-* **Buyers (Government Only):**
-  * Ministry of Defence (MoD)
-  * Armed Forces Medical Services (AFMS) & DGAFMS
-  * Ex-Servicemen Contributory Health Scheme (ECHS)
-  * Ministry of Home Affairs (MHA) for Central Armed Police Forces (CRPF, BSF, ITBP, CISF, SSB, Assam Rifles)
-* **Users:**
-  * Serving soldiers, sailors, airmen, and paramilitary jawans.
-  * Military Medical Officers (AMC), Physiotherapists, and AFMS Counselors.
-  * ECHS Adjudicators & Claims Officers (AG Branch).
+KAVACH provides 6 strictly segregated, purpose-built portals with distinct visual accents, authoritative JWT security boundaries, and zero role bleed:
+
+| Role | Portal Accent | Seeded Army ID / Service No | Default Password | Primary Operational Scope |
+|:---|:---|:---|:---|:---|
+| **SOLDIER** | Military Olive (`#4d7c0f`) | `15489201A` | `kavach123` | Personal Health Wallet, posting-grouped records, appointments, psychometric screening, sovereign access grants. |
+| **DOCTOR** | AMC Medical Blue (`#0284c7`) | `MR-09824X` | `kavach123` | Patient directory of soldiers with active DOCTOR grants, clinical history, field record creation, doctor MH-access requests. |
+| **PHYSIOTHERAPIST** | Emerald Rehab (`#059669`) | `MR-11204K` | `kavach123` | Assigned rehab patients directory, mobility arc, pain VAS, missed-session alerts, and exercise regimen prescription. |
+| **COUNSELOR** | Amethyst Psychology (`#7c3aed`) | `CIV-PSY-042` | `kavach123` | Doctor MH-access authorization queue, proactive nudge queue (PHQ-9/PCL-5 triggers), sealed AES-256 CBT note entry. |
+| **CLAIMS_OFFICER** | ECHS Amber (`#d97706`) | `IC-48291M` | `kavach123` | ECHS disability adjudication pipeline (Stages 1–5), non-mental-health physical service injury proofs only. |
+| **COMMANDING_OFFICER** | Tactical Slate (`#1e293b`) | `IC-51920P` | `kavach123` | Aggregate battalion readiness & SHAPE-1 ratios. Absolutely zero access to individual mental health dossiers. |
 
 ---
 
@@ -37,127 +38,130 @@
 ```
                                ┌────────────────────────────────────────────────────────┐
                                │                    KAVACH FRONTEND                     │
-                               │  - Modern React-like SPA & Military Design System       │
+                               │  - 6 Discrete Role Dashboards (Soldier, Doctor, Physio, │
+                               │    Counselor, Claims Officer, Commanding Officer)      │
+                               │  - Authoritative Auth Guard calling /api/auth/me       │
                                │  - Offline-first encrypted cache + live sync badge     │
-                               │  - Role switcher (RBAC) & Hindi / English toggle       │
-                               │  - Crisis help bar (Tele-MANAS / Sanjeevani) & quick-exit│
+                               │  - Crisis help bar (Tele-MANAS / Sanjeevani)           │
                                └───────────────────────────┬────────────────────────────┘
-                                                           │ REST / JSON (HTTP)
+                                                           │ Bearer JWT / JSON (HTTP)
                                                            ▼
     ┌───────────────────────────────────────────────────────────────────────────────────┐
     │                       KAVACH REST API & RBAC SECURITY BARRIER                     │
-    │  - JWT Authentication carrying user role (SOLDIER, DOCTOR, COUNSELOR, CLAIMS, CO) │
-    │  - Mental Health Privacy Barrier: Claims Officers & COs barred with HTTP 403      │
+    │  - HMAC-SHA256 JWT Authentication with strict 8-hour expiry ('exp')               │
+    │  - require_role(*roles): 401 unauthenticated, 403 + BLOCKED audit log on mismatch │
+    │  - Zero fallbacks to default users; ?role= query override strictly eliminated     │
     │  - Cryptographic Verification: SHA-256 HMAC checksums + AES-256-GCM data at rest │
-    │  - Append-Only Tamper-Proof Audit Logger: logs all accesses & BLOCKED attempts    │
+    │  - Immutable Audit Logger: logs all accesses, grants, and BLOCKED attempts        │
     └───────────────────────────────────────┬───────────────────────────────────────────┘
                                             │
                                             ▼
     ┌───────────────────────────────────────────────────────────────────────────────────┐
     │                               DATABASE REPOSITORY                                 │
     │  USERS | RECORDS | ACCESS_GRANTS | SCREENINGS | REHAB_PLANS | CONSULTATIONS | AUDIT│
-    │  - Full PostgreSQL Schema (backend/schema.sql)                                   │
     │  - Zero-Dependency Built-in Engine (server.py on port 8000)                        │
+    │  - Full PostgreSQL Schema (backend/schema.sql)                                   │
     └───────────────────────────────────────────────────────────────────────────────────┘
 ```
 
 ### Security & Privacy Protections
-1. **AES-256-GCM Encryption at Rest:** Mental health evaluations and sensitive clinical diagnoses are encrypted at rest with authenticated tags (`authTag`) and unique IVs.
-2. **SHA-256 Tamper-Proof Seals:** Every record payload generates an immutable SHA-256 HMAC seal. If a record is tampered with in transit or storage, the checksum fails immediately.
-3. **Strict Role-Based Access Control (RBAC):**
-   * **Soldier (`SOLDIER`):** Sees everything of his own and controls who gets access. Can revoke consent at any second.
-   * **Doctor & Physiotherapist (`DOCTOR`, `PHYSIOTHERAPIST`):** Access medical history under active consent grants, but **never** private counseling notes.
-   * **Counselor (`COUNSELOR`):** Sees psychological assessments and trend trajectories under active soldier consent.
-   * **Claims Officer (`CLAIMS_OFFICER`):** Sees physical service injuries, battle casualties, and surgical summaries. Querying mental health triggers **ACCESS DENIED** (HTTP 403) and permanently logs a `BLOCKED` attempt in the audit log.
-   * **Commanding Officer (`COMMANDING_OFFICER`):** Barred from soldier mental health data by military privacy regulation.
-4. **Immutable Audit Logging:** Every read, creation, grant revocation, and blocked attempt is immutably logged with user role, soldier ID, timestamp, and IP address.
+1. **Cryptographic JWT Tokens:** Signed with HMAC-SHA256 with 8-hour expiration (`exp`). Expired or tampered tokens are rejected with HTTP 401.
+2. **Authoritative Server Role Enforcement:** Every sensitive endpoint strictly checks `require_role(*roles)`. If a user attempts to call an unauthorized endpoint (e.g. Doctor calling `/api/claims`), the server immediately halts the request with HTTP 403 and records a permanent `BLOCKED` entry in `audit_log`.
+3. **AES-256-GCM Encryption at Rest:** Mental health evaluations and sensitive clinical diagnoses are encrypted at rest with authenticated tags (`authTag`) and unique IVs.
+4. **SHA-256 Tamper-Proof Seals:** Every record payload generates an immutable SHA-256 HMAC seal. If a record is tampered with in transit or storage, the checksum fails immediately.
+5. **Client-Side Auth Guard (`frontend/shared/auth_guard.js`):** `enforceRoleGuard()` calls `GET /api/auth/me` on load. If the server returns 401 or a role mismatch, storage is wiped completely and the browser is redirected to login. `logoutUser()` purges both `localStorage` and `sessionStorage`.
+6. **No Leaked Hashes:** Password hashes are stripped via `safe_user()` from all API responses (login, register, `/api/auth/me`, `/api/doctor/credentials`, `/api/database/*`).
 
 ---
 
-## 🪖 Demo Soldier Profile: Rifleman Arjun Verma
-
-* **Service Number:** `15489201A`
-* **Unit:** 14 Rajputana Rifles | **Branch:** Indian Army
-* **3 Postings Tracked in Wallet:**
-  1. **Siachen Base Camp (2021–2022):** Extreme high-altitude adaptation, frostbite prophylaxis, and vaccination records.
-  2. **North East / Tawang (2022–2023):** Grade III Left Knee Meniscus Tear sustained on snow patrol. Arthroscopic surgical repair at 151 Base Hospital Guwahati.
-  3. **Rajasthan / Desert Sector (2023–Present):** Battle shrapnel wound right deltoid sustained in tactical firing. Debrided and healed.
-* **Rising Stress Trend:** 6 weeks of PHQ-9 depression check-ins escalating from score **5** up to **13**, crossing clinical threshold 10 and activating a **Counselor Proactive Nudge**.
-* **Rehab Plan:** 20-session left knee meniscus rehabilitation protocol. Currently on **Session 14 of 20 (70% progress)**. Includes daily exercise checklist, pain slider (VAS 0–10), and automated physiotherapist alert on missed sessions.
-
----
-
-## 🚀 Live Hackathon Demo Flow (Step-by-Step)
-
-The application includes interactive 1-click **Demo Flow** buttons in the top banner:
-
-1. **Step 1: Log in as Soldier**
-   * View the **Health Wallet** grouped by posting (Rajasthan, North East, Siachen).
-   * Notice SHA-256 verified tamper-proof seals on every record.
-   * Inspect the **Stress Screening** tab to see the 6-week rising PHQ-9 trend graph (5 ➔ 13) with the Counselor Nudge alert.
-   * Inspect the **Rehab Tracker** with the 20-session knee plan, checkboxes, and pain slider.
-2. **Step 2: Switch to Counselor (`Dr. Sunita Rao`)**
-   * Mental health assessments and confidential clinical notes become visible under active patient consent.
-   * Review escalating stress trajectories and clinical outreach recommendations.
-3. **Step 3: Switch to Claims Officer (`Col. V.K. Singh, ECHS`)**
-   * Battle casualties and physical service injuries remain fully visible with verified hashes for pension adjudication.
-   * Click **"Test Mental Health Access"** or navigate to Mental Health records.
-   * A prominent, red **ACCESS DENIED** security modal appears!
-   * Switch to the **Audit Log** tab: observe the security violation permanently logged as `[BLOCKED] ACCESS_DENIED_MENTAL_HEALTH by CLAIMS_OFFICER`.
-4. **Step 4: Book a Teleconsultation**
-   * Launch a secure encrypted teleconsultation (mock video call with timer and clinical specialist).
-   * Click **"End Call & Save"**: the consult summary, clinical notes, and follow-up directives are **automatically saved directly into the Soldier's Health Wallet**.
-
----
-
-## 💻 Tech Stack & Directory Structure
+## 💻 Directory Structure
 
 ```
 KAVACH/
-├── backend/
-│   ├── package.json          # Node.js backend package
-│   ├── server.js             # Express REST API with JWT, RBAC, AES-256, Audit Logging
-│   ├── schema.sql            # Full PostgreSQL schema with tables, constraints & triggers
-│   └── crypto_utils.js       # AES-256-GCM encryption & SHA-256 HMAC checksums
-├── server.py                 # Zero-dependency Python server (serves REST API & Web UI on port 8000)
-├── public/
-│   ├── index.html            # Responsive military UI with Crisis Bar & Role Switcher
-│   ├── app.js                # Frontend state, RBAC handler, trend charts, teleconsult call
-│   └── styles.css            # Olive Green, Khaki, White & Alert Red design system + Dark Mode
-└── README.md                 # Complete documentation & demo walkthrough
+├── server.py                                # Zero-dependency Python server & REST API (port 8000)
+├── database/
+│   └── kavach_db.json                       # Persistent JSON database with military seed records
+├── frontend/
+│   ├── index.html                           # Landing portal redirecting to login
+│   ├── auth/
+│   │   ├── login.html                       # Military authentication console
+│   │   ├── login.js                         # Login authentication handler
+│   │   ├── register.html                    # Personnel enrollment console
+│   │   └── register.js                      # Enrollment handler
+│   ├── dashboards/
+│   │   ├── soldier/                         # Soldier Health Wallet (Olive)
+│   │   │   ├── soldier.html
+│   │   │   ├── soldier.js
+│   │   │   └── soldier.css
+│   │   ├── doctor/                          # Doctor Consultation Terminal (AMC Blue)
+│   │   │   ├── doctor.html
+│   │   │   └── doctor.js
+│   │   ├── physio/                          # Physiotherapy & Rehab Portal (Emerald)
+│   │   │   ├── physio.html
+│   │   │   └── physio.js
+│   │   ├── counselor/                       # AFMS Psychological Support Cell (Amethyst)
+│   │   │   ├── counselor.html
+│   │   │   └── counselor.js
+│   │   ├── claims/                          # ECHS Disability Adjudication (Amber)
+│   │   │   ├── claims.html
+│   │   │   └── claims.js
+│   │   └── commanding/                      # Unit Regimental Command (Slate)
+│   │       ├── commanding.html
+│   │       └── commanding.js
+│   └── shared/
+│       ├── auth_guard.js                    # Authoritative /api/auth/me role guard & storage purge
+│       └── shared.css                       # Military design system & responsive styling
+└── README.md
 ```
 
 ---
 
 ## 🏃 Running the Application
 
-### Option A: Immediate Zero-Dependency Runner (Default)
+### Immediate Zero-Dependency Runner (Default)
 Run the application locally without installing external packages:
 ```bash
 python3 server.py
 ```
-Open **`http://localhost:8000`** in any web browser.
-
-### Option B: Node.js / Express Backend with PostgreSQL
-If Node.js and PostgreSQL are installed:
-```bash
-cd backend
-npm install
-node server.js
-```
+Open **`http://localhost:8000`** in any modern web browser.
 
 ---
 
-## 🇮🇳 Features Checklist
+## 🧪 Verification & Test Checklist
 
-- [x] **Health Wallet:** Encrypted records grouped by posting (Siachen, North East, Rajasthan) with tamper-proof SHA-256 seals.
-- [x] **Teleconsultation:** Booking flow with mock military video call, active timer, and automatic persisting of consult summary to wallet.
-- [x] **Stress Screening:** Interactive PCL-5, PHQ-9, and GAD-7 check-ins with 6-week trend graph (5 to 13) and counselor nudge.
-- [x] **Rehab Tracker:** 20-session knee plan, progress bar, interactive exercise checklist, pain slider (VAS 0–10), and missed session alert to physio.
-- [x] **Strict RBAC & Privacy Barrier:** Claims Officers & COs are blocked from mental health records with HTTP 403 and bold ACCESS DENIED screen.
-- [x] **Immutable Audit Log:** Live chronological audit trail recording every access and blocked attempt.
-- [x] **Consent Grants with Revoke:** Instant revocation of provider access by the soldier.
-- [x] **Emergency Field QR Card:** Instant access to blood group (O+), allergies (Penicillin), and ICE contacts.
-- [x] **Claim-Ready Summary:** Single-click export of authenticated service history for ECHS disability claims.
-- [x] **Bilingual Support:** Full English and Hindi (हिन्दी) toggle across the entire dashboard.
-- [x] **Military Design System:** Authentic olive green, khaki, and white theme, red strictly reserved for medical cross and security alerts, with Dark/Light mode toggle and Quick-Exit privacy curtain.
+### 1. Positive Login Tests (All 6 Roles)
+Log in via `http://localhost:8000/frontend/auth/login.html` with the seeded credentials:
+
+1. **SOLDIER (`15489201A` / `kavach123`):**
+   * Lands on `frontend/dashboards/soldier/soldier.html`.
+   * Sees Rifleman Arjun Verma's personal wallet, postings (Rajasthan, North East, Siachen), stress screenings, and active rehab tracker.
+2. **DOCTOR (`MR-09824X` / `kavach123`):**
+   * Lands on `frontend/dashboards/doctor/doctor.html` with AMC Blue styling.
+   * Sees Capt. Dr. Priya Nair's header, active patient directory (only soldiers with active DOCTOR grants), and search.
+   * Clicking "Open Wallet" inspects the soldier's verified history, dynamic rehab banner, and sealed mental health access status.
+3. **PHYSIOTHERAPIST (`MR-11204K` / `kavach123`):**
+   * Lands on `frontend/dashboards/physio/physio.html` with Emerald styling.
+   * Sees Lt. Rajesh Kumar's header, assigned rehab patients directory, adherence metrics (70%), joint mobility arc (115°), and missed session alert with "Send Adherence Push".
+4. **COUNSELOR (`CIV-PSY-042` / `kavach123`):**
+   * Lands on `frontend/dashboards/counselor/counselor.html` with Amethyst styling.
+   * Sees Dr. Sunita Rao's header, doctor consultation access request queue with Approve/Deny buttons, proactive nudge queue, and screening trends.
+5. **CLAIMS_OFFICER (`IC-48291M` / `kavach123`):**
+   * Lands on `frontend/dashboards/claims/claims.html` with Amber styling.
+   * Sees Col. V.K. Singh's header, claims queue directory, 5-stage moving adjudication pipeline, and non-mental-health physical service injury proofs only.
+6. **COMMANDING_OFFICER (`IC-51920P` / `kavach123`):**
+   * Lands on `frontend/dashboards/commanding/commanding.html` with Tactical Slate styling.
+   * Sees Col. R.S. Rathore's header, aggregate battalion readiness metrics (842 strength, 96.0% SHAPE-1), and explicit Command Mental Health Privacy Barrier.
+
+### 2. Negative Security Tests
+- **Test (a) - Doctor calling `/api/claims`:**
+  * Request `GET /api/claims` with Doctor's Bearer token.
+  * Result: **HTTP 403 Forbidden** + Audit log records `[BLOCKED] ROLE_ACCESS_DENIED`.
+- **Test (b) - Soldier opening Doctor dashboard:**
+  * Logged in as SOLDIER, navigate directly to `frontend/dashboards/doctor/doctor.html`.
+  * Result: `enforceRoleGuard('DOCTOR')` detects role mismatch via `/api/auth/me`, clears storage, and redirects to login with an RBAC warning.
+- **Test (c) - Invalid or Expired Token:**
+  * Call any protected endpoint (`/api/auth/me`, `/api/records`, etc.) with an expired or tampered token.
+  * Result: **HTTP 401 Unauthorized**.
+- **Test (d) - Doctor requesting patient without active grant:**
+  * Doctor calls `GET /api/doctor/active-patient?soldier_id=usr-soldier-no-grant`.
+  * Result: **HTTP 403 Forbidden** + Audit log records `[BLOCKED] ACCESS_DENIED_NO_GRANT`.
