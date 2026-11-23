@@ -1171,11 +1171,19 @@ class KavachRequestHandler(http.server.SimpleHTTPRequestHandler):
             soldier_id = user['id'] if user.get('role') == 'SOLDIER' else payload.get('soldier_id', 'usr-soldier-1')
             q_type = payload.get('questionnaire_type', 'PHQ-9')
             answers = payload.get('answers', [])
-            
+            clean_answers = []
             if answers and isinstance(answers, list) and len(answers) > 0:
-                score = sum(int(a) for a in answers)
+                for a in answers:
+                    try:
+                        clean_answers.append(int(a) if a is not None else 0)
+                    except (ValueError, TypeError):
+                        clean_answers.append(0)
+                score = sum(clean_answers)
             else:
-                score = int(payload.get('score', 0))
+                try:
+                    score = int(payload.get('score', 0))
+                except (ValueError, TypeError):
+                    score = 0
 
             q_info = CLINICAL_QUESTIONNAIRES.get(q_type, CLINICAL_QUESTIONNAIRES['PHQ-9'])
             max_score = q_info['max_score']
@@ -1190,12 +1198,13 @@ class KavachRequestHandler(http.server.SimpleHTTPRequestHandler):
                 "severity": severity,
                 "color_code": color_code,
                 "clinical_advice": advice,
-                "answers": answers,
+                "answers": clean_answers,
                 "date": datetime.date.today().isoformat(),
                 "counselor_nudge_triggered": nudge,
                 "created_at": datetime.datetime.now(datetime.timezone.utc).isoformat()
             }
-            DB.setdefault('screenings', []).append(scr)
+            DB.setdefault('screenings', []).insert(0, scr)
+            save_db()
 
             if nudge:
                 notif = {

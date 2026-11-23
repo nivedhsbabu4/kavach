@@ -247,12 +247,14 @@
       "granted_to_role": "DOCTOR",
       "granted_by": "usr-soldier-1",
       "purpose": "Routine Orthopedic Follow-up & Knee Evaluation",
-      "expiry_date": "2026-12-31T23:59:59Z",
-      "status": "ACTIVE",
+      "expiry_date": "2026-12-23",
+      "status": "REVOKED",
       "access_count": 4,
       "last_accessed_at": "Today at 09:30 AM",
       "is_live": true,
-      "created_at": "2024-01-15T09:00:00Z"
+      "created_at": "2024-01-15T09:00:00Z",
+      "last_accessed": "23 Nov 2026 13:33",
+      "visits_count": 3
     },
     {
       "id": "grant-002",
@@ -292,12 +294,14 @@
       "granted_to_role": "CLAIMS_OFFICER",
       "granted_by": "usr-soldier-1",
       "purpose": "Disability & Combat Injury Verification for ECHS Claim",
-      "expiry_date": "2026-12-31T23:59:59Z",
+      "expiry_date": "2026-12-23",
       "status": "ACTIVE",
       "access_count": 3,
       "last_accessed_at": "Nov 22, 2024 at 11:15 AM",
       "is_live": false,
-      "created_at": "2024-03-01T12:00:00Z"
+      "created_at": "2024-03-01T12:00:00Z",
+      "last_accessed": "23 Nov 2026 13:35",
+      "visits_count": 2
     }
   ],
   "screenings": [
@@ -534,6 +538,174 @@
     }
   ],
   "audit_log": [
+    {
+      "id": "aud-1795421481900",
+      "user_id": "usr-claims-1",
+      "user_role": "CLAIMS_OFFICER",
+      "soldier_id": "usr-soldier-1",
+      "record_id": null,
+      "action": "VIEW_SERVICE_INJURIES",
+      "timestamp": "2026-11-23T08:11:21.900530+00:00",
+      "status": "ALLOWED",
+      "details": "Claims Officer verified battle and physical service injuries for ECHS claim processing",
+      "ip_address": "127.0.0.1"
+    },
+    {
+      "id": "aud-1795421269499",
+      "user_id": "usr-claims-1",
+      "user_role": "CLAIMS_OFFICER",
+      "soldier_id": "usr-soldier-1",
+      "record_id": null,
+      "action": "VIEW_SERVICE_INJURIES",
+      "timestamp": "2026-11-23T08:07:49.499734+00:00",
+      "status": "ALLOWED",
+      "details": "Claims Officer verified battle and physical service injuries for ECHS claim processing",
+      "ip_address": "127.0.0.1"
+    },
+    {
+      "id": "aud-1795421268681",
+      "user_id": "usr-claims-1",
+      "user_role": "CLAIMS_OFFICER",
+      "soldier_id": "usr-claims-1",
+      "record_id": null,
+      "action": "LOGIN_SUCCESS",
+      "timestamp": "2026-11-23T08:07:48.681137+00:00",
+      "status": "SUCCESS",
+      "details": "Personnel Col. V.K. Singh (Retd) (IC-48291M) authenticated via JWT",
+      "ip_address": "127.0.0.1"
+    },
+    {
+      "id": "aud-1795421195675",
+      "user_id": "usr-soldier-1",
+      "user_role": "SOLDIER",
+      "soldier_id": "usr-soldier-1",
+      "record_id": null,
+      "action": "VIEW_WALLET",
+      "timestamp": "2026-11-23T08:06:35.675881+00:00",
+      "status": "ALLOWED",
+      "details": "Soldier opened comprehensive health wallet",
+      "ip_address": "127.0.0.1"
+    },
+    {
+      "id": "aud-1795421191814",
+      "user_id": "usr-soldier-1",
+      "user_role": "SOLDIER",
+      "soldier_id": "usr-soldier-1",
+      "record_id": null,
+      "action": "LOGIN_SUCCESS",
+      "timestamp": "2026-11-23T08:06:31.814100+00:00",
+      "status": "SUCCESS",
+      "details": "Personnel Rifleman Arjun Verma (15489201A) authenticated via JWT",
+      "ip_address": "127.0.0.1"
+    },
+    {
+      "id": "aud-1795421138886",
+      "user_id": "usr-claims-1",
+      "user_role": "CLAIMS_OFFICER",
+      "soldier_id": "usr-soldier-1",
+      "record_id": null,
+      "action": "TOGGLE_GRANT",
+      "timestamp": "2026-11-23T08:05:38.886884+00:00",
+      "status": "SUCCESS",
+      "details": "Access grant status switched to ACTIVE for CLAIMS_OFFICER",
+      "ip_address": "127.0.0.1"
+    },
+    {
+      "id": "aud-1795421133587",
+      "user_id": "usr-claims-1",
+      "user_role": "CLAIMS_OFFICER",
+      "soldier_id": "usr-soldier-1",
+      "record_id": null,
+      "action": "TOGGLE_GRANT",
+      "timestamp": "2026-11-23T08:05:33.587691+00:00",
+      "status": "SUCCESS",
+      "details": "Access grant status switched to REVOKED for CLAIMS_OFFICER",
+      "ip_address": "127.0.0.1"
+    },
+    {
+      "id": "aud-1795421115007",
+      "user_id": "usr-claims-1",
+      "user_role": "CLAIMS_OFFICER",
+      "soldier_id": "usr-soldier-1",
+      "record_id": null,
+      "action": "VIEW_SERVICE_INJURIES",
+      "timestamp": "2026-11-23T08:05:15.007104+00:00",
+      "status": "ALLOWED",
+      "details": "Claims Officer verified battle and physical service injuries for ECHS claim processing",
+      "ip_address": "127.0.0.1"
+    },
+    {
+      "id": "aud-1795421114224",
+      "user_id": "usr-claims-1",
+      "user_role": "CLAIMS_OFFICER",
+      "soldier_id": "usr-claims-1",
+      "record_id": null,
+      "action": "LOGIN_SUCCESS",
+      "timestamp": "2026-11-23T08:05:14.224571+00:00",
+      "status": "SUCCESS",
+      "details": "Personnel Col. V.K. Singh (Retd) (IC-48291M) authenticated via JWT",
+      "ip_address": "127.0.0.1"
+    },
+    {
+      "id": "aud-1795421022903",
+      "user_id": "usr-soldier-1",
+      "user_role": "SOLDIER",
+      "soldier_id": "usr-soldier-1",
+      "record_id": null,
+      "action": "TOGGLE_GRANT",
+      "timestamp": "2026-11-23T08:03:42.903623+00:00",
+      "status": "SUCCESS",
+      "details": "Access grant status switched to REVOKED for DOCTOR",
+      "ip_address": "127.0.0.1"
+    },
+    {
+      "id": "aud-1795421019571",
+      "user_id": "usr-soldier-1",
+      "user_role": "SOLDIER",
+      "soldier_id": "usr-soldier-1",
+      "record_id": null,
+      "action": "TOGGLE_GRANT",
+      "timestamp": "2026-11-23T08:03:39.571197+00:00",
+      "status": "SUCCESS",
+      "details": "Access grant status switched to ACTIVE for DOCTOR",
+      "ip_address": "127.0.0.1"
+    },
+    {
+      "id": "aud-1795421014306",
+      "user_id": "usr-soldier-1",
+      "user_role": "SOLDIER",
+      "soldier_id": "usr-soldier-1",
+      "record_id": null,
+      "action": "TOGGLE_GRANT",
+      "timestamp": "2026-11-23T08:03:34.306058+00:00",
+      "status": "SUCCESS",
+      "details": "Access grant status switched to REVOKED for DOCTOR",
+      "ip_address": "127.0.0.1"
+    },
+    {
+      "id": "aud-1795420991759",
+      "user_id": "usr-soldier-1",
+      "user_role": "SOLDIER",
+      "soldier_id": "usr-soldier-1",
+      "record_id": null,
+      "action": "VIEW_WALLET",
+      "timestamp": "2026-11-23T08:03:11.759591+00:00",
+      "status": "ALLOWED",
+      "details": "Soldier opened comprehensive health wallet",
+      "ip_address": "127.0.0.1"
+    },
+    {
+      "id": "aud-1795420769475",
+      "user_id": "usr-soldier-1",
+      "user_role": "SOLDIER",
+      "soldier_id": "usr-soldier-1",
+      "record_id": null,
+      "action": "VIEW_WALLET",
+      "timestamp": "2026-11-23T07:59:29.475590+00:00",
+      "status": "ALLOWED",
+      "details": "Soldier opened comprehensive health wallet",
+      "ip_address": "127.0.0.1"
+    },
     {
       "id": "aud-1795416854313",
       "user_id": "usr-soldier-1",
@@ -781,5 +953,6 @@
       "is_read": false,
       "priority": "HIGH"
     }
-  ]
+  ],
+  "last_active_soldier_id": "usr-soldier-1"
 }
