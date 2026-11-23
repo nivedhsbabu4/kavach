@@ -1331,3 +1331,39 @@ body {
 [data-theme="dark"] .access-denied-text {
   color: #fecdd3;
 }
+
+/* ==========================================================================
+   11. PRINT STYLESHEET (OFFICIAL AFMS CLINICAL DOSSIER)
+   ========================================================================== */
+@media print {
+  body {
+    background: #ffffff !important;
+    color: #000000 !important;
+  }
+  .crisis-topbar,
+  .kavach-header,
+  .tab-nav,
+  .quick-action-fab,
+  .quick-drawer,
+  .modal-backdrop,
+  .modal,
+  .btn,
+  button,
+  .badge-live-pulse,
+  .app-toast-container,
+  #toastContainer {
+    display: none !important;
+  }
+  .dashboard-container,
+  .main-content,
+  .card,
+  .section-card {
+    box-shadow: none !important;
+    border: 1px solid #999999 !important;
+    background: #ffffff !important;
+    color: #000000 !important;
+    width: 100% !important;
+    margin: 12px 0 !important;
+    padding: 12px !important;
+  }
+}

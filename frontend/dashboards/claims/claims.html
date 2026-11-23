@@ -16,7 +16,6 @@
       <span style="font-weight: 800;">⚖️ ECHS CENTRAL ADJUDICATION ORG &bull; ADJUTANT GENERAL'S BRANCH</span>
       <span style="font-size: 0.75rem; color: var(--gold-light);">DISABILITY PENSION CELL &bull; NEW DELHI</span>
     </div>
-    <button class="btn-logout" onclick="logoutUser()">LOGOUT</button>
   </aside>
 
   <header class="app-header">
@@ -53,31 +52,100 @@
     </div>
   </header>
 
+  <!-- Inline Toast Container (No Browser Alerts!) -->
+  <div id="toastContainer" style="position: fixed; top: 20px; right: 20px; z-index: 9999; display: flex; flex-direction: column; gap: 10px;"></div>
+
   <div class="dashboard-layout">
-    <main class="main-content" style="padding: 24px;">
-      <!-- Claims Officer Policy Notice -->
-      <div style="background: #fefce8; border: 1.5px solid #ca8a04; border-radius: 8px; padding: 14px 20px; margin-bottom: 22px; display: flex; justify-content: space-between; align-items: center;">
-        <div>
-          <strong style="color: #854d0e; font-size: 0.95rem; display: block;">⚖️ ECHS Adjudication Integrity Protocol Active</strong>
-          <span style="font-size: 0.82rem; color: #713f12;">
-            Evaluating verified battle casualty and physical service injuries for Rifleman Arjun Verma (15489201A). Cryptographic SHA-256 HMAC checksums authenticate uninterrupted chain-of-custody across transfers.
-          </span>
+    <main class="main-content" style="padding: 24px; max-width: 1200px; margin: 0 auto;">
+
+      <!-- Patient Header & Sovereign Grant Switch -->
+      <div class="card" style="margin-bottom: 22px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: gap; gap: 16px;">
+          <div>
+            <div style="display: flex; align-items: center; gap: 10px;">
+              <h2 style="font-size: 1.25rem; font-weight: 900; margin: 0;">Rifleman Arjun Verma</h2>
+              <span class="badge-tag badge-vaccine">14 RAJPUTANA RIFLES</span>
+              <span style="font-size: 0.8rem; color: var(--text-muted);">Service No: <strong>15489201A</strong></span>
+            </div>
+            <div style="font-size: 0.82rem; color: var(--text-muted); margin-top: 4px;">
+              Primary Disability Claim: <strong>Battle Shrapnel Wound (Right Deltoid) &bull; Left Knee Meniscectomy</strong> &bull; Attributable to Military Service
+            </div>
+          </div>
+
+          <!-- Sovereign Access Grant Switch (Syncs with Soldier Side!) -->
+          <div style="background: var(--bg-main); border: 1.5px solid var(--border-color); border-radius: 10px; padding: 12px 18px; display: flex; align-items: center; gap: 14px;">
+            <div>
+              <div style="font-size: 0.72rem; font-weight: 800; text-transform: uppercase; color: var(--text-muted);">Sovereign Verification Grant</div>
+              <div style="display: flex; align-items: center; gap: 6px; margin-top: 2px;">
+                <span id="grantStatusPill" class="badge-tag badge-vaccine" style="font-size: 0.75rem; font-weight: 800;">ACTIVE CONSENT</span>
+                <span id="grantExpiryText" style="font-size: 0.72rem; color: var(--text-muted);">Exp: 31 Dec 2026</span>
+              </div>
+            </div>
+            <button id="toggleGrantBtn" class="btn-primary" style="font-size: 0.78rem; padding: 7px 14px;" onclick="handleToggleGrant()">
+              🔄 Toggle Grant / Revoke
+            </button>
+          </div>
         </div>
-        <button class="btn-primary" style="background: #dc2626;" onclick="attemptInspectMentalHealth()">
-          🔒 Test Mental Health Dossier Access
-        </button>
       </div>
 
-      <!-- Verified Physical Service Records -->
+      <!-- Disability Claim Pipeline Stage Tracker (Moving Line) -->
+      <div class="card" style="margin-bottom: 22px;">
+        <div class="card-header">
+          <div>
+            <h3 class="card-title">📋 ECHS Disability Claim Adjudication Pipeline</h3>
+            <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 2px;">
+              Claim ID: <strong>CLM-2024-8841</strong> &bull; Adjudication Officer: Col. V.K. Singh (Retd) &bull; Verified Attributable to Active Service
+            </div>
+          </div>
+          <button class="btn-outline" onclick="window.print()" style="font-size: 0.78rem; padding: 6px 12px;">
+            🖨️ Print Disability Board Summary
+          </button>
+        </div>
+
+        <!-- 5-Stage Moving Pipeline Line -->
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin: 16px 0;">
+          <div style="padding: 12px; border-radius: 8px; border: 1.5px solid #16a34a; background: #f0fdf4;">
+            <div style="font-size: 0.7rem; font-weight: 800; color: #166534;">STAGE 1 &bull; COMPLETED</div>
+            <div style="font-size: 0.9rem; font-weight: 800; margin-top: 2px;">Claim Submitted</div>
+            <div style="font-size: 0.74rem; color: #15803d; margin-top: 2px;">10 Oct 2024 &bull; Service Records Verified</div>
+          </div>
+
+          <div style="padding: 12px; border-radius: 8px; border: 1.5px solid #16a34a; background: #f0fdf4;">
+            <div style="font-size: 0.7rem; font-weight: 800; color: #166534;">STAGE 2 &bull; COMPLETED</div>
+            <div style="font-size: 0.9rem; font-weight: 800; margin-top: 2px;">Medical Board Assessment</div>
+            <div style="font-size: 0.74rem; color: #15803d; margin-top: 2px;">28 Oct 2024 &bull; Classified 40% Disability</div>
+          </div>
+
+          <div style="padding: 12px; border-radius: 8px; border: 2px solid #2563eb; background: #eff6ff; box-shadow: 0 2px 8px rgba(37,99,235,0.15);">
+            <div style="font-size: 0.7rem; font-weight: 800; color: #1e40af;">STAGE 3 &bull; IN ADJUDICATION</div>
+            <div style="font-size: 0.9rem; font-weight: 800; color: #1e3a8a; margin-top: 2px;">Disability Compensation Review</div>
+            <div style="font-size: 0.74rem; color: #2563eb; margin-top: 2px;">Proposed: ₹18,500/mo Pension + Ex-gratia</div>
+          </div>
+
+          <div style="padding: 12px; border-radius: 8px; border: 1px dashed var(--border-color); background: var(--bg-card);">
+            <div style="font-size: 0.7rem; font-weight: 800; color: var(--text-muted);">STAGE 4 &bull; PENDING</div>
+            <div style="font-size: 0.9rem; font-weight: 700; color: var(--text-muted); margin-top: 2px;">PCDA Sanction &amp; Disbursement</div>
+            <div style="font-size: 0.74rem; color: var(--text-muted); margin-top: 2px;">Awaiting Final Adjudicator Sign-off</div>
+          </div>
+        </div>
+
+        <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 14px;">
+          <button class="btn-primary" style="background: #15803d; border-color: #166534;" onclick="advanceClaimStage()">
+            ✓ Sanction &amp; Advance Claim to PCDA →
+          </button>
+        </div>
+      </div>
+
+      <!-- Verified Physical Service Records & Battle Casualties -->
       <div class="card">
         <div class="card-header">
           <div>
-            <h2 class="card-title">📁 Verified Service Records &amp; Battle Casualties (Rfn. Arjun Verma)</h2>
+            <h3 class="card-title">📁 Verified Physical Service Records &amp; Battle Casualties</h3>
             <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 2px;">
-              Physical injuries across all postings &bull; Tamper-proof verified for disability pension computation
+              Tamper-proof medical records across all postings &bull; Sealed with SHA-256 HMAC cryptographic checksums
             </div>
           </div>
-          <span class="badge-tag badge-vaccine">5 EVIDENCE PROOFS VERIFIED</span>
+          <span class="badge-tag badge-vaccine" id="recordsCountBadge">5 EVIDENCE PROOFS VERIFIED</span>
         </div>
 
         <div class="records-grid" id="claimsRecordsGrid">
@@ -85,32 +153,6 @@
         </div>
       </div>
 
-      <!-- Mental Health Privacy Barrier Screen (Prominent Red ACCESS DENIED box) -->
-      <div class="card" style="border: 2px solid #dc2626; background: #fff5f5;" id="mentalHealthBarrierCard">
-        <div class="card-header" style="border-bottom: 1.5px solid #fecaca;">
-          <div style="display: flex; align-items: center; gap: 8px;">
-            <span style="font-size: 1.5rem;">⛔</span>
-            <h3 style="font-size: 1.15rem; font-weight: 900; color: #991b1b; letter-spacing: 0.5px;">
-              ACCESS DENIED: RESTRICTED PRIVACY BARRIER
-            </h3>
-          </div>
-          <span class="badge-tag badge-injury" style="background: #dc2626; color: #fff;">
-            RBAC PROHIBITED
-          </span>
-        </div>
-
-        <div style="padding: 10px 0; color: #7f1d1d; font-size: 0.88rem; line-height: 1.55;">
-          <p style="margin-bottom: 10px;">
-            <strong>Under Armed Forces Mental Health Directives &amp; Kavach RBAC Security Rules:</strong>
-            Claims Officers, unit commanding officers, and external administrative personnel are <strong>strictly barred</strong> from inspecting confidential psychological check-ins, depression scores, or counseling notes.
-          </p>
-          <div style="background: rgba(220, 38, 38, 0.1); border: 1px dashed #dc2626; padding: 10px 14px; border-radius: 6px; font-family: monospace; font-size: 0.78rem;">
-            [SECURITY AUDIT LOGGED]<br />
-            Status: BLOCKED &bull; Policy: ROLE_MENTAL_HEALTH_FORBIDDEN &bull; Target: Rifleman Arjun Verma (15489201A)<br />
-            User: Col. V.K. Singh (CLAIMS_OFFICER) &bull; Timestamped at AFMS Security Controller
-          </div>
-        </div>
-      </div>
     </main>
   </div>
 

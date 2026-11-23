@@ -12,13 +12,13 @@ function enforceRoleGuard(expectedRole) {
   const name = localStorage.getItem('kavach_user_name');
 
   if (!token || !role) {
-    alert('Military Authentication Required. Please login.');
+    sessionStorage.setItem('kavach_auth_msg', 'Military Authentication Required. Please login.');
     window.location.href = '../../auth/login.html';
     return false;
   }
 
   if (role !== expectedRole) {
-    alert(`⛔ RBAC ACCESS FORBIDDEN:\nYou are logged in as ${role} (${name}).\nYou are not authorized to view the ${expectedRole} Dashboard!`);
+    sessionStorage.setItem('kavach_auth_msg', `⛔ RBAC ACCESS FORBIDDEN: You are logged in as ${role} (${name}). Redirected to your authorized post.`);
     
     // Redirect to their own authorized dashboard
     const dashboardMap = {
@@ -51,12 +51,10 @@ function getAuthHeaders() {
  * Log out and return to the login console
  */
 function logoutUser() {
-  if (confirm('Terminate session and log out of Kavach secure terminal?')) {
-    localStorage.removeItem('kavach_jwt_token');
-    localStorage.removeItem('kavach_user_role');
-    localStorage.removeItem('kavach_user_name');
-    localStorage.removeItem('kavach_user_service_no');
-    localStorage.removeItem('kavach_user_id');
-    window.location.href = '../../auth/login.html';
-  }
+  localStorage.removeItem('kavach_jwt_token');
+  localStorage.removeItem('kavach_user_role');
+  localStorage.removeItem('kavach_user_name');
+  localStorage.removeItem('kavach_user_service_no');
+  localStorage.removeItem('kavach_user_id');
+  window.location.href = '../../auth/login.html';
 }

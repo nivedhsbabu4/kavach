@@ -41,10 +41,14 @@ DB = {
             "unit": "14 Rajputana Rifles",
             "branch": "Indian Army",
             "phone": "+91-9876543210",
+            "email": "arjun.verma@afms.nic.in",
+            "address": "Vill: Khetri, Dist: Jhunjhunu, Rajasthan - 333503",
             "emergency_contact": "Sunita Verma (Wife) - +91-9876543211",
             "blood_group": "O+",
             "allergies": "Penicillin",
-            "enlistment_date": "2018-04-10"
+            "enlistment_date": "2018-04-10",
+            "lock_enabled": True,
+            "pin": "1234"
         },
         {
             "id": "usr-doctor-1",
@@ -394,6 +398,61 @@ DB = {
             "details": "Counselor accessed confidential mental health notes following rising PHQ-9 alert",
             "ip_address": "10.14.9.12"
         }
+    ],
+
+    "notifications": [
+        {
+            "id": "notif-001",
+            "recipient_id": "usr-soldier-1",
+            "recipient_role": "SOLDIER",
+            "sender_name": "Capt. Dr. Priya Nair, AMC",
+            "sender_role": "DOCTOR",
+            "type": "REHAB_MISSED",
+            "title": "Knee Mobility Session #14 Missed",
+            "message": "Session #14 Knee Rehab was flagged as missed yesterday. Please complete your exercises to maintain joint flexion and prevent arthrofibrosis.",
+            "created_at": "2026-11-22T14:30:00Z",
+            "is_read": False,
+            "priority": "HIGH"
+        },
+        {
+            "id": "notif-002",
+            "recipient_id": "usr-soldier-1",
+            "recipient_role": "SOLDIER",
+            "sender_name": "Dr. Sunita Rao (AFMS)",
+            "sender_role": "COUNSELOR",
+            "type": "STRESS_NUDGE",
+            "title": "PHQ-9 Score Trend Alert",
+            "message": "Your stress scores have climbed 3 weeks in a row. A confidential counselor is one tap away for support.",
+            "created_at": "2026-11-21T09:15:00Z",
+            "is_read": False,
+            "priority": "MEDIUM"
+        },
+        {
+            "id": "notif-003",
+            "recipient_id": "usr-doctor-1",
+            "recipient_role": "DOCTOR",
+            "sender_name": "Kavach Rehab Monitor",
+            "sender_role": "SYSTEM",
+            "type": "REHAB_MISSED_ALERT",
+            "title": "Rifleman Arjun Verma Missed Session #14",
+            "message": "Patient missed scheduled knee session yesterday. Adherence reminder recommended.",
+            "created_at": "2026-11-22T14:30:00Z",
+            "is_read": False,
+            "priority": "HIGH"
+        },
+        {
+            "id": "notif-004",
+            "recipient_id": "usr-physio-1",
+            "recipient_role": "PHYSIOTHERAPIST",
+            "sender_name": "Kavach Adherence Engine",
+            "sender_role": "SYSTEM",
+            "type": "REHAB_MISSED_ALERT",
+            "title": "Rfn. Arjun Verma Missed Wall Squats",
+            "message": "Session #14 incomplete. Knee flexion arc adherence requires follow-up.",
+            "created_at": "2026-11-22T14:30:00Z",
+            "is_read": False,
+            "priority": "HIGH"
+        }
     ]
 }
 
@@ -460,6 +519,9 @@ class KavachRequestHandler(http.server.SimpleHTTPRequestHandler):
             token = auth_header[7:]
             decoded = verify_jwt(token)
             if decoded:
+                live = next((usr for usr in DB['users'] if usr['id'] == decoded.get('id') or usr['service_no'] == decoded.get('service_no')), None)
+                if live:
+                    return live
                 return decoded
         query = urllib.parse.urlparse(self.path).query
         params = urllib.parse.parse_qs(query)
@@ -480,16 +542,30 @@ class KavachRequestHandler(http.server.SimpleHTTPRequestHandler):
         path = parsed.path
         params = urllib.parse.parse_qs(parsed.query)
 
-        # 1. API: Current user
-        if path == '/api/users/me':
+        # 1. API: Current user profile
+        if path in ('/api/users/me', '/api/users/profile'):
             user = self.get_auth_user()
             return self.send_json(200, user)
+
+        # 1.1 API: Notifications for current user / role
+        elif path == '/api/notifications':
+            user = self.get_auth_user()
+            user_id = user.get('id')
+            role = user.get('role')
+            notifs = [
+                n for n in DB.get('notifications', [])
+                if n.get('recipient_id') in (user_id, 'ALL') or n.get('recipient_role') in (role, 'ALL')
+            ]
+            return self.send_json(200, notifs)
 
         # 2. API: Records with strict RBAC rules
         elif path == '/api/records':
             user = self.get_auth_user()
             role = user.get('role', 'SOLDIER')
-            soldier_id = params.get('soldier_id', ['usr-soldier-1'])[0]
+            if role == 'SOLDIER':
+                soldier_id = user['id']
+            else:
+                soldier_id = params.get('soldier_id', ['usr-soldier-1'])[0]
             requested_type = params.get('type', [None])[0]
 
             # RULE: Soldier
@@ -557,19 +633,41 @@ class KavachRequestHandler(http.server.SimpleHTTPRequestHandler):
 
         # 3. API: Screenings (PCL-5, PHQ-9, GAD-7)
         elif path == '/api/screenings':
-            soldier_id = params.get('soldier_id', ['usr-soldier-1'])[0]
+            user = self.get_auth_user()
+            soldier_id = user['id'] if user.get('role') == 'SOLDIER' else params.get('soldier_id', ['usr-soldier-1'])[0]
             res = [s for s in DB['screenings'] if s['soldier_id'] == soldier_id]
             return self.send_json(200, res)
 
         # 4. API: Rehab
         elif path == '/api/rehab':
-            soldier_id = params.get('soldier_id', ['usr-soldier-1'])[0]
-            plan = next((p for p in DB['rehab_plans'] if p['soldier_id'] == soldier_id), {})
-            return self.send_json(200, plan)
+            user = self.get_auth_user()
+            soldier_id = user['id'] if user.get('role') == 'SOLDIER' else params.get('soldier_id', ['usr-soldier-1'])[0]
+            plan = next((p for p in DB['rehab_plans'] if p['soldier_id'] == soldier_id), None)
+            if not plan and user.get('role') == 'SOLDIER':
+                plan = {
+                    "id": f"rhb-{user['id']}",
+                    "soldier_id": user['id'],
+                    "title": "Musculoskeletal Conditioning & Mobility Protocol",
+                    "diagnosed_by": "Capt. Dr. Priya Nair, AMC",
+                    "pain_location": "No Active Joint Injury Reported",
+                    "pain_type": "Standard Routine Conditioning",
+                    "since_when": "Enlistment",
+                    "pain_severity": "Mild",
+                    "completed_sessions": 0,
+                    "total_sessions": 10,
+                    "exercises": [
+                        { "id": "ex-01", "name": "Core Stability & Lumbar Plank", "reps": "3 sets x 30 sec", "completed": False },
+                        { "id": "ex-02", "name": "Quadriceps & Hamstring Conditioning", "reps": "3 sets x 12 reps", "completed": False },
+                        { "id": "ex-03", "name": "Shoulder Scapular Retraction", "reps": "3 sets x 15 reps", "completed": False }
+                    ]
+                }
+                DB['rehab_plans'].append(plan)
+            return self.send_json(200, plan or {})
 
         # 5. API: Access Grants
         elif path == '/api/access-grants':
-            soldier_id = params.get('soldier_id', ['usr-soldier-1'])[0]
+            user = self.get_auth_user()
+            soldier_id = user['id'] if user.get('role') == 'SOLDIER' else params.get('soldier_id', ['usr-soldier-1'])[0]
             grants = [g for g in DB['access_grants'] if g['soldier_id'] == soldier_id]
             return self.send_json(200, grants)
 
@@ -579,13 +677,15 @@ class KavachRequestHandler(http.server.SimpleHTTPRequestHandler):
 
         # 8. API: Claims Progress Tracker
         elif path == '/api/claims':
-            soldier_id = params.get('soldier_id', ['usr-soldier-1'])[0]
+            user = self.get_auth_user()
+            soldier_id = user['id'] if user.get('role') == 'SOLDIER' else params.get('soldier_id', ['usr-soldier-1'])[0]
             claims = [c for c in DB.get('claims', []) if c['soldier_id'] == soldier_id]
             return self.send_json(200, claims)
 
         # 9. API: Consultations
         elif path == '/api/consultations':
-            soldier_id = params.get('soldier_id', ['usr-soldier-1'])[0]
+            user = self.get_auth_user()
+            soldier_id = user['id'] if user.get('role') == 'SOLDIER' else params.get('soldier_id', ['usr-soldier-1'])[0]
             res = [c for c in DB.get('consultations', []) if c['soldier_id'] == soldier_id]
             return self.send_json(200, res)
 
@@ -664,11 +764,55 @@ class KavachRequestHandler(http.server.SimpleHTTPRequestHandler):
                 "unit": unit,
                 "branch": branch,
                 "blood_group": blood,
-                "allergies": "None",
-                "phone": "+91-9876540000",
-                "emergency_contact": "Emergency Next of Kin"
+                "allergies": payload.get('allergies', "None Reported"),
+                "phone": payload.get('phone', "+91-9876540000"),
+                "email": payload.get('email', f"{service_no.lower()}@kavach.afms.in"),
+                "address": payload.get('address', f"Station HQ, {posting}"),
+                "emergency_contact": payload.get('emergency_contact', "Next of Kin - Family Contact"),
+                "lock_enabled": False,
+                "pin": "1234",
+                "enlistment_date": datetime.date.today().isoformat()
             }
             DB['users'].append(new_user)
+
+            # If new registered user is a Soldier, initialize their personal wallet
+            if role == 'SOLDIER':
+                induction_rec = {
+                    "id": f"rec-ind-{int(time.time()*1000)}",
+                    "soldier_id": new_user['id'],
+                    "doctor_id": "usr-doctor-1",
+                    "type": "PRESCRIPTION",
+                    "title": "Service Enlistment Medical Fitness Examination",
+                    "date": datetime.date.today().isoformat(),
+                    "posting": posting,
+                    "doctor_name": "Capt. Dr. Priya Nair, AMC",
+                    "hospital": "Station Health Organization",
+                    "diagnosis": f"Initial military medical fitness examination completed. Classified SHAPE-1. Immunizations current. Enrolled in Kavach Health Tracker.",
+                    "file_url": "records/enlistment_fitness_certificate.pdf",
+                    "is_mental_health": False,
+                    "encrypted_data": None,
+                    "version": 1,
+                    "created_at": datetime.datetime.now(datetime.timezone.utc).isoformat()
+                }
+                induction_rec["tamper_hash"] = generate_tamper_hash(induction_rec)
+                DB['records'].insert(0, induction_rec)
+
+                # Initialize sovereign access grant
+                new_grant = {
+                    "id": f"grant-{int(time.time()*1000)}",
+                    "soldier_id": new_user['id'],
+                    "record_id": None,
+                    "granted_to_user": "usr-doctor-1",
+                    "granted_to_role": "DOCTOR",
+                    "granted_by": new_user['id'],
+                    "purpose": "Clinical Consultation & General Care",
+                    "expiry_date": (datetime.date.today() + datetime.timedelta(days=90)).isoformat(),
+                    "status": "ACTIVE",
+                    "visits_count": 0,
+                    "last_accessed": "Never",
+                    "created_at": datetime.datetime.now(datetime.timezone.utc).isoformat()
+                }
+                DB['access_grants'].insert(0, new_grant)
 
             token = make_jwt({
                 "id": new_user['id'],
@@ -686,7 +830,7 @@ class KavachRequestHandler(http.server.SimpleHTTPRequestHandler):
         # 3. Add New Record (Append-Only)
         elif path == '/api/records':
             user = self.get_auth_user()
-            soldier_id = payload.get('soldier_id', 'usr-soldier-1')
+            soldier_id = user['id'] if user.get('role') == 'SOLDIER' else payload.get('soldier_id', 'usr-soldier-1')
             rec_type = payload.get('type', 'GENERAL')
             title = payload.get('title', 'Clinical Note')
             diagnosis = payload.get('diagnosis', '')
@@ -722,7 +866,7 @@ class KavachRequestHandler(http.server.SimpleHTTPRequestHandler):
         # 4. Stress Screening Check-in
         elif path == '/api/screenings':
             user = self.get_auth_user()
-            soldier_id = 'usr-soldier-1'
+            soldier_id = user['id'] if user.get('role') == 'SOLDIER' else payload.get('soldier_id', 'usr-soldier-1')
             q_type = payload.get('questionnaire_type', 'PHQ-9')
             score = int(payload.get('score', 0))
             max_score = int(payload.get('max_score', 27))
@@ -758,7 +902,7 @@ class KavachRequestHandler(http.server.SimpleHTTPRequestHandler):
         # 5. Rehab Session Check-off
         elif path == '/api/rehab/session':
             user = self.get_auth_user()
-            soldier_id = payload.get('soldier_id', 'usr-soldier-1')
+            soldier_id = user['id'] if user.get('role') == 'SOLDIER' else payload.get('soldier_id', 'usr-soldier-1')
             plan = next((p for p in DB['rehab_plans'] if p['soldier_id'] == soldier_id), None)
             if not plan:
                 return self.send_json(404, {"error": "Rehab plan not found"})
@@ -796,7 +940,7 @@ class KavachRequestHandler(http.server.SimpleHTTPRequestHandler):
         # 7. Grant Time-Stamped Access
         elif path == '/api/access-grants':
             user = self.get_auth_user()
-            soldier_id = 'usr-soldier-1'
+            soldier_id = user['id'] if user.get('role') == 'SOLDIER' else payload.get('soldier_id', 'usr-soldier-1')
             role_to = payload.get('granted_to_role', 'DOCTOR')
             duration = payload.get('duration', '30_DAYS')
             purpose = payload.get('purpose', 'General Medical Follow-up')
@@ -849,7 +993,8 @@ class KavachRequestHandler(http.server.SimpleHTTPRequestHandler):
         # 9. Update Bank Account for Disability Pension / ECHS Reimbursement
         elif path == '/api/users/bank-account':
             user = self.get_auth_user()
-            soldier = next((u for u in DB['users'] if u['id'] == 'usr-soldier-1'), None)
+            soldier_id = user['id'] if user.get('role') == 'SOLDIER' else 'usr-soldier-1'
+            soldier = next((u for u in DB['users'] if u['id'] == soldier_id), None)
             if soldier:
                 soldier['bank_account'] = {
                     "bank_name": payload.get('bank_name', 'State Bank of India'),
@@ -859,9 +1004,9 @@ class KavachRequestHandler(http.server.SimpleHTTPRequestHandler):
                     "account_holder": payload.get('account_holder', soldier['name']),
                     "dsp_tag": payload.get('dsp_tag', 'Defence Salary Package (DSP) - Gold')
                 }
-            log_audit(user['id'], user['role'], 'usr-soldier-1', 'UPDATE_BANK_ACCOUNT', 'SUCCESS',
+            log_audit(user['id'], user['role'], soldier_id, 'UPDATE_BANK_ACCOUNT', 'SUCCESS',
                       "Updated verified bank disbursement account for disability pension")
-            return self.send_json(200, soldier.get('bank_account', {}))
+            return self.send_json(200, soldier.get('bank_account', {}) if soldier else {})
 
         # 10. Change Password / Military PIN
         elif path == '/api/users/password':
@@ -877,7 +1022,7 @@ class KavachRequestHandler(http.server.SimpleHTTPRequestHandler):
         # 11. Book Teleconsultation (Branch, Hospital, Specialty, Doctor, Date, Slot, Reason)
         elif path == '/api/consultations':
             user = self.get_auth_user()
-            soldier_id = payload.get('soldier_id', 'usr-soldier-1')
+            soldier_id = user['id'] if user.get('role') == 'SOLDIER' else payload.get('soldier_id', 'usr-soldier-1')
             branch = payload.get('branch', 'Indian Army')
             hospital = payload.get('hospital', 'Base Hospital, Delhi Cantt')
             specialty = payload.get('specialty', 'Orthopedics')
@@ -934,14 +1079,180 @@ class KavachRequestHandler(http.server.SimpleHTTPRequestHandler):
 
             return self.send_json(201, {"consultation": consult, "record": rec})
 
+        # 12. Update User Profile Details
+        elif path == '/api/users/profile':
+            user = self.get_auth_user()
+            u = next((usr for usr in DB['users'] if usr['id'] == user['id']), None)
+            if not u:
+                return self.send_json(404, {"error": "User profile not found"})
+
+            for field in ['name', 'rank', 'unit', 'posting', 'branch', 'blood_group', 'phone', 'email', 'address', 'emergency_contact', 'allergies', 'lock_enabled', 'pin']:
+                if field in payload:
+                    u[field] = payload[field]
+
+            log_audit(user['id'], user['role'], user['id'], 'UPDATE_PROFILE', 'SUCCESS',
+                      f"User updated personal soldier profile ({u['name']})")
+            return self.send_json(200, u)
+
+        # 13. Dispatch Real-time Notification
+        elif path == '/api/notifications':
+            user = self.get_auth_user()
+            recipient_id = payload.get('recipient_id', 'usr-soldier-1')
+            recipient_role = payload.get('recipient_role', 'SOLDIER')
+            title = payload.get('title', 'Military Notification')
+            message = payload.get('message', '')
+            n_type = payload.get('type', 'GENERAL_ALERT')
+            priority = payload.get('priority', 'HIGH')
+
+            notif = {
+                "id": f"notif-{int(time.time()*1000)}",
+                "recipient_id": recipient_id,
+                "recipient_role": recipient_role,
+                "sender_name": user.get('name', 'Medical Officer'),
+                "sender_role": user.get('role', 'DOCTOR'),
+                "type": n_type,
+                "title": title,
+                "message": message,
+                "created_at": datetime.datetime.now(datetime.timezone.utc).isoformat(),
+                "is_read": False,
+                "priority": priority
+            }
+            DB.setdefault('notifications', []).insert(0, notif)
+            log_audit(user['id'], user['role'], recipient_id, 'DISPATCH_NOTIFICATION', 'SUCCESS',
+                      f"Dispatched {priority} notification '{title}' to {recipient_role}")
+            return self.send_json(201, notif)
+
+        # 14. Mark Notification as Read
+        elif path == '/api/notifications/mark-read':
+            user = self.get_auth_user()
+            notif_id = payload.get('id', 'ALL')
+            for n in DB.get('notifications', []):
+                if notif_id == 'ALL' or n['id'] == notif_id:
+                    n['is_read'] = True
+            return self.send_json(200, {"message": "Notifications marked as read"})
+
+        # 15. Add Exercise to Rehab Regimen (Doctor / Physio)
+        elif path == '/api/rehab/exercise':
+            user = self.get_auth_user()
+            soldier_id = payload.get('soldier_id', 'usr-soldier-1')
+            plan = next((p for p in DB['rehab_plans'] if p['soldier_id'] == soldier_id), None)
+            if not plan:
+                return self.send_json(404, {"error": "Rehab plan not found"})
+
+            name = payload.get('name') or payload.get('exercise') or 'New Prescribed Rehab Exercise'
+            reps = payload.get('reps') or payload.get('schedule') or '3 sets x 12 reps'
+            ex = {
+                "id": f"ex-{int(time.time()*1000)}",
+                "name": name,
+                "reps": reps,
+                "completed": False
+            }
+            plan.setdefault('exercises', []).append(ex)
+            log_audit(user['id'], user['role'], soldier_id, 'ADD_EXERCISE', 'SUCCESS',
+                      f"{user.get('name')} added rehab exercise: {name}")
+            return self.send_json(201, {"exercise": ex, "plan": plan})
+
+        # 16. Record Confidential Psychological Intervention (Counselor)
+        elif path == '/api/counselor/notes':
+            user = self.get_auth_user()
+            soldier_id = payload.get('soldier_id', 'usr-soldier-1')
+            title = payload.get('title', 'Confidential Psychological Consultation')
+            session_notes = payload.get('notes', 'CBT intervention conducted.')
+            technique = payload.get('cbt_technique', 'Cognitive Restructuring & Grounding')
+            risk = payload.get('risk_level', 'Moderate')
+
+            rec_id = f"rec-cbt-{int(time.time()*1000)}"
+            diag = f"Confidential Clinical Counseling: {title}. Technique: {technique}. Clinical Assessment: {session_notes}. Assessed Risk Level: {risk}. Directives: Breathing biofeedback exercises."
+            rec = {
+                "id": rec_id,
+                "soldier_id": soldier_id,
+                "doctor_id": user.get('id', 'usr-counselor-1'),
+                "type": "MENTAL_HEALTH",
+                "title": title,
+                "date": datetime.date.today().isoformat(),
+                "posting": user.get('posting', 'Command Hospital AFMS'),
+                "doctor_name": user.get('name', 'Dr. Sunita Rao'),
+                "hospital": "Command Hospital (Central), AFMS",
+                "diagnosis": diag,
+                "file_url": "records/confidential_counseling_sealed.pdf",
+                "is_mental_health": True,
+                "encrypted_data": f"AES-256-GCM::{int(time.time())}::CIPHERTEXT_SEALED",
+                "version": 1,
+                "created_at": datetime.datetime.now(datetime.timezone.utc).isoformat()
+            }
+            rec["tamper_hash"] = generate_tamper_hash(rec)
+            DB['records'].insert(0, rec)
+
+            log_audit(user['id'], user['role'], soldier_id, 'LOG_COUNSELING_NOTE', 'SUCCESS',
+                      f"Recorded AES-256 encrypted psychological intervention #{rec_id}",
+                      record_id=rec_id)
+            return self.send_json(201, {"record": rec})
+
+        # 17. Toggle / Revoke Access Grant (Claims Officer & Soldier)
+        elif path == '/api/access-grants/toggle':
+            user = self.get_auth_user()
+            grant_id = payload.get('grant_id')
+            role = payload.get('role', 'CLAIMS_OFFICER')
+            soldier_id = payload.get('soldier_id', 'usr-soldier-1')
+
+            grant = next((g for g in DB['access_grants'] if g['id'] == grant_id or (grant_id is None and g['soldier_id'] == soldier_id and g['granted_to_role'] == role)), None)
+            if not grant:
+                grant = {
+                    "id": f"grant-{int(time.time()*1000)}",
+                    "soldier_id": soldier_id,
+                    "record_id": None,
+                    "granted_to_user": user.get('id', 'usr-claims-1'),
+                    "granted_to_role": role,
+                    "granted_by": soldier_id,
+                    "purpose": "ECHS Disability Adjudication & Physical Injury Proof Verification",
+                    "expiry_date": (datetime.date.today() + datetime.timedelta(days=90)).isoformat(),
+                    "status": "ACTIVE",
+                    "visits_count": 1,
+                    "last_accessed": datetime.datetime.now().strftime("%d %b %Y %H:%M"),
+                    "created_at": datetime.datetime.now(datetime.timezone.utc).isoformat()
+                }
+                DB['access_grants'].insert(0, grant)
+                log_audit(user['id'], user['role'], soldier_id, 'GRANT_CREATED', 'SUCCESS', f"Access grant created for {role}")
+                return self.send_json(201, {"grant": grant, "status": "ACTIVE"})
+
+            new_status = 'REVOKED' if grant['status'] == 'ACTIVE' else 'ACTIVE'
+            grant['status'] = new_status
+            grant['last_accessed'] = datetime.datetime.now().strftime("%d %b %Y %H:%M")
+            grant['visits_count'] = grant.get('visits_count', 0) + 1
+            log_audit(user['id'], user['role'], grant['soldier_id'], 'TOGGLE_GRANT', 'SUCCESS',
+                      f"Access grant status switched to {new_status} for {grant['granted_to_role']}")
+            return self.send_json(200, {"grant": grant, "status": new_status})
+
         return self.send_json(404, {"error": "Endpoint not found"})
 
 
     def do_PUT(self):
-        # Update existing record (only authoring doctor can edit)
         parsed = urllib.parse.urlparse(self.path)
         path = parsed.path
-        if path.startswith('/api/records/'):
+        length = int(self.headers.get('Content-Length', 0))
+        body = self.rfile.read(length).decode('utf-8') if length > 0 else '{}'
+        try:
+            payload = json.loads(body)
+        except Exception:
+            payload = {}
+
+        # Update User Profile via PUT
+        if path == '/api/users/profile':
+            user = self.get_auth_user()
+            u = next((usr for usr in DB['users'] if usr['id'] == user['id']), None)
+            if not u:
+                return self.send_json(404, {"error": "User profile not found"})
+
+            for field in ['name', 'rank', 'unit', 'posting', 'branch', 'blood_group', 'phone', 'email', 'address', 'emergency_contact', 'allergies', 'lock_enabled', 'pin']:
+                if field in payload:
+                    u[field] = payload[field]
+
+            log_audit(user['id'], user['role'], user['id'], 'UPDATE_PROFILE', 'SUCCESS',
+                      f"User updated personal soldier profile ({u['name']})")
+            return self.send_json(200, u)
+
+        # Update existing record (only authoring doctor can edit)
+        elif path.startswith('/api/records/'):
             rec_id = path.replace('/api/records/', '')
             length = int(self.headers.get('Content-Length', 0))
             body = self.rfile.read(length).decode('utf-8') if length > 0 else '{}'

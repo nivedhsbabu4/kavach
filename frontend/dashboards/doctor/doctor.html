@@ -17,7 +17,6 @@
       <span style="font-weight: 800;">🩺 ARMY MEDICAL CORPS (AMC) &bull; CLINICAL OFFICER CONSOLE</span>
       <span style="font-size: 0.75rem; color: var(--gold-light);">BASE HOSPITAL DELHI CANTT</span>
     </div>
-    <button class="btn-logout" onclick="logoutUser()">LOGOUT</button>
   </aside>
 
   <!-- Header -->
@@ -91,6 +90,9 @@
     </div>
   </header>
 
+  <!-- Inline Toast Container (No Browser Alerts!) -->
+  <div id="toastContainer" style="position: fixed; top: 20px; right: 20px; z-index: 9999; display: flex; flex-direction: column; gap: 10px;"></div>
+
   <div class="dashboard-layout">
     <main class="main-content" style="padding: 24px;">
       <!-- Prominent Missed Rehab Session Alert Banner -->
@@ -160,8 +162,13 @@
               Tamper-proof records &bull; Once entered, records CANNOT be deleted &bull; Only the original authoring doctor can edit
             </div>
           </div>
-          <div class="role-tag-badge" style="background: #fef2f2; color: #991b1b; border-color: #fca5a5;">
-            🔒 Mental Health Notes Barred
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <button class="btn-outline" onclick="window.print()" style="font-size: 0.78rem; padding: 6px 12px;">
+              🖨️ Print Clinical Dossier
+            </button>
+            <div class="role-tag-badge" style="background: #fef2f2; color: #991b1b; border-color: #fca5a5;">
+              🔒 Mental Health Notes Barred
+            </div>
           </div>
         </div>
 

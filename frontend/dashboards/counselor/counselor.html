@@ -16,7 +16,6 @@
       <span style="font-weight: 800;">🧠 DEFENCE PSYCHOLOGICAL SUPPORT CELL &bull; AFMS COUNSELOR CONSOLE</span>
       <span style="font-size: 0.75rem; color: var(--gold-light);">COMMAND HOSPITAL (CENTRAL)</span>
     </div>
-    <button class="btn-logout" onclick="logoutUser()">LOGOUT</button>
   </aside>
 
   <header class="app-header">
@@ -121,7 +120,7 @@
         </div>
 
         <div style="display: flex; justify-content: flex-end;">
-          <button class="btn-primary" onclick="alert('Clinical progress note encrypted with AES-256 and appended to confidential psychological vault.')">
+          <button class="btn-primary" onclick="openConfidentialSessionModal('usr-soldier-1')">
             ✚ Add Confidential Therapy Note
           </button>
         </div>
@@ -129,9 +128,108 @@
     </main>
   </div>
 
+  <!-- Inline Toast Container -->
+  <div id="toastContainer" style="position: fixed; top: 20px; right: 20px; z-index: 9999; display: flex; flex-direction: column; gap: 10px;"></div>
+
   <script>
+    function showToast(message, type = 'success') {
+      const container = document.getElementById('toastContainer');
+      if (!container) return;
+      const toast = document.createElement('div');
+      toast.style.background = type === 'success' ? '#701a75' : (type === 'warn' ? '#92400e' : '#991b1b');
+      toast.style.color = '#ffffff';
+      toast.style.padding = '12px 18px';
+      toast.style.borderRadius = '10px';
+      toast.style.fontSize = '0.84rem';
+      toast.style.fontWeight = '700';
+      toast.style.boxShadow = '0 6px 20px rgba(0,0,0,0.3)';
+      toast.style.display = 'flex';
+      toast.style.alignItems = 'center';
+      toast.style.gap = '10px';
+      toast.style.animation = 'fadeIn 0.25s ease';
+      toast.innerHTML = `<span>${type === 'success' ? '✓' : '⚠️'}</span> <span>${message}</span>`;
+      container.appendChild(toast);
+      setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.transition = 'opacity 0.4s ease';
+        setTimeout(() => toast.remove(), 400);
+      }, 3500);
+    }
+
     function openConfidentialSessionModal(soldierId) {
-      alert('🔒 Opening End-to-End Encrypted Tele-Psychology Room with Rifleman Arjun Verma...\nSession is completely unmonitored by unit commanding officers.');
+      const modal = document.createElement('div');
+      modal.className = 'privacy-curtain active';
+      modal.id = 'cbtModal';
+      modal.style.background = 'rgba(0,0,0,0.75)';
+      modal.innerHTML = `
+        <div style="background: var(--bg-card); border-radius: 12px; max-width: 520px; width: 92%; padding: 24px; color: var(--text-main); border: 2px solid #a21caf; text-align: left;" onclick="event.stopPropagation()">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+            <h3 style="font-size: 1.15rem; font-weight: 800; color: #86198f;">🔒 Record Confidential CBT Intervention</h3>
+            <span style="font-size: 0.72rem; background: #fdf4ff; color: #86198f; border: 1px solid #f5d0fe; padding: 2px 8px; border-radius: 4px; font-weight: 800;">AES-256 VAULT</span>
+          </div>
+          <div style="font-size: 0.78rem; color: var(--text-muted); margin-bottom: 14px;">
+            This clinical entry is encrypted with AES-256-GCM. <strong>Strictly invisible</strong> to Unit Commanders and Claims Officers.
+          </div>
+
+          <div style="margin-bottom: 12px;">
+            <label style="display: block; font-size: 0.8rem; font-weight: 700; margin-bottom: 4px;">Session Title:</label>
+            <input type="text" id="cbtTitle" value="CBT Session #3: High-Altitude Snow Patrol Flashbacks" style="width: 100%; padding: 8px; border-radius: 6px; border: 1px solid var(--border-color); font-weight: 600;" />
+          </div>
+
+          <div style="margin-bottom: 12px;">
+            <label style="display: block; font-size: 0.8rem; font-weight: 700; margin-bottom: 4px;">Therapeutic Technique:</label>
+            <select id="cbtTech" style="width: 100%; padding: 8px; border-radius: 6px; border: 1px solid var(--border-color); font-weight: 600;">
+              <option value="Cognitive Restructuring & Trauma Grounding">Cognitive Restructuring & Trauma Grounding</option>
+              <option value="Prolonged Exposure (PE) Desensitization">Prolonged Exposure (PE) Desensitization</option>
+              <option value="Somatic Grounding & Controlled Breathing (4-7-8)">Somatic Grounding & Controlled Breathing (4-7-8)</option>
+              <option value="Behavioral Activation & Sleep Hygiene Protocol">Behavioral Activation & Sleep Hygiene Protocol</option>
+            </select>
+          </div>
+
+          <div style="margin-bottom: 12px;">
+            <label style="display: block; font-size: 0.8rem; font-weight: 700; margin-bottom: 4px;">Clinical Notes &amp; Patient Directives:</label>
+            <textarea id="cbtNotes" rows="3" style="width: 100%; padding: 8px; border-radius: 6px; border: 1px solid var(--border-color);" placeholder="Patient reports decreased intrusive memories of snow scree incident...">Patient responded positively to grounding cues. Night awakenings reduced from 4/night to 2/night. Prescribed audio relaxation drills via Kavach app.</textarea>
+          </div>
+
+          <div style="margin-bottom: 16px;">
+            <label style="display: block; font-size: 0.8rem; font-weight: 700; margin-bottom: 4px;">Assessed Risk Level:</label>
+            <select id="cbtRisk" style="width: 100%; padding: 8px; border-radius: 6px; border: 1px solid var(--border-color); font-weight: 600;">
+              <option value="Low">Low - Well stabilized with protective factors</option>
+              <option value="Moderate" selected>Moderate - Elevating PHQ-9, no self-harm ideation</option>
+              <option value="High">High - Requires scheduled bi-weekly check-ins</option>
+            </select>
+          </div>
+
+          <div style="display: flex; justify-content: flex-end; gap: 10px;">
+            <button class="btn-outline" onclick="document.getElementById('cbtModal').remove()">Cancel</button>
+            <button class="btn-primary" style="background: #a21caf;" onclick="submitConfidentialNote('${soldierId}')">Sign &amp; Encrypt Note →</button>
+          </div>
+        </div>
+      `;
+      document.body.appendChild(modal);
+    }
+
+    async function submitConfidentialNote(soldierId) {
+      const title = document.getElementById('cbtTitle').value.trim();
+      const cbt_technique = document.getElementById('cbtTech').value;
+      const notes = document.getElementById('cbtNotes').value.trim();
+      const risk_level = document.getElementById('cbtRisk').value;
+
+      try {
+        const headers = getAuthHeaders();
+        const res = await fetch('/api/counselor/notes', {
+          method: 'POST',
+          headers,
+          body: JSON.stringify({ soldier_id: soldierId, title, cbt_technique, notes, risk_level })
+        });
+
+        if (res.ok) {
+          document.getElementById('cbtModal').remove();
+          showToast('✓ Confidential Note cryptographically sealed with AES-256 and appended to psychological vault!', 'success');
+        }
+      } catch (e) {
+        showToast('Error recording note.', 'warn');
+      }
     }
   </script>
 </body>

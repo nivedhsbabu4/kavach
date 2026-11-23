@@ -202,3 +202,12 @@ async function handleRegisterSubmit(event) {
     }
   }
 }
+
+// On load, display any redirection message stored by the auth guard
+document.addEventListener('DOMContentLoaded', () => {
+  const msg = sessionStorage.getItem('kavach_auth_msg');
+  if (msg) {
+    showAlert(msg, 'error');
+    sessionStorage.removeItem('kavach_auth_msg');
+  }
+});
